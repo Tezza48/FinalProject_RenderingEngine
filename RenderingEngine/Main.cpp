@@ -80,7 +80,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	ComPtr<ID3D12Debug> debugController;
 
 #endif // defined(DEBUG) || defined(_DEBUG)
-	HRESULT hardwareResult = D3D12CreateDevice(nullptr, D3D_FEATURE_LEVEL_11_0, IID_PPV_ARGS)
+	//HRESULT hardwareResult = D3D12CreateDevice(nullptr, D3D_FEATURE_LEVEL_11_0, IID_PPV_ARGS)
 
 	// Set up Message Loop
 	MSG msg;
