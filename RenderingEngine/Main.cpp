@@ -9,6 +9,8 @@
 #include <DirectXMath.h>
 //#include "d3dx12.h"// from 
 
+#include "utils.h"
+
 // dont forget to set Target Platform Version to '10.x' p.xxxiii (Luna)
 #pragma comment(lib, "d3dcompiler.lib")
 #pragma comment(lib, "D3D12.lib")
@@ -78,6 +80,9 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 #if defined(DEBUG) || defined(_DEBUG)
 	// Enable D3D12 debug layer
 	ComPtr<ID3D12Debug> debugController;
+
+	DX::ThrowIfFailed(D3D12GetDebugInterface(IID_PPV_ARGS(&debugController)));
+	debugController->EnableDebugLayer();
 
 #endif // defined(DEBUG) || defined(_DEBUG)
 	//HRESULT hardwareResult = D3D12CreateDevice(nullptr, D3D_FEATURE_LEVEL_11_0, IID_PPV_ARGS)
