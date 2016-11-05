@@ -99,18 +99,16 @@ int D3DApplication::Run()
 {
 	MSG msg = { 0 };
 
-	BOOL bRet = 1;
-	while ((bRet = GetMessage(&msg, 0, 0, 0)) != 0)// While the message isn't WM_QUIT
+	while (msg.message != WM_QUIT)// While the message isn't WM_QUIT
 	{
-		if (bRet == -1)
-		{
-			MessageBox(0, L"GetMessage FAILED", 0, 0);
-			break;
-		}
-		else
+		if (PeekMessage(&msg, 0, 0, 0, PM_REMOVE))
 		{
 			TranslateMessage(&msg);
 			DispatchMessage(&msg);
+		}
+		else// Do Game Loopy Stuff
+		{
+
 		}
 	}
 

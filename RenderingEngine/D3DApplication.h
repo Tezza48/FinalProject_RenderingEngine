@@ -9,7 +9,9 @@ class D3DApplication
 private:
 	HWND mhMainWindow = 0;
 	static D3DApplication *mApp;
+
 	D3DApplication();
+	
 	bool InitWindowsApp(HINSTANCE instanceHandle, int show);
 	bool InitD3D();
 protected:
