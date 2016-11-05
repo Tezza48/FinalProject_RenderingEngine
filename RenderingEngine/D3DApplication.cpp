@@ -24,6 +24,15 @@ LRESULT CALLBACK D3DApplication::WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPA
 	return DefWindowProc(hWnd, msg, wParam, lParam);
 }
 
+bool D3DApplication::Init(HINSTANCE instanceHandle, int show)
+{
+	if (!InitWindowsApp(instanceHandle, show))
+		return false;
+	if (!InitD3D())
+		return false;
+	return true;
+}
+
 D3DApplication::D3DApplication(HINSTANCE hInstance)
 {
 	assert(mApp == nullptr);
@@ -78,6 +87,11 @@ bool D3DApplication::InitWindowsApp(HINSTANCE instanceHandle, int show)
 	ShowWindow(mhMainWindow, show);
 	UpdateWindow(mhMainWindow);
 
+	return true;
+}
+
+bool D3DApplication::InitD3D()
+{
 	return true;
 }
 
