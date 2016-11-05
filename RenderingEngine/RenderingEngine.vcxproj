@@ -142,8 +142,17 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="d3dEnvironment.cpp" />
     <ClCompile Include="Main.cpp" />
   </ItemGroup>
+<<<<<<< HEAD
+=======
+  <ItemGroup>
+    <ClInclude Include="d3dEnvironment.h" />
+    <ClInclude Include="d3dx12.h" />
+    <ClInclude Include="utils.h" />
+  </ItemGroup>
+>>>>>>> refs/remotes/origin/master
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>
