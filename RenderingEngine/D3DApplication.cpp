@@ -31,6 +31,8 @@ bool D3DApplication::Init()
 	if (!InitD3D())
 		return false;
 
+
+
 	return true;
 }
 
@@ -328,6 +330,8 @@ int D3DApplication::Run()
 {
 	MSG msg = { 0 };
 
+	mTimer.Reset();
+
 	while (msg.message != WM_QUIT)// While the message isn't WM_QUIT
 	{
 		if (PeekMessage(&msg, 0, 0, 0, PM_REMOVE))
@@ -337,14 +341,15 @@ int D3DApplication::Run()
 		}
 		else// Do Game Loopy Stuff
 		{
-			Draw(GameTimer());
+			mTimer.Tick();
+			Draw(mTimer);
 		}
 	}
 
 	return (int)msg.wParam;
 }
 
-void D3DApplication::Draw(GameTimer gameTimer)
+void D3DApplication::Draw(const GameTimer &gt)
 {
 	ThrowIfFailed(mDirectCmdListAlloc->Reset());
 	

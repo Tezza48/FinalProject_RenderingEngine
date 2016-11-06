@@ -31,6 +31,8 @@ protected:
 	bool m4xMsaaState = false;
 	UINT m4xMsaaQuality = 4;
 
+	GameTimer mTimer;
+
 	ComPtr<IDXGIFactory4> mdxgiFactory;
 	ComPtr<IDXGISwapChain> mSwapChain;
 	ComPtr<ID3D12Device> md3dDevice;
@@ -61,7 +63,7 @@ protected:
 	bool InitWindowsApp();
 	bool InitD3D();
 
-	void Draw(GameTimer);
+	virtual void Draw(const GameTimer &);
 
 	void CreateCommandObjects();
 	void CreateSwapChain();
@@ -81,6 +83,13 @@ protected:
 
 	int mClientWidth = 800, mClientHeight = 600;
 
+	Vertex mTriVertBuffer[] =
+	{
+		MakeVert(XMFLOAT3(0, 1.0, 1.0), XMFLOAT4(1, 0, 0, 1)),
+		MakeVert(XMFLOAT3(1.0, -1.0, 1.0), XMFLOAT4(0, 1, 0, 1)),
+		MakeVert(XMFLOAT3(-1.0, -1.0, 1.0), XMFLOAT4(0, 0, 1, 1))
+	};
+	
 public:
 
 	static D3DApplication *getApp();
