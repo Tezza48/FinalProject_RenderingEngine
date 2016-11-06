@@ -7,6 +7,7 @@
 #include <dxgi1_4.h>
 #include <DirectXColors.h>
 #include "d3dx12.h"
+#include "GameTimer.h"
 #include "utils.h"
 
 // dont forget to set Target Platform Version to '10.x' p.xxxiii (Luna)
@@ -16,6 +17,7 @@
 
 using namespace Microsoft::WRL;
 using namespace DirectX;
+using namespace DX;
 
 // Handles all DirectX specific stuff
 class D3DApplication
@@ -58,9 +60,15 @@ private:
 	bool InitWindowsApp(HINSTANCE instanceHandle, int show);
 	bool InitD3D();
 
+	void Draw(GameTimer);
+
 	void CreateCommandObjects();
 	void CreateSwapChain();
 	void CreateRtvAndDsvDesvriptorHeaps();
+
+	ID3D12Resource *GetCurrBackBuffer();
+
+	UINT mCurrFence = 0;
 
 	void FlushCommandQueue();
 
