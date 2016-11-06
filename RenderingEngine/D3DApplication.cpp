@@ -31,15 +31,6 @@ bool D3DApplication::Init(HINSTANCE instanceHandle, int show)
 	if (!InitD3D())
 		return false;
 
-	mScreenViewport.TopLeftX = 0.0f;
-	mScreenViewport.TopLeftY = 0.0f;
-	mScreenViewport.Width = static_cast<float>(mClientWidth);
-	mScreenViewport.Height = static_cast<float>(mClientHeight);
-	mScreenViewport.MinDepth = 0.0f;
-	mScreenViewport.MaxDepth = 1.0f;
-
-	mScissorRect = { 0, 0, mClientWidth, mClientHeight };
-
 	return true;
 }
 
@@ -106,13 +97,13 @@ bool D3DApplication::InitD3D()
 	#if defined(DEBUG) || defined (_DEBUG)// Enable Debug Layer
 	{
 		ComPtr<ID3D12Debug> debugController;
-		DX::ThrowIfFailed(D3D12GetDebugInterface(IID_PPV_ARGS(&debugController)));
+		ThrowIfFailed(D3D12GetDebugInterface(IID_PPV_ARGS(&debugController)));
 		debugController->EnableDebugLayer();
 	}
 	#endif
 
 	// Create Hardware Device
-	DX::ThrowIfFailed(CreateDXGIFactory1(IID_PPV_ARGS(&mdxgiFactory)));
+	ThrowIfFailed(CreateDXGIFactory1(IID_PPV_ARGS(&mdxgiFactory)));
 
 	HRESULT hardwareResult = D3D12CreateDevice(
 		nullptr,
@@ -123,24 +114,22 @@ bool D3DApplication::InitD3D()
 	if (FAILED(hardwareResult))
 	{
 		ComPtr<IDXGIAdapter> pWarpAdapter;
-		DX::ThrowIfFailed(mdxgiFactory->EnumWarpAdapter(
+		ThrowIfFailed(mdxgiFactory->EnumWarpAdapter(
 			IID_PPV_ARGS(&pWarpAdapter)));
 
-		DX::ThrowIfFailed(D3D12CreateDevice(
+		ThrowIfFailed(D3D12CreateDevice(
 			pWarpAdapter.Get(),
 			D3D_FEATURE_LEVEL_11_0,
 			IID_PPV_ARGS(&md3dDevice)));
 	}
 
-	// Crate Fence & Descriptor Sizes
-	DX::ThrowIfFailed(md3dDevice->CreateFence(
-		0, D3D12_FENCE_FLAG_NONE, IID_PPV_ARGS(&mFence)));
-	mRtvDescriptorSize = md3dDevice->GetDescriptorHandleIncrementSize(
-		D3D12_DESCRIPTOR_HEAP_TYPE_RTV);
-	mDsvDescriptorSize = md3dDevice->GetDescriptorHandleIncrementSize(
-		D3D12_DESCRIPTOR_HEAP_TYPE_DSV);
-	mCbvSrvDescriptorSize = md3dDevice->GetDescriptorHandleIncrementSize(
-		D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
+	// Crate Fence
+	ThrowIfFailed(md3dDevice->CreateFence(0, D3D12_FENCE_FLAG_NONE, IID_PPV_ARGS(&mFence)));
+	
+	// Create Descriptor Sizes
+	mRtvDescriptorSize = md3dDevice->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_RTV);
+	mDsvDescriptorSize = md3dDevice->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_DSV);
+	mCbvSrvDescriptorSize = md3dDevice->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 
 	// Check 4X MSAA
 	D3D12_FEATURE_DATA_MULTISAMPLE_QUALITY_LEVELS msQualityLevels;
@@ -148,7 +137,7 @@ bool D3DApplication::InitD3D()
 	msQualityLevels.SampleCount = 4;
 	msQualityLevels.Flags = D3D12_MULTISAMPLE_QUALITY_LEVELS_FLAG_NONE;
 	msQualityLevels.NumQualityLevels = 0;
-	DX::ThrowIfFailed(md3dDevice->CheckFeatureSupport(
+	ThrowIfFailed(md3dDevice->CheckFeatureSupport(
 		D3D12_FEATURE_MULTISAMPLE_QUALITY_LEVELS,
 		&msQualityLevels,
 		sizeof(msQualityLevels)));
@@ -170,7 +159,7 @@ bool D3DApplication::InitD3D()
 
 	for (UINT i = 0; i < SwapChainBufferCount; i++)
 	{
-		DX::ThrowIfFailed(mSwapChain->GetBuffer(
+		ThrowIfFailed(mSwapChain->GetBuffer(
 			i, IID_PPV_ARGS(&mSwapChainBuffer[i])));
 
 		md3dDevice->CreateRenderTargetView(
@@ -197,7 +186,7 @@ bool D3DApplication::InitD3D()
 	optClear.Format = mDepthStencilFormat;
 	optClear.DepthStencil.Depth = 1.0f;
 	optClear.DepthStencil.Stencil = 0;
-	DX::ThrowIfFailed(md3dDevice->CreateCommittedResource(
+	ThrowIfFailed(md3dDevice->CreateCommittedResource(
 		&CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_DEFAULT),
 		D3D12_HEAP_FLAG_NONE,
 		&depthStencilDesc,
@@ -217,6 +206,15 @@ bool D3DApplication::InitD3D()
 			D3D12_RESOURCE_STATE_COMMON,
 			D3D12_RESOURCE_STATE_DEPTH_WRITE));
 
+	mScreenViewport.TopLeftX = 0.0f;
+	mScreenViewport.TopLeftY = 0.0f;
+	mScreenViewport.Width = static_cast<float>(mClientWidth);
+	mScreenViewport.Height = static_cast<float>(mClientHeight);
+	mScreenViewport.MinDepth = 0.0f;
+	mScreenViewport.MaxDepth = 1.0f;
+
+	mScissorRect = { 0, 0, mClientWidth, mClientHeight };
+
 	return true;
 }
 
@@ -225,23 +223,20 @@ void D3DApplication::CreateCommandObjects()
 	D3D12_COMMAND_QUEUE_DESC queueDesc = {};
 	queueDesc.Type = D3D12_COMMAND_LIST_TYPE_DIRECT;
 	queueDesc.Flags = D3D12_COMMAND_QUEUE_FLAG_NONE;
-	DX::ThrowIfFailed(md3dDevice->CreateCommandQueue(
+	ThrowIfFailed(md3dDevice->CreateCommandQueue(
 		&queueDesc, IID_PPV_ARGS(&mCommandQueue)));
 
-	DX::ThrowIfFailed(md3dDevice->CreateCommandAllocator(
+	ThrowIfFailed(md3dDevice->CreateCommandAllocator(
 		D3D12_COMMAND_LIST_TYPE_DIRECT,
 		IID_PPV_ARGS(mDirectCmdListAlloc.GetAddressOf())));
 
-	DX::ThrowIfFailed(md3dDevice->CreateCommandList(
+	ThrowIfFailed(md3dDevice->CreateCommandList(
 		0,
 		D3D12_COMMAND_LIST_TYPE_DIRECT,
 		mDirectCmdListAlloc.Get(),
 		nullptr,
 		IID_PPV_ARGS(mCommandList.GetAddressOf())));
 	mCommandList->Close();
-
-
-
 }
 
 void D3DApplication::CreateSwapChain()
@@ -265,19 +260,10 @@ void D3DApplication::CreateSwapChain()
 	sd.SwapEffect = DXGI_SWAP_EFFECT_FLIP_SEQUENTIAL;
 	sd.Flags = DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH;
 
-	if (FAILED(mdxgiFactory->CreateSwapChain(
-		mCommandQueue.Get(), 
-		&sd, 
-		mSwapChain.GetAddressOf())))
-	{
-		MessageBox(0, L"Failed To Create Swap Chain", L"ERROR", 0);
-		throw std::exception();
-	}
-
-	//DX::ThrowIfFailed(mdxgiFactory->CreateSwapChain(
-	//	mCommandQueue.Get(),
-	//	&sd,
-	//	mSwapChain.GetAddressOf()));
+	ThrowIfFailed(mdxgiFactory->CreateSwapChain(
+		mCommandQueue.Get(),
+		&sd,
+		mSwapChain.GetAddressOf()));
 }
 
 void D3DApplication::CreateRtvAndDsvDesvriptorHeaps()
@@ -287,7 +273,7 @@ void D3DApplication::CreateRtvAndDsvDesvriptorHeaps()
 	rtvHeapDesc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_RTV;
 	rtvHeapDesc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_NONE;
 	rtvHeapDesc.NodeMask = 0;
-	DX::ThrowIfFailed(md3dDevice->CreateDescriptorHeap(
+	ThrowIfFailed(md3dDevice->CreateDescriptorHeap(
 		&rtvHeapDesc, IID_PPV_ARGS(mRtvHeap.GetAddressOf())));
 
 	D3D12_DESCRIPTOR_HEAP_DESC dsvHeapDesc;
@@ -295,8 +281,32 @@ void D3DApplication::CreateRtvAndDsvDesvriptorHeaps()
 	dsvHeapDesc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_DSV;
 	dsvHeapDesc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_NONE;
 	dsvHeapDesc.NodeMask = 0;
-	DX::ThrowIfFailed(md3dDevice->CreateDescriptorHeap(
+	ThrowIfFailed(md3dDevice->CreateDescriptorHeap(
 		&dsvHeapDesc, IID_PPV_ARGS(mDsvHeap.GetAddressOf())));
+}
+
+ID3D12Resource *D3DApplication::GetCurrBackBuffer()
+{
+	return mSwapChainBuffer[mCurrBackBuffer].Get();
+}
+
+void D3DApplication::FlushCommandQueue()
+{
+	mCurrFence++;
+
+	ThrowIfFailed(mCommandQueue->Signal(mFence.Get(), mCurrFence));// signal to make new fence once the command queue gets to this command
+
+	if (mFence->GetCompletedValue() < mCurrFence)
+	{
+		HANDLE eventHandle = CreateEventEx(nullptr, false, false, EVENT_ALL_ACCESS);
+
+		ThrowIfFailed(mFence->SetEventOnCompletion(mCurrFence,
+			eventHandle));
+
+		WaitForSingleObject(eventHandle, INFINITE);
+		CloseHandle(eventHandle);
+	}
+
 }
 
 D3D12_CPU_DESCRIPTOR_HANDLE D3DApplication::CurrentBackBufferView() const
@@ -325,46 +335,49 @@ int D3DApplication::Run()
 		}
 		else// Do Game Loopy Stuff
 		{
-			//DX::ThrowIfFailed(mDirectCmdListAlloc->Reset());
-			//
-			//DX::ThrowIfFailed(mCommandList->Reset(
-			//	mDirectCmdListAlloc.Get(), nullptr));
-			//
-			//mCommandList->ResourceBarrier(
-			//	1, &CD3DX12_RESOURCE_BARRIER::Transition(
-			//		mSwapChainBuffer[mCurrBackBuffer].Get(),
-			//		D3D12_RESOURCE_STATE_PRESENT,
-			//		D3D12_RESOURCE_STATE_RENDER_TARGET));
-			//
-			//mCommandList->RSSetViewports(1, &mScreenViewport);
-			//mCommandList->RSSetScissorRects(1, &mScissorRect);
-			//
-			//mCommandList->ClearRenderTargetView(
-			//	CurrentBackBufferView(),
-			//	Colors::LightSteelBlue, 0, nullptr);
-			//mCommandList->ClearDepthStencilView(
-			//	DepthStencilView(), D3D12_CLEAR_FLAG_DEPTH | D3D12_CLEAR_FLAG_STENCIL,
-			//	1.0f, 0, 0, nullptr);
-			//
-			//mCommandList->OMSetRenderTargets(1, &CurrentBackBufferView(),
-			//	true, &DepthStencilView());
-			//
-			//mCommandList->ResourceBarrier(
-			//	1, &CD3DX12_RESOURCE_BARRIER::Transition(
-			//		mSwapChainBuffer[mCurrBackBuffer].Get(),
-			//		D3D12_RESOURCE_STATE_RENDER_TARGET,
-			//		D3D12_RESOURCE_STATE_PRESENT));
-			//
-			//DX::ThrowIfFailed(mCommandList->Close());
-			//
-			//ID3D12CommandList *cmdsLists[] = { mCommandList.Get() };
-			//mCommandQueue->ExecuteCommandLists(_countof(cmdsLists), cmdsLists);
-			//
-			//FlushCommandQueue();
+			Draw(GameTimer());
 		}
 	}
 
 	return (int)msg.wParam;
+}
+
+void D3DApplication::Draw(GameTimer gameTimer)
+{
+	ThrowIfFailed(mDirectCmdListAlloc->Reset());
+	
+	ThrowIfFailed(mCommandList->Reset(
+		mDirectCmdListAlloc.Get(), nullptr));
+	
+	mCommandList->ResourceBarrier(
+		1, &CD3DX12_RESOURCE_BARRIER::Transition(
+			GetCurrBackBuffer(),
+			D3D12_RESOURCE_STATE_PRESENT,
+			D3D12_RESOURCE_STATE_RENDER_TARGET));
+	
+	mCommandList->RSSetViewports(1, &mScreenViewport);
+	mCommandList->RSSetScissorRects(1, &mScissorRect);
+	
+	mCommandList->ClearRenderTargetView(CurrentBackBufferView(), Colors::CornflowerBlue, 0, nullptr);	
+	mCommandList->ClearDepthStencilView(DepthStencilView(), D3D12_CLEAR_FLAG_DEPTH | D3D12_CLEAR_FLAG_STENCIL, 1.0f, 0, 0, nullptr);
+	
+	mCommandList->OMSetRenderTargets(1, &CurrentBackBufferView(), true, &DepthStencilView());
+	
+	mCommandList->ResourceBarrier(
+		1, &CD3DX12_RESOURCE_BARRIER::Transition(
+			GetCurrBackBuffer(),
+			D3D12_RESOURCE_STATE_RENDER_TARGET,
+			D3D12_RESOURCE_STATE_PRESENT));
+	
+	ThrowIfFailed(mCommandList->Close());
+	
+	ID3D12CommandList *cmdsLists[] = { mCommandList.Get() };
+	mCommandQueue->ExecuteCommandLists(_countof(cmdsLists), cmdsLists);
+
+	ThrowIfFailed(mSwapChain->Present(0, 0));
+	mCurrBackBuffer = (mCurrBackBuffer + 1) % SwapChainBufferCount;
+
+	FlushCommandQueue();
 }
 
 D3DApplication *D3DApplication::mApp = nullptr;
