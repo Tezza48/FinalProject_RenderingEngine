@@ -5,6 +5,7 @@
 #include <assert.h>
 #include <d3d12.h>
 #include <dxgi1_4.h>
+#include <DirectXColors.h>
 #include "d3dx12.h"
 #include "utils.h"
 
@@ -14,6 +15,7 @@
 #pragma comment(lib, "dxgi.lib")
 
 using namespace Microsoft::WRL;
+using namespace DirectX;
 
 // Handles all DirectX specific stuff
 class D3DApplication
@@ -59,6 +61,11 @@ private:
 	void CreateCommandObjects();
 	void CreateSwapChain();
 	void CreateRtvAndDsvDesvriptorHeaps();
+
+	void FlushCommandQueue();
+
+	D3D12_VIEWPORT mScreenViewport;
+	D3D12_RECT mScissorRect;
 
 	D3D12_CPU_DESCRIPTOR_HANDLE CurrentBackBufferView() const;
 	D3D12_CPU_DESCRIPTOR_HANDLE DepthStencilView() const;

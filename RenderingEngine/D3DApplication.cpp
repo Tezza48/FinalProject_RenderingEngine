@@ -30,6 +30,16 @@ bool D3DApplication::Init(HINSTANCE instanceHandle, int show)
 		return false;
 	if (!InitD3D())
 		return false;
+
+	mScreenViewport.TopLeftX = 0.0f;
+	mScreenViewport.TopLeftY = 0.0f;
+	mScreenViewport.Width = static_cast<float>(mClientWidth);
+	mScreenViewport.Height = static_cast<float>(mClientHeight);
+	mScreenViewport.MinDepth = 0.0f;
+	mScreenViewport.MaxDepth = 1.0f;
+
+	mScissorRect = { 0, 0, mClientWidth, mClientHeight };
+
 	return true;
 }
 
@@ -229,6 +239,9 @@ void D3DApplication::CreateCommandObjects()
 		nullptr,
 		IID_PPV_ARGS(mCommandList.GetAddressOf())));
 	mCommandList->Close();
+
+
+
 }
 
 void D3DApplication::CreateSwapChain()
@@ -312,7 +325,42 @@ int D3DApplication::Run()
 		}
 		else// Do Game Loopy Stuff
 		{
-
+			//DX::ThrowIfFailed(mDirectCmdListAlloc->Reset());
+			//
+			//DX::ThrowIfFailed(mCommandList->Reset(
+			//	mDirectCmdListAlloc.Get(), nullptr));
+			//
+			//mCommandList->ResourceBarrier(
+			//	1, &CD3DX12_RESOURCE_BARRIER::Transition(
+			//		mSwapChainBuffer[mCurrBackBuffer].Get(),
+			//		D3D12_RESOURCE_STATE_PRESENT,
+			//		D3D12_RESOURCE_STATE_RENDER_TARGET));
+			//
+			//mCommandList->RSSetViewports(1, &mScreenViewport);
+			//mCommandList->RSSetScissorRects(1, &mScissorRect);
+			//
+			//mCommandList->ClearRenderTargetView(
+			//	CurrentBackBufferView(),
+			//	Colors::LightSteelBlue, 0, nullptr);
+			//mCommandList->ClearDepthStencilView(
+			//	DepthStencilView(), D3D12_CLEAR_FLAG_DEPTH | D3D12_CLEAR_FLAG_STENCIL,
+			//	1.0f, 0, 0, nullptr);
+			//
+			//mCommandList->OMSetRenderTargets(1, &CurrentBackBufferView(),
+			//	true, &DepthStencilView());
+			//
+			//mCommandList->ResourceBarrier(
+			//	1, &CD3DX12_RESOURCE_BARRIER::Transition(
+			//		mSwapChainBuffer[mCurrBackBuffer].Get(),
+			//		D3D12_RESOURCE_STATE_RENDER_TARGET,
+			//		D3D12_RESOURCE_STATE_PRESENT));
+			//
+			//DX::ThrowIfFailed(mCommandList->Close());
+			//
+			//ID3D12CommandList *cmdsLists[] = { mCommandList.Get() };
+			//mCommandQueue->ExecuteCommandLists(_countof(cmdsLists), cmdsLists);
+			//
+			//FlushCommandQueue();
 		}
 	}
 
