@@ -142,12 +142,22 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+<<<<<<< HEAD
     <ClCompile Include="d3dEnvironment.cpp" />
     <ClCompile Include="Main.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="d3dEnvironment.h" />
+=======
+    <ClCompile Include="D3DApplication.cpp" />
+    <ClCompile Include="GameTimer.cpp" />
+    <ClCompile Include="Main.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="D3DApplication.h" />
+>>>>>>> refs/remotes/origin/d3d-initialisation
     <ClInclude Include="d3dx12.h" />
+    <ClInclude Include="GameTimer.h" />
     <ClInclude Include="utils.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
