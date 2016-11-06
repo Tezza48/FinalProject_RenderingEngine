@@ -12,7 +12,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR pCmdLine, 
 	try
 	{
 	D3DApplication d3dApp = D3DApplication(hInstance);
-	d3dApp.Init(hInstance, nCmdShow);
+	d3dApp.Init();
 
 	return d3dApp.Run();
 

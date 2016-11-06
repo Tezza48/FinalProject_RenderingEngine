@@ -24,9 +24,9 @@ LRESULT CALLBACK D3DApplication::WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPA
 	return DefWindowProc(hWnd, msg, wParam, lParam);
 }
 
-bool D3DApplication::Init(HINSTANCE instanceHandle, int show)
+bool D3DApplication::Init()
 {
-	if (!InitWindowsApp(instanceHandle, show))
+	if (!InitWindowsApp())
 		return false;
 	if (!InitD3D())
 		return false;
@@ -38,6 +38,8 @@ D3DApplication::D3DApplication(HINSTANCE hInstance)
 {
 	assert(mApp == nullptr);
 	mApp = this;
+
+	instanceHandle = hInstance;
 }
 
 
@@ -45,7 +47,7 @@ D3DApplication::~D3DApplication()
 {
 }
 
-bool D3DApplication::InitWindowsApp(HINSTANCE instanceHandle, int show)
+bool D3DApplication::InitWindowsApp()
 {
 	WNDCLASS wc;
 
@@ -85,7 +87,7 @@ bool D3DApplication::InitWindowsApp(HINSTANCE instanceHandle, int show)
 		return false;
 	}
 
-	ShowWindow(mhMainWindow, show);
+	ShowWindow(mhMainWindow, SW_SHOW);
 	UpdateWindow(mhMainWindow);
 
 	return true;
@@ -360,7 +362,7 @@ void D3DApplication::Draw(GameTimer gameTimer)
 	
 	mCommandList->ClearRenderTargetView(CurrentBackBufferView(), Colors::CornflowerBlue, 0, nullptr);	
 	mCommandList->ClearDepthStencilView(DepthStencilView(), D3D12_CLEAR_FLAG_DEPTH | D3D12_CLEAR_FLAG_STENCIL, 1.0f, 0, 0, nullptr);
-	
+
 	mCommandList->OMSetRenderTargets(1, &CurrentBackBufferView(), true, &DepthStencilView());
 	
 	mCommandList->ResourceBarrier(

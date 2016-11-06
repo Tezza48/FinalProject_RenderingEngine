@@ -22,7 +22,9 @@ using namespace DX;
 // Handles all DirectX specific stuff
 class D3DApplication
 {
-private:
+
+protected:
+	HINSTANCE instanceHandle;
 	HWND mhMainWindow = nullptr;
 	static D3DApplication *mApp;
 
@@ -55,9 +57,8 @@ private:
 	DXGI_FORMAT mBackBufferFormat = DXGI_FORMAT_R8G8B8A8_UNORM;
 	DXGI_FORMAT mDepthStencilFormat = DXGI_FORMAT_D24_UNORM_S8_UINT;
 
-	D3DApplication();
 	
-	bool InitWindowsApp(HINSTANCE instanceHandle, int show);
+	bool InitWindowsApp();
 	bool InitD3D();
 
 	void Draw(GameTimer);
@@ -79,18 +80,19 @@ private:
 	D3D12_CPU_DESCRIPTOR_HANDLE DepthStencilView() const;
 
 	int mClientWidth = 800, mClientHeight = 600;
-protected:
 
 public:
+
+	static D3DApplication *getApp();
+	
 	// Ctor
 	D3DApplication(HINSTANCE);
 	//Dtor
 	~D3DApplication();
 
 	LRESULT CALLBACK WndProc(HWND, UINT, WPARAM, LPARAM);
-	bool Init(HINSTANCE instanceHandle, int show);
+	virtual bool Init();
 	int Run();
-	static D3DApplication *getApp();
 
 };
 
