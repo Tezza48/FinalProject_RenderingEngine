@@ -6,10 +6,15 @@
 #include <d3dx11.h>
 #include <d3dx10.h>
 #include <DirectXColors.h>
+#include <DirectXMath.h>
+#include "utils.h"
 
 #pragma comment(lib, "d3d11.lib")
 #pragma comment(lib, "d3dx11.lib")
 #pragma comment(lib, "d3dx10.lib")
+
+using namespace DirectX;
+using namespace DX;
 
 struct VERTEX
 {

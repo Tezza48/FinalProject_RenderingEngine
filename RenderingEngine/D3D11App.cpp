@@ -42,10 +42,10 @@ bool D3D11App::InitD3D()
 		&mDeviceContext);
 
 	ID3D11Texture2D *pBackBuffer;
-	mSwapChain->GetBuffer(0, __uuidof(ID3D11Texture2D), (LPVOID*)&pBackBuffer);
+	ThrowIfFailed(mSwapChain->GetBuffer(0, __uuidof(ID3D11Texture2D), (LPVOID*)&pBackBuffer));
 
-	mDevice->CreateRenderTargetView(pBackBuffer, NULL, &mBackBuffer);
-	pBackBuffer->Release();
+	ThrowIfFailed(mDevice->CreateRenderTargetView(pBackBuffer, NULL, &mBackBuffer));
+	ThrowIfFailed(pBackBuffer->Release());
 
 	mDeviceContext->OMSetRenderTargets(1, &mBackBuffer, NULL);
 
@@ -68,8 +68,8 @@ void D3D11App::InitPipeline()
 	D3DX11CompileFromFile(L"shaders.shader", 0, 0, "VShader", "vs_4_0", 0, 0, 0, &VS, 0, 0);
 	D3DX11CompileFromFile(L"shaders.shader", 0, 0, "PShader", "ps_4_0", 0, 0, 0, &PS, 0, 0);
 
-	mDevice->CreateVertexShader(VS->GetBufferPointer(), VS->GetBufferSize(), NULL, &mpVS);
-	mDevice->CreatePixelShader(PS->GetBufferPointer(), PS->GetBufferSize(), NULL, &mpPS);
+	ThrowIfFailed(mDevice->CreateVertexShader(VS->GetBufferPointer(), VS->GetBufferSize(), NULL, &mpVS));
+	ThrowIfFailed(mDevice->CreatePixelShader(PS->GetBufferPointer(), PS->GetBufferSize(), NULL, &mpPS));
 
 	mDeviceContext->VSSetShader(mpVS, 0, 0);
 	mDeviceContext->PSSetShader(mpPS, 0, 0);
@@ -81,7 +81,7 @@ void D3D11App::InitPipeline()
 			0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0}
 	};
 
-	mDevice->CreateInputLayout(ied, 2, VS->GetBufferPointer(), VS->GetBufferSize(), &mpLayout);
+	ThrowIfFailed(mDevice->CreateInputLayout(ied, 2, VS->GetBufferPointer(), VS->GetBufferSize(), &mpLayout));
 	mDeviceContext->IASetInputLayout(mpLayout);
 }
 
@@ -109,7 +109,7 @@ void D3D11App::Draw(void)
 
 	mDeviceContext->Draw(3, 0);
 
-	mSwapChain->Present(0, 0);
+	ThrowIfFailed(mSwapChain->Present(0, 0));
 }
 
 
@@ -138,10 +138,10 @@ bool D3D11App::Init(HINSTANCE hInstance, int nShowCmd)
 	bd.BindFlags = D3D11_BIND_VERTEX_BUFFER;
 	bd.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
 
-	mDevice->CreateBuffer(&bd, NULL, &mpVBuffer);
+	ThrowIfFailed(mDevice->CreateBuffer(&bd, NULL, &mpVBuffer));
 
 	D3D11_MAPPED_SUBRESOURCE ms;
-	mDeviceContext->Map(mpVBuffer, NULL, D3D11_MAP_WRITE_DISCARD, NULL, &ms);
+	ThrowIfFailed(mDeviceContext->Map(mpVBuffer, NULL, D3D11_MAP_WRITE_DISCARD, NULL, &ms));
 	memcpy(ms.pData, TVertices, sizeof(TVertices));
 	mDeviceContext->Unmap(mpVBuffer, NULL);
 
