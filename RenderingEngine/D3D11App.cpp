@@ -13,6 +13,10 @@ D3D11App::~D3D11App()
 
 bool D3D11App::InitD3D()
 {
+	#if defined(DEBUG) || defined(_DEBUG)
+	
+	#endif
+
 	DXGI_SWAP_CHAIN_DESC scd;
 
 	ZeroMemory(&scd, sizeof(DXGI_SWAP_CHAIN_DESC));
@@ -27,19 +31,39 @@ bool D3D11App::InitD3D()
 	scd.SampleDesc.Quality = 0;
 	scd.Windowed = true;
 
-	D3D11CreateDeviceAndSwapChain(
+	D3D_FEATURE_LEVEL FeatureLevels = D3D_FEATURE_LEVEL_10_1;
+
+	HRESULT hr = D3D11CreateDeviceAndSwapChain(
 		NULL,
 		D3D_DRIVER_TYPE_HARDWARE,
 		NULL,
-		NULL,
-		NULL,
-		NULL,
+		0,
+		&FeatureLevels,
+		1,
 		D3D11_SDK_VERSION,
 		&scd,
 		&mSwapChain,
 		&mDevice,
 		NULL,
 		&mDeviceContext);
+
+	if (FAILED(hr))
+	{
+		ThrowIfFailed(D3D11CreateDeviceAndSwapChain(
+			NULL,
+			D3D_DRIVER_TYPE_WARP,
+			NULL,
+			0,
+			&FeatureLevels,
+			1,
+			D3D11_SDK_VERSION,
+			&scd,
+			&mSwapChain,
+			&mDevice,
+			NULL,
+			&mDeviceContext
+			));
+	}
 
 	ID3D11Texture2D *pBackBuffer;
 	ThrowIfFailed(mSwapChain->GetBuffer(0, __uuidof(ID3D11Texture2D), (LPVOID*)&pBackBuffer));
@@ -54,8 +78,8 @@ bool D3D11App::InitD3D()
 
 	vp.TopLeftX = 0;
 	vp.TopLeftY = 0;
-	vp.Width = 800;// remove magic numbers
-	vp.Height = 600;// when this class andle window creation (width + height will be here)
+	vp.Width = mClientWidth;
+	vp.Height = mClientHeight;// when this class andle window creation (width + height will be here)
 
 	mDeviceContext->RSSetViewports(1, &vp);
 
@@ -103,11 +127,18 @@ void D3D11App::Draw(void)
 
 	UINT stride = sizeof(VERTEX);
 	UINT offset = 0;
-	mDeviceContext->IASetVertexBuffers(0, 1, &mpVBuffer, &stride, &offset);
+	
+	ID3D11Buffer **vBuffers = {
+		&mpVBuffer
+	};
+
+	mDeviceContext->IASetVertexBuffers(0, 1, vBuffers, &stride, &offset);
+
+	mDeviceContext->IASetIndexBuffer(mpIBuffer, DXGI_FORMAT_R32_UINT, 0);
 
 	mDeviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
-	mDeviceContext->Draw(3, 0);
+	mDeviceContext->DrawIndexed(6, 0, 0);
 
 	ThrowIfFailed(mSwapChain->Present(0, 0));
 }
@@ -124,9 +155,15 @@ bool D3D11App::Init(HINSTANCE hInstance, int nShowCmd)
 	// other init code
 
 	VERTEX TVertices[]{
-		{ 0.0f, 0.5f, 0.0f, D3DXCOLOR(1.0f, 0.0f, 0.0f, 1.0f) },
-		{ 0.45f, -0.5, 0.0f, D3DXCOLOR(0.0f, 1.0f, 0.0f, 1.0f) },
-		{ -0.45f, -0.5f, 0.0f, D3DXCOLOR(0.0f, 0.0f, 1.0f, 1.0f) }
+		{ -0.5f, -0.5f, 0.0f, D3DXCOLOR(1.0f, 0.0f, 0.0f, 1.0f) },
+		{ -0.5f, 0.5, 0.0f, D3DXCOLOR(0.0f, 1.0f, 0.0f, 1.0f) },
+		{ 0.5f, 0.5f, 0.0f, D3DXCOLOR(0.0f, 0.0f, 1.0f, 1.0f) },
+		{ 0.5f, -0.5f, 0.0f, D3DXCOLOR(1.0f, 1.0f, 0.0f, 1.0f)}
+	};
+
+	int TIndices[]{
+		0, 1, 2,
+		0, 2, 3
 	};
 
 	// description for triangle buffer
@@ -134,7 +171,7 @@ bool D3D11App::Init(HINSTANCE hInstance, int nShowCmd)
 	ZeroMemory(&bd, sizeof(D3D11_BUFFER_DESC));
 
 	bd.Usage = D3D11_USAGE_DYNAMIC;
-	bd.ByteWidth = sizeof(VERTEX) * 3;
+	bd.ByteWidth = sizeof(VERTEX) * 4;
 	bd.BindFlags = D3D11_BIND_VERTEX_BUFFER;
 	bd.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
 
@@ -145,6 +182,19 @@ bool D3D11App::Init(HINSTANCE hInstance, int nShowCmd)
 	memcpy(ms.pData, TVertices, sizeof(TVertices));
 	mDeviceContext->Unmap(mpVBuffer, NULL);
 
+	//description for Indicie buffer
+	ZeroMemory(&bd, sizeof(D3D11_BUFFER_DESC));
+
+	bd.Usage = D3D11_USAGE_DYNAMIC;
+	bd.ByteWidth = sizeof(int) * 6;
+	bd.BindFlags = D3D11_BIND_INDEX_BUFFER;
+	bd.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
+
+	ThrowIfFailed(mDevice->CreateBuffer(&bd, NULL, &mpIBuffer));
+	ThrowIfFailed(mDeviceContext->Map(mpIBuffer, NULL, D3D11_MAP_WRITE_DISCARD, NULL, &ms));
+	memcpy(ms.pData, TIndices, sizeof(TIndices));
+	mDeviceContext->Unmap(mpIBuffer, NULL);
+	
 	return true;
 }
 

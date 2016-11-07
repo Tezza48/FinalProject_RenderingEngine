@@ -27,6 +27,7 @@ LRESULT CALLBACK MainWndProc(HWND, UINT, WPARAM, LPARAM);
 class D3D11App
 {
 	ID3D11Buffer *mpVBuffer;
+	ID3D11Buffer *mpIBuffer;
 	ID3D11InputLayout *mpLayout;
 
 protected:
@@ -42,13 +43,16 @@ protected:
 	ID3D11VertexShader *mpVS;
 	ID3D11PixelShader *mpPS;
 
+	bool m4XMsaaState = false;
+	UINT m4XMsaaQuality = 1;
+
 	bool InitWindowsApp(HINSTANCE hInstance, int nShowCmd);
 	bool InitD3D();
 	void InitPipeline();
 	void CleanD3D();
 	void Draw();
 
-	const int mClientWidth = 800, mClientHeight = 600;
+	const int mClientWidth = 800, mClientHeight = 800;
 public:
 	D3D11App();
 	virtual ~D3D11App();
