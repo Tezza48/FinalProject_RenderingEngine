@@ -62,8 +62,33 @@ bool D3D11App::InitD3D()
 	return true;
 }
 
+void D3D11App::InitPipeline()
+{
+	ID3D10Blob *VS, *PS;
+	D3DX11CompileFromFile(L"shaders.shader", 0, 0, "VShader", "vs_4_0", 0, 0, 0, &VS, 0, 0);
+	D3DX11CompileFromFile(L"shaders.shader", 0, 0, "PShader", "ps_4_0", 0, 0, 0, &PS, 0, 0);
+
+	mDevice->CreateVertexShader(VS->GetBufferPointer(), VS->GetBufferSize(), NULL, &mpVS);
+	mDevice->CreatePixelShader(PS->GetBufferPointer(), PS->GetBufferSize(), NULL, &mpPS);
+
+	mDeviceContext->VSSetShader(mpVS, 0, 0);
+	mDeviceContext->PSSetShader(mpPS, 0, 0);
+
+	D3D11_INPUT_ELEMENT_DESC ied[] = {
+		{"POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT,
+			0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0},
+		{"COLOR", 0, DXGI_FORMAT_R32G32B32A32_FLOAT,
+			0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0}
+	};
+
+	mDevice->CreateInputLayout(ied, 2, VS->GetBufferPointer(), VS->GetBufferSize(), &mpLayout);
+	mDeviceContext->IASetInputLayout(mpLayout);
+}
+
 void D3D11App::CleanD3D()
 {
+	mpVS->Release();
+	mpPS->Release();
 	mSwapChain->Release();
 	mBackBuffer->Release();
 	mDevice->Release();
@@ -76,6 +101,14 @@ void D3D11App::Draw(void)
 
 	// render stuff
 
+	UINT stride = sizeof(VERTEX);
+	UINT offset = 0;
+	mDeviceContext->IASetVertexBuffers(0, 1, &mpVBuffer, &stride, &offset);
+
+	mDeviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+
+	mDeviceContext->Draw(3, 0);
+
 	mSwapChain->Present(0, 0);
 }
 
@@ -86,6 +119,31 @@ bool D3D11App::Init(HINSTANCE hInstance, int nShowCmd)
 		return false;
 	if (!InitD3D())
 		return false;
+
+	InitPipeline();
+	// other init code
+
+	VERTEX TVertices[]{
+		{ 0.0f, 0.5f, 0.0f, D3DXCOLOR(1.0f, 0.0f, 0.0f, 1.0f) },
+		{ 0.45f, -0.5, 0.0f, D3DXCOLOR(0.0f, 1.0f, 0.0f, 1.0f) },
+		{ -0.45f, -0.5f, 0.0f, D3DXCOLOR(0.0f, 0.0f, 1.0f, 1.0f) }
+	};
+
+	// description for triangle buffer
+	D3D11_BUFFER_DESC bd;
+	ZeroMemory(&bd, sizeof(D3D11_BUFFER_DESC));
+
+	bd.Usage = D3D11_USAGE_DYNAMIC;
+	bd.ByteWidth = sizeof(VERTEX) * 3;
+	bd.BindFlags = D3D11_BIND_VERTEX_BUFFER;
+	bd.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
+
+	mDevice->CreateBuffer(&bd, NULL, &mpVBuffer);
+
+	D3D11_MAPPED_SUBRESOURCE ms;
+	mDeviceContext->Map(mpVBuffer, NULL, D3D11_MAP_WRITE_DISCARD, NULL, &ms);
+	memcpy(ms.pData, TVertices, sizeof(TVertices));
+	mDeviceContext->Unmap(mpVBuffer, NULL);
 
 	return true;
 }
