@@ -1,4 +1,3 @@
-#include <Windows.h>
 #include <exception>
 #include "D3D11App.h"
 

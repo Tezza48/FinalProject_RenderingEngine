@@ -6,8 +6,9 @@
 #include <d3dx11.h>
 #include <d3dx10.h>
 #include <DirectXColors.h>
-#include <DirectXMath.h>
 #include "utils.h"
+#include "Vertex.h"
+#include "Mesh.h"
 
 #pragma comment(lib, "d3d11.lib")
 #pragma comment(lib, "d3dx11.lib")
@@ -16,18 +17,12 @@
 using namespace DirectX;
 using namespace DX;
 
-struct VERTEX
-{
-	float X, Y, Z;
-	D3DXCOLOR Color;
-};
-
 LRESULT CALLBACK MainWndProc(HWND, UINT, WPARAM, LPARAM);
 
 class D3D11App
 {
-	ID3D11Buffer *mpVBuffer;
-	ID3D11Buffer *mpIBuffer;
+
+	Mesh *mpMesh = nullptr;
 	ID3D11InputLayout *mpLayout;
 
 protected:
@@ -49,6 +44,7 @@ protected:
 	bool InitWindowsApp(HINSTANCE hInstance, int nShowCmd);
 	bool InitD3D();
 	void InitPipeline();
+	void Start();
 	void CleanD3D();
 	void Draw();
 

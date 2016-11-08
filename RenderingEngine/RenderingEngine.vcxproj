@@ -145,12 +145,15 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="D3D11App.cpp" />
+    <ClCompile Include="Mesh.cpp" />
     <ClCompile Include="Source.cpp" />
     <ClCompile Include="utils.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="D3D11App.h" />
+    <ClInclude Include="Mesh.h" />
     <ClInclude Include="utils.h" />
+    <ClInclude Include="Vertex.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="shaders.shader" />

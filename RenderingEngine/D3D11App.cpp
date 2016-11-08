@@ -109,6 +109,10 @@ void D3D11App::InitPipeline()
 	mDeviceContext->IASetInputLayout(mpLayout);
 }
 
+void D3D11App::Start()
+{
+}
+
 void D3D11App::CleanD3D()
 {
 	mpVS->Release();
@@ -124,22 +128,22 @@ void D3D11App::Draw(void)
 	mDeviceContext->ClearRenderTargetView(mBackBuffer, D3DXCOLOR(0.0f, 0.2f, 0.4f, 1.0f));
 
 	// render stuff
-
+	
 	UINT stride = sizeof(VERTEX);
 	UINT offset = 0;
 	
-	ID3D11Buffer **vBuffers = {
-		&mpVBuffer
+	ID3D11Buffer *vBuffers[] = {
+		mpMesh->GetVBuffer()
 	};
 
 	mDeviceContext->IASetVertexBuffers(0, 1, vBuffers, &stride, &offset);
 
-	mDeviceContext->IASetIndexBuffer(mpIBuffer, DXGI_FORMAT_R32_UINT, 0);
+	mDeviceContext->IASetIndexBuffer(mpMesh->GetIBuffer(), DXGI_FORMAT_R32_UINT, 0);
 
 	mDeviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
-	mDeviceContext->DrawIndexed(6, 0, 0);
-
+	mDeviceContext->DrawIndexed(sizeof(mpMesh->GetIBuffer()), 0, 0);
+	
 	ThrowIfFailed(mSwapChain->Present(0, 0));
 }
 
@@ -154,46 +158,26 @@ bool D3D11App::Init(HINSTANCE hInstance, int nShowCmd)
 	InitPipeline();
 	// other init code
 
-	VERTEX TVertices[]{
+	Start();
+
+	VERTEX *vertices = new VERTEX[sizeof(VERTEX) * 4] {
 		{ -0.5f, -0.5f, 0.0f, D3DXCOLOR(1.0f, 0.0f, 0.0f, 1.0f) },
 		{ -0.5f, 0.5, 0.0f, D3DXCOLOR(0.0f, 1.0f, 0.0f, 1.0f) },
 		{ 0.5f, 0.5f, 0.0f, D3DXCOLOR(0.0f, 0.0f, 1.0f, 1.0f) },
 		{ 0.5f, -0.5f, 0.0f, D3DXCOLOR(1.0f, 1.0f, 0.0f, 1.0f)}
 	};
 
-	int TIndices[]{
+	int *indices = new int[6] {
 		0, 1, 2,
 		0, 2, 3
 	};
 
+	mpMesh = new Mesh(vertices, indices, mDevice, mDeviceContext);
+
+	delete indices;
+	delete vertices;
+
 	// description for triangle buffer
-	D3D11_BUFFER_DESC bd;
-	ZeroMemory(&bd, sizeof(D3D11_BUFFER_DESC));
-
-	bd.Usage = D3D11_USAGE_DYNAMIC;
-	bd.ByteWidth = sizeof(VERTEX) * 4;
-	bd.BindFlags = D3D11_BIND_VERTEX_BUFFER;
-	bd.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
-
-	ThrowIfFailed(mDevice->CreateBuffer(&bd, NULL, &mpVBuffer));
-
-	D3D11_MAPPED_SUBRESOURCE ms;
-	ThrowIfFailed(mDeviceContext->Map(mpVBuffer, NULL, D3D11_MAP_WRITE_DISCARD, NULL, &ms));
-	memcpy(ms.pData, TVertices, sizeof(TVertices));
-	mDeviceContext->Unmap(mpVBuffer, NULL);
-
-	//description for Indicie buffer
-	ZeroMemory(&bd, sizeof(D3D11_BUFFER_DESC));
-
-	bd.Usage = D3D11_USAGE_DYNAMIC;
-	bd.ByteWidth = sizeof(int) * 6;
-	bd.BindFlags = D3D11_BIND_INDEX_BUFFER;
-	bd.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
-
-	ThrowIfFailed(mDevice->CreateBuffer(&bd, NULL, &mpIBuffer));
-	ThrowIfFailed(mDeviceContext->Map(mpIBuffer, NULL, D3D11_MAP_WRITE_DISCARD, NULL, &ms));
-	memcpy(ms.pData, TIndices, sizeof(TIndices));
-	mDeviceContext->Unmap(mpIBuffer, NULL);
 	
 	return true;
 }
@@ -214,25 +198,18 @@ bool D3D11App::InitWindowsApp(HINSTANCE hInstance, int nShowCmd)
 
 	if (!RegisterClass(&wc))
 	{
-		return false;//add message box
+		MessageBox(0, L"RegisterClass FAILED", L"ERROR", 0);
+		return false;
 	}
 
-	mMainWindow = CreateWindow(
-		L"DX11RE",
-		L"DX11 Rendering Engine",
-		WS_OVERLAPPEDWINDOW,
-		CW_USEDEFAULT,
-		CW_USEDEFAULT,
-		mClientWidth,
-		mClientHeight,
-		0,
-		0,
-		hInstance,
-		0);
+	mMainWindow = CreateWindow(L"DX11RE", L"DX11 Rendering Engine",
+		WS_OVERLAPPEDWINDOW, CW_USEDEFAULT, CW_USEDEFAULT,
+		mClientWidth, mClientHeight, 0, 0, hInstance, 0);
 
 	if (mMainWindow == 0)
 	{
-		return false;//add message box
+		MessageBox(0, L"CreateWindow FAILED", L"ERROR", 0);
+		return false;
 	}
 
 	ShowWindow(mMainWindow, nShowCmd);
