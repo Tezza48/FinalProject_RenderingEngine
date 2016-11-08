@@ -46,12 +46,9 @@ protected:
 	ID3D11VertexShader *mpVS;
 	ID3D11PixelShader *mpPS;
 
-<<<<<<< Updated upstream
-=======
 	bool m4xMsaaState = true;
 	UINT m4xMsaaQuality = 1;
 
->>>>>>> Stashed changes
 	bool InitWindowsApp(HINSTANCE hInstance, int nShowCmd);
 	bool InitD3D();
 	void InitPipeline();
