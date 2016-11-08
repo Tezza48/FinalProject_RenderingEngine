@@ -4,7 +4,7 @@
 #include <assert.h>
 #include <d3d11.h>
 #include <d3dx11.h>
-#include <d3dx10.h>
+//#include <d3dx10.h>
 #include <DirectXColors.h>
 #include <DirectXMath.h>
 #include "utils.h"
@@ -19,7 +19,7 @@ using namespace DX;
 struct VERTEX
 {
 	float X, Y, Z;
-	D3DXCOLOR Color;
+	XMFLOAT4 Color;
 };
 
 LRESULT CALLBACK MainWndProc(HWND, UINT, WPARAM, LPARAM);
@@ -33,15 +33,25 @@ protected:
 	HWND mMainWindow = 0;
 	static D3D11App *mApp;
 
+	ID3D11Device *md3dDevice;
+	ID3D11DeviceContext *md3dImmediateContext;
 	IDXGISwapChain *mSwapChain;
-	ID3D11Device *mDevice;
-	ID3D11DeviceContext *mDeviceContext;
 
-	ID3D11RenderTargetView *mBackBuffer;
+	ID3D11Texture2D *mBackBuffer;
+	ID3D11RenderTargetView *mRenderTargetView;
+
+	ID3D11Texture2D *mDepthStencilBuffer;
+	ID3D11DepthStencilView *mDepthStencilView;
 
 	ID3D11VertexShader *mpVS;
 	ID3D11PixelShader *mpPS;
 
+<<<<<<< Updated upstream
+=======
+	bool m4xMsaaState = true;
+	UINT m4xMsaaQuality = 1;
+
+>>>>>>> Stashed changes
 	bool InitWindowsApp(HINSTANCE hInstance, int nShowCmd);
 	bool InitD3D();
 	void InitPipeline();
