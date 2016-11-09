@@ -146,12 +146,14 @@
   <ItemGroup>
     <ClCompile Include="D3D11App.cpp" />
     <ClCompile Include="GameTimer.cpp" />
+    <ClCompile Include="IRenderFramework.cpp" />
     <ClCompile Include="Source.cpp" />
     <ClCompile Include="utils.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="D3D11App.h" />
     <ClInclude Include="GameTimer.h" />
+    <ClInclude Include="IRenderFramework.h" />
     <ClInclude Include="utils.h" />
   </ItemGroup>
   <ItemGroup>

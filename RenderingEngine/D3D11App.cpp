@@ -6,9 +6,65 @@ D3D11App::D3D11App()
 	mApp = this;
 }
 
-
 D3D11App::~D3D11App()
 {
+
+}
+
+bool D3D11App::Init(HINSTANCE hInstance, int nShowCmd)
+{
+	if (!InitWindowsApp(hInstance, nShowCmd))
+		return false;
+	if (!InitD3D())
+		return false;
+
+	InitPipeline();
+
+	Start();
+	return true;
+}
+
+bool D3D11App::InitWindowsApp(HINSTANCE hInstance, int nShowCmd)
+{
+	WNDCLASS wc;
+	wc.style = CS_HREDRAW | CS_VREDRAW;
+	wc.lpfnWndProc = MainWndProc;
+	wc.cbClsExtra = 0;
+	wc.cbWndExtra = 0;
+	wc.hInstance = hInstance;
+	wc.hIcon = LoadIcon(0, IDI_APPLICATION);
+	wc.hCursor = LoadCursor(0, IDC_ARROW);
+	wc.hbrBackground = (HBRUSH)GetStockObject(WHITE_BRUSH);
+	wc.lpszMenuName = 0;
+	wc.lpszClassName = L"DX11RE";
+
+	if (!RegisterClass(&wc))
+	{
+		return false;//add message box
+	}
+
+	mMainWindow = CreateWindow(
+		L"DX11RE",
+		L"DX11 Rendering Engine",
+		WS_OVERLAPPEDWINDOW,
+		CW_USEDEFAULT,
+		CW_USEDEFAULT,
+		mClientWidth,
+		mClientHeight,
+		0,
+		0,
+		hInstance,
+		0);
+
+	if (mMainWindow == 0)
+	{
+		return false;//add message box
+	}
+
+	ShowWindow(mMainWindow, nShowCmd);
+	UpdateWindow(mMainWindow);
+
+	return true;
 }
 
 bool D3D11App::InitD3D()
@@ -34,8 +90,6 @@ bool D3D11App::InitD3D()
 		&featureLevel,
 		&md3dImmediateContext);
 
-	ID3D11Texture2D *pBackBuffer;
-	ThrowIfFailed(mSwapChain->GetBuffer(0, __uuidof(ID3D11Texture2D), (LPVOID*)&pBackBuffer));
 	if (FAILED(hr))
 	{
 		MessageBox(0, L"D3D11CreateDevice Failed.", 0, 0);
@@ -129,98 +183,34 @@ bool D3D11App::InitD3D()
 
 	md3dImmediateContext->RSSetViewports(1, &vp);
 
+	OnResize();
+
 	return true;
 }
 
-void D3D11App::InitPipeline()
+bool D3D11App::InitPipeline()
 {
-	ID3D10Blob *VS, *PS;
-	D3DX11CompileFromFile(L"shaders.shader", 0, 0, "VShader", "vs_4_0", 0, 0, 0, &VS, 0, 0);
-	D3DX11CompileFromFile(L"shaders.shader", 0, 0, "PShader", "ps_4_0", 0, 0, 0, &PS, 0, 0);
-
-	ThrowIfFailed(md3dDevice->CreateVertexShader(VS->GetBufferPointer(), VS->GetBufferSize(), NULL, &mpVS));
-	ThrowIfFailed(md3dDevice->CreatePixelShader(PS->GetBufferPointer(), PS->GetBufferSize(), NULL, &mpPS));
-
-	md3dImmediateContext->VSSetShader(mpVS, 0, 0);
-	md3dImmediateContext->PSSetShader(mpPS, 0, 0);
-
-	D3D11_INPUT_ELEMENT_DESC ied[] = {
-		{"POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT,
-			0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0},
-		{"COLOR", 0, DXGI_FORMAT_R32G32B32A32_FLOAT,
-			0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0}
+	D3D11_INPUT_ELEMENT_DESC vertexDesc[] = {
+		{"POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0},
+		{"COLOR", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, 12, D3D11_INPUT_PER_VERTEX_DATA, 0}
 	};
 
-	ThrowIfFailed(md3dDevice->CreateInputLayout(ied, 2, VS->GetBufferPointer(), VS->GetBufferSize(), &mpLayout));
-	md3dImmediateContext->IASetInputLayout(mpLayout);
-}
+	D3D10_PASS_DESC passDesc;
+	passDesc.
 
-void D3D11App::CleanD3D()
-{
-	mpVS->Release();
-	mpPS->Release();
-	mSwapChain->Release();
-	mRenderTargetView->Release();
-	md3dDevice->Release();
-	md3dImmediateContext->Release();
-}
-
-void D3D11App::Draw(void)
-{
+	/*md3dDevice->CreateInputLayout(
+		vertexDesc, 2, mpVS, sizeof(mpVS), &mVertexLayout);*/
 
 }
 
-bool D3D11App::Init(HINSTANCE hInstance, int nShowCmd)
+void D3D11App::OnResize()
 {
-	if (!InitWindowsApp(hInstance, nShowCmd))
-		return false;
-	if (!InitD3D())
-		return false;
-	return true;
+	//mSwapChain->ResizeBuffers()
 }
 
-
-bool D3D11App::InitWindowsApp(HINSTANCE hInstance, int nShowCmd)
+void D3D11App::Start()
 {
-	WNDCLASS wc;
-	wc.style = CS_HREDRAW | CS_VREDRAW;
-	wc.lpfnWndProc = MainWndProc;
-	wc.cbClsExtra = 0;
-	wc.cbWndExtra = 0;
-	wc.hInstance = hInstance;
-	wc.hIcon = LoadIcon(0, IDI_APPLICATION);
-	wc.hCursor = LoadCursor(0, IDC_ARROW);
-	wc.hbrBackground = (HBRUSH)GetStockObject(WHITE_BRUSH);
-	wc.lpszMenuName = 0;
-	wc.lpszClassName = L"DX11RE";
-
-	if (!RegisterClass(&wc))
-	{
-		return false;//add message box
-	}
-
-	mMainWindow = CreateWindow(
-		L"DX11RE",
-		L"DX11 Rendering Engine",
-		WS_OVERLAPPEDWINDOW,
-		CW_USEDEFAULT,
-		CW_USEDEFAULT,
-		mClientWidth,
-		mClientHeight,
-		0,
-		0,
-		hInstance,
-		0);
-
-	if (mMainWindow == 0)
-	{
-		return false;//add message box
-	}
-
-	ShowWindow(mMainWindow, nShowCmd);
-	UpdateWindow(mMainWindow);
-
-	return true;
+	mTimer = GameTimer();
 }
 
 int D3D11App::Run()
@@ -235,10 +225,25 @@ int D3D11App::Run()
 		}
 		else
 		{
-			Draw();
+			//Update();
+			//Draw();
 		}
 	}
 	return (int)msg.wParam;
+}
+
+void D3D11App::Update(const GameTimer & gt)
+{
+}
+
+void D3D11App::Draw(const GameTimer &gt)
+{
+
+}
+
+float D3D11App::AspectRatio()
+{
+	return static_cast<float>(mClientWidth/mClientHeight);
 }
 
 LRESULT CALLBACK MainWndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)

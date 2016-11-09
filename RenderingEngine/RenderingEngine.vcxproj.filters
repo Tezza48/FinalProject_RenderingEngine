@@ -13,6 +13,9 @@
     <ClCompile Include="D3D11App.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="IRenderFramework.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="D3D11App.h">
@@ -22,6 +25,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="utils.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="IRenderFramework.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
