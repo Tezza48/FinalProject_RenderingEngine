@@ -195,12 +195,7 @@ bool D3D11App::InitPipeline()
 		{"COLOR", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, 12, D3D11_INPUT_PER_VERTEX_DATA, 0}
 	};
 
-	D3D10_PASS_DESC passDesc;
-	passDesc.
-
-	/*md3dDevice->CreateInputLayout(
-		vertexDesc, 2, mpVS, sizeof(mpVS), &mVertexLayout);*/
-
+	return true;
 }
 
 void D3D11App::OnResize()

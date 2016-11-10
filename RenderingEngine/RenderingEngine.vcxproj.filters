@@ -44,10 +44,24 @@
       <UniqueIdentifier>{31e90bff-5cfe-472d-be55-8caaec499ae1}</UniqueIdentifier>
       <Extensions>cpp</Extensions>
     </Filter>
+    <Filter Include="Resources\Pixel Shaders">
+      <UniqueIdentifier>{06af6e55-c8ff-4ff6-99e6-ed10ba4ebbdb}</UniqueIdentifier>
+      <Extensions>ps</Extensions>
+    </Filter>
+    <Filter Include="Resources\Vertex Shaders">
+      <UniqueIdentifier>{267a8f32-7850-4948-b608-7011301b78a1}</UniqueIdentifier>
+      <Extensions>vs</Extensions>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <None Include="shaders.shader">
       <Filter>Resources</Filter>
+    </None>
+    <None Include="color.vs">
+      <Filter>Resources\Vertex Shaders</Filter>
+    </None>
+    <None Include="color.ps">
+      <Filter>Resources\Pixel Shaders</Filter>
     </None>
   </ItemGroup>
 </Project>
