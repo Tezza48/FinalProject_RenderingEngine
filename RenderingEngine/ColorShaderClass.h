@@ -1,5 +1,13 @@
 #pragma once
 
+/*
+ * I'm not a fan of how the RasterTek tutorial performs it's bool
+ * method checks with the `result`, i will change this the more elegant
+ * `if(method())
+ *		then;`
+ * that i have been using from Luna, F;
+ */
+
 #include <d3d11.h>
 #include <D3DX11.h>
 #include <d3dcompiler.h>

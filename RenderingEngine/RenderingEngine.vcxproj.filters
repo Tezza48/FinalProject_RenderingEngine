@@ -16,6 +16,15 @@
     <ClCompile Include="IRenderFramework.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="ColorShaderClass.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ModelClass.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="CameraClass.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="D3D11App.h">
@@ -28,6 +37,15 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="IRenderFramework.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ColorShaderClass.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ModelClass.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="CameraClass.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -57,11 +75,11 @@
     <None Include="shaders.shader">
       <Filter>Resources</Filter>
     </None>
-    <None Include="color.vs">
-      <Filter>Resources\Vertex Shaders</Filter>
-    </None>
-    <None Include="color.ps">
+    <None Include="colorPS.hlsl">
       <Filter>Resources\Pixel Shaders</Filter>
+    </None>
+    <None Include="colorVS.hlsl">
+      <Filter>Resources\Vertex Shaders</Filter>
     </None>
   </ItemGroup>
 </Project>

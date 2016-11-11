@@ -18,7 +18,8 @@ bool D3D11App::Init(HINSTANCE hInstance, int nShowCmd)
 	if (!InitD3D())
 		return false;
 
-	InitPipeline();
+	if (!InitPipeline())
+		return false;
 
 	Start();
 	return true;
@@ -124,29 +125,28 @@ bool D3D11App::InitD3D()
 	sd.SwapEffect = DXGI_SWAP_EFFECT_DISCARD;
 	sd.Flags = 0;
 
-	{
-		IDXGIDevice *dxgiDevice = 0;
-		ThrowIfFailed(md3dDevice->QueryInterface(__uuidof(IDXGIDevice), (void**)&dxgiDevice));
+	
+	IDXGIDevice *dxgiDevice = 0;
+	ThrowIfFailed(md3dDevice->QueryInterface(__uuidof(IDXGIDevice), (void**)&dxgiDevice));
 
-		IDXGIAdapter *dxgiAdapter = 0;
-		ThrowIfFailed(dxgiDevice->GetParent(__uuidof(IDXGIAdapter), (void**)&dxgiAdapter));
+	IDXGIAdapter *dxgiAdapter = 0;
+	ThrowIfFailed(dxgiDevice->GetParent(__uuidof(IDXGIAdapter), (void**)&dxgiAdapter));
 
-		IDXGIFactory *dxgiFactory = 0;
-		ThrowIfFailed(dxgiAdapter->GetParent(__uuidof(IDXGIFactory), (void**)&dxgiFactory));
+	IDXGIFactory *dxgiFactory = 0;
+	ThrowIfFailed(dxgiAdapter->GetParent(__uuidof(IDXGIFactory), (void**)&dxgiFactory));
 
-		ThrowIfFailed(dxgiFactory->CreateSwapChain(md3dDevice, &sd, &mSwapChain));
+	ThrowIfFailed(dxgiFactory->CreateSwapChain(md3dDevice, &sd, &mSwapChain));
 
-		dxgiDevice->Release();
-		dxgiAdapter->Release();
-		dxgiFactory->Release();
-	}
-	{
-		ID3D11Texture2D *backBuffer;
-		mSwapChain->GetBuffer(0, __uuidof(ID3D11Texture2D),
-			reinterpret_cast<void**>(&backBuffer));
-		md3dDevice->CreateRenderTargetView(backBuffer, 0, &mRenderTargetView);
-		backBuffer->Release();
-	}
+	dxgiDevice->Release();
+	dxgiAdapter->Release();
+	dxgiFactory->Release();
+	
+	ID3D11Texture2D *backBuffer;
+	mSwapChain->GetBuffer(0, __uuidof(ID3D11Texture2D),
+		reinterpret_cast<void**>(&backBuffer));
+	md3dDevice->CreateRenderTargetView(backBuffer, 0, &mRenderTargetView);
+	backBuffer->Release();
+	
 
 	D3D11_TEXTURE2D_DESC dsd;// depth stencil description
 	dsd.Width = mClientWidth;
@@ -190,10 +190,23 @@ bool D3D11App::InitD3D()
 
 bool D3D11App::InitPipeline()
 {
-	D3D11_INPUT_ELEMENT_DESC vertexDesc[] = {
-		{"POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0},
-		{"COLOR", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, 12, D3D11_INPUT_PER_VERTEX_DATA, 0}
-	};
+
+	XMMATRIX I = XMMatrixIdentity();
+
+	mWorld = I;
+	mView = I;
+	mProjection = I;
+
+	XMMATRIX P = XMMatrixPerspectiveFovLH(0.25f * XM_PI, AspectRatio(), 1.0f, 1000.0f);
+	mProjection = P;
+
+	mColorShader = new ColorShaderClass();
+
+	if (!mColorShader->Init(md3dDevice, mMainWindow))
+	{
+		MessageBox(mMainWindow, L"Could not initialize the Color Shader object", L"ERROR", MB_OK);
+		return false;
+	}
 
 	return true;
 }
@@ -206,6 +219,14 @@ void D3D11App::OnResize()
 void D3D11App::Start()
 {
 	mTimer = GameTimer();
+
+	mCamera = new CameraClass();
+	mCamera->SetPosition(0.0f, 0.0f, -0.5f);
+
+	mTriangle = new ModelClass();
+
+	mTriangle->Init(md3dDevice);
+
 }
 
 int D3D11App::Run()
@@ -221,7 +242,7 @@ int D3D11App::Run()
 		else
 		{
 			//Update();
-			//Draw();
+			Draw(mTimer);
 		}
 	}
 	return (int)msg.wParam;
@@ -233,7 +254,20 @@ void D3D11App::Update(const GameTimer & gt)
 
 void D3D11App::Draw(const GameTimer &gt)
 {
+	float color[] = { 0.0f, 0.0f, 0.0f, 1.0f };
+	md3dImmediateContext->ClearRenderTargetView(mRenderTargetView, color);
 
+	md3dImmediateContext->ClearDepthStencilView(mDepthStencilView, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0.0f);
+
+	mCamera->Render();
+
+	mCamera->GetViewMatrix(mView);
+
+	mTriangle->Render(md3dImmediateContext);
+
+	mColorShader->Render(md3dImmediateContext, mTriangle->GetIndexCount(), mWorld, mView, mProjection);
+
+	mSwapChain->Present(0, 0);
 }
 
 float D3D11App::AspectRatio()

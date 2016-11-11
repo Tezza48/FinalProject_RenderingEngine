@@ -144,23 +144,27 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="CameraClass.cpp" />
     <ClCompile Include="ColorShaderClass.cpp" />
     <ClCompile Include="D3D11App.cpp" />
     <ClCompile Include="GameTimer.cpp" />
     <ClCompile Include="IRenderFramework.cpp" />
+    <ClCompile Include="ModelClass.cpp" />
     <ClCompile Include="Source.cpp" />
     <ClCompile Include="utils.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="CameraClass.h" />
     <ClInclude Include="ColorShaderClass.h" />
     <ClInclude Include="D3D11App.h" />
     <ClInclude Include="GameTimer.h" />
     <ClInclude Include="IRenderFramework.h" />
+    <ClInclude Include="ModelClass.h" />
     <ClInclude Include="utils.h" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="color.ps" />
-    <None Include="color.vs" />
+    <None Include="colorPS.hlsl" />
+    <None Include="colorVS.hlsl" />
     <None Include="shaders.shader" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

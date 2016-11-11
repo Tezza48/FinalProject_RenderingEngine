@@ -22,7 +22,7 @@ bool ColorShaderClass::Init(ID3D11Device *device, HWND hWnd)
 {
 	bool result;
 
-	result = InitShader(device, hWnd, L"color.vs", L"color.ps");
+	result = InitShader(device, hWnd, L"colorVS.hlsl", L"colorPS.hlsl");
 	if (!result)
 	{
 		return false;
@@ -81,7 +81,7 @@ bool ColorShaderClass::InitShader(ID3D11Device *device, HWND hWnd, WCHAR *vsFile
 		return false;
 	}
 
-	hr = D3DX11CompileFromFile(psFilename, NULL, NULL, "ColorPixelShader", "vs_5_0", D3D10_SHADER_ENABLE_STRICTNESS, 0, NULL, &pixelShaderBuffer, &errorMessage, NULL);
+	hr = D3DX11CompileFromFile(psFilename, NULL, NULL, "ColorPixelShader", "ps_5_0", D3D10_SHADER_ENABLE_STRICTNESS, 0, NULL, &pixelShaderBuffer, &errorMessage, NULL);
 	if (FAILED(hr))
 	{
 		if (errorMessage)

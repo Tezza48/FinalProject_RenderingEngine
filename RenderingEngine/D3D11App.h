@@ -6,12 +6,13 @@
 #include <d3d11.h>
 #include <D3DX11.h>
 #include <D3DX10.h>
-//#include <dxgi1_2.h>
 #include <DirectXMath.h>
 #include <DirectXColors.h>
 #include "IRenderFramework.h"
 #include "utils.h"
-//#include "include/d3dx11effect.h"
+#include "ColorShaderClass.h"
+#include "ModelClass.h"
+#include "CameraClass.h"
 
 #pragma comment(lib, "d3d11.lib")
 #pragma comment(lib, "d3dx11.lib")
@@ -32,8 +33,11 @@ LRESULT CALLBACK MainWndProc(HWND, UINT, WPARAM, LPARAM);
 
 class D3D11App : IRenderFramework
 {
-	ID3D11Buffer *mpVBuffer;
-	ID3D11InputLayout *mpLayout;
+	CameraClass *mCamera;
+	ModelClass *mTriangle;
+	ColorShaderClass *mColorShader;
+
+	XMMATRIX mWorld, mView, mProjection;
 
 protected:
 	HWND mMainWindow = 0;
