@@ -39,6 +39,8 @@ class D3D11App : IRenderFramework
 
 	XMMATRIX mWorld, mView, mProjection;
 
+	ID3D11RasterizerState *mWireframeRS;
+
 protected:
 	HWND mMainWindow = 0;
 	static D3D11App *mApp;

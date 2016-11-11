@@ -171,7 +171,7 @@ bool D3D11App::InitD3D()
 		0,
 		&mDepthStencilView));
 
-	md3dImmediateContext->OMGetRenderTargets(1, &mRenderTargetView, &mDepthStencilView);
+	md3dImmediateContext->OMSetRenderTargets(1, &mRenderTargetView, mDepthStencilView);
 
 	D3D11_VIEWPORT vp;
 	vp.TopLeftX = 0;
@@ -191,13 +191,25 @@ bool D3D11App::InitD3D()
 bool D3D11App::InitPipeline()
 {
 
-	XMMATRIX I = XMMatrixIdentity();
+	D3D11_RASTERIZER_DESC rd;
+	rd.FillMode = D3D11_FILL_WIREFRAME;
+	rd.CullMode = D3D11_CULL_NONE;
+	rd.FrontCounterClockwise = false;
+	rd.DepthBias = 0;
+	rd.DepthBiasClamp = 0.0f;
+	rd.SlopeScaledDepthBias = 0.0f;
+	rd.DepthClipEnable = true;
+	rd.ScissorEnable = false;
+	rd.MultisampleEnable = false;
+	rd.AntialiasedLineEnable = false;
+	
+	md3dDevice->CreateRasterizerState(&rd, &mWireframeRS);
+	
+	mWorld = XMMatrixIdentity();
+	mView = XMMatrixIdentity();
+	mProjection = XMMatrixIdentity();
 
-	mWorld = I;
-	mView = I;
-	mProjection = I;
-
-	XMMATRIX P = XMMatrixPerspectiveFovLH(0.25f * XM_PI, AspectRatio(), 1.0f, 1000.0f);
+	XMMATRIX P = XMMatrixPerspectiveFovLH(0.25f * XM_PI, AspectRatio(), 0.1f, 100.0f);
 	mProjection = P;
 
 	mColorShader = new ColorShaderClass();
@@ -221,7 +233,7 @@ void D3D11App::Start()
 	mTimer = GameTimer();
 
 	mCamera = new CameraClass();
-	mCamera->SetPosition(0.0f, 0.0f, -0.5f);
+	mCamera->SetPosition(0.0f, 0.0f, -5.0f);
 
 	mTriangle = new ModelClass();
 
@@ -254,10 +266,11 @@ void D3D11App::Update(const GameTimer & gt)
 
 void D3D11App::Draw(const GameTimer &gt)
 {
-	float color[] = { 0.0f, 0.0f, 0.0f, 1.0f };
-	md3dImmediateContext->ClearRenderTargetView(mRenderTargetView, color);
+	md3dImmediateContext->ClearRenderTargetView(mRenderTargetView, D3DXCOLOR(0.0f, 0.0f, 0.0f, 1.0f));
 
 	md3dImmediateContext->ClearDepthStencilView(mDepthStencilView, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0.0f);
+
+	md3dImmediateContext->RSSetState(mWireframeRS);
 
 	mCamera->Render();
 

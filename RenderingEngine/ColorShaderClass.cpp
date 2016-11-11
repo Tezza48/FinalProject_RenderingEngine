@@ -50,7 +50,7 @@ bool XM_CALLCONV ColorShaderClass::Render(ID3D11DeviceContext *deviceContext, in
 
 	RenderShader(deviceContext, indexCount);
 
-	return false;
+	return true;
 }
 
 bool ColorShaderClass::InitShader(ID3D11Device *device, HWND hWnd, WCHAR *vsFilename, WCHAR *psFilename)
