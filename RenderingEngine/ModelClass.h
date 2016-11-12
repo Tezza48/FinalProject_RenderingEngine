@@ -7,7 +7,7 @@ using namespace DirectX;
 
 class ModelClass
 {
-private:
+public:
 	struct VertexType
 	{
 		XMFLOAT3 position;
@@ -19,6 +19,7 @@ public:
 	~ModelClass();
 
 	bool Init(ID3D11Device*);
+	bool Init(ID3D11Device*, VertexType*, unsigned long, unsigned long*, unsigned long);
 	void Shutdown();
 	void Render(ID3D11DeviceContext*);
 
@@ -26,6 +27,7 @@ public:
 
 private:
 	bool InitBuffers(ID3D11Device*);
+	bool InitBuffers(ID3D11Device*, VertexType*, unsigned long, unsigned long*, unsigned long);
 	void ShutdownBuffers();
 	void RenderBuffers(ID3D11DeviceContext*);
 

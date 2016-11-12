@@ -10,7 +10,7 @@
 #include <DirectXColors.h>
 #include "IRenderFramework.h"
 #include "utils.h"
-#include "ColorShaderClass.h"
+#include "BasicShader.h"
 #include "ModelClass.h"
 #include "CameraClass.h"
 
@@ -23,19 +23,13 @@ using namespace DirectX;
 using namespace DX;
 using namespace Microsoft::WRL;
 
-struct VERTEX
-{
-	XMFLOAT3 Pos;
-	XMFLOAT4 Color;
-};
-
 LRESULT CALLBACK MainWndProc(HWND, UINT, WPARAM, LPARAM);
 
 class D3D11App : IRenderFramework
 {
 	CameraClass *mCamera;
 	ModelClass *mTriangle;
-	ColorShaderClass *mColorShader;
+	BasicShader *mBasicShader;
 
 	XMMATRIX mWorld, mView, mProjection;
 
@@ -85,10 +79,3 @@ public:
 
 	int Run();
 };
-
-/*	case WM_SIZE:
-		mClientWidth = LOWORD(&lParam);
-		mClientHeight = HIWORD(&lParam)
-		OnResize();
-		return 0;
-	}*/

@@ -192,7 +192,7 @@ bool D3D11App::InitPipeline()
 {
 
 	D3D11_RASTERIZER_DESC rd;
-	rd.FillMode = D3D11_FILL_WIREFRAME;
+	rd.FillMode = D3D11_FILL_SOLID;
 	rd.CullMode = D3D11_CULL_NONE;
 	rd.FrontCounterClockwise = false;
 	rd.DepthBias = 0;
@@ -212,11 +212,11 @@ bool D3D11App::InitPipeline()
 	XMMATRIX P = XMMatrixPerspectiveFovLH(0.25f * XM_PI, AspectRatio(), 0.1f, 100.0f);
 	mProjection = P;
 
-	mColorShader = new ColorShaderClass();
+	mBasicShader = new BasicShader();
 
-	if (!mColorShader->Init(md3dDevice, mMainWindow))
+	if (!mBasicShader->Init(md3dDevice))
 	{
-		MessageBox(mMainWindow, L"Could not initialize the Color Shader object", L"ERROR", MB_OK);
+		MessageBox(mMainWindow, L"Could not initialize the Basic Shader object", L"ERROR", MB_OK);
 		return false;
 	}
 
@@ -237,7 +237,24 @@ void D3D11App::Start()
 
 	mTriangle = new ModelClass();
 
-	mTriangle->Init(md3dDevice);
+	ModelClass::VertexType *vertices = new ModelClass::VertexType[3];
+
+	unsigned long *indices = new unsigned long[3];
+
+	vertices[0].position = XMFLOAT3(-0.5f, -0.5f, 0.0f);
+	vertices[0].color = XMFLOAT4(0.0f, 1.0f, 0.0f, 1.0f);
+
+	vertices[1].position = XMFLOAT3(0.0f, 0.5f, 0.0f);
+	vertices[1].color = XMFLOAT4(0.0f, 1.0f, 0.0f, 1.0f);
+
+	vertices[2].position = XMFLOAT3(0.5f, -0.5f, 0.0f);
+	vertices[2].color = XMFLOAT4(0.0f, 1.0f, 0.0f, 1.0f);
+
+	indices[0] = 0;
+	indices[1] = 1;
+	indices[2] = 2;
+
+	mTriangle->Init(md3dDevice, vertices, 3, indices, 3);
 
 }
 
@@ -260,7 +277,7 @@ int D3D11App::Run()
 	return (int)msg.wParam;
 }
 
-void D3D11App::Update(const GameTimer & gt)
+void D3D11App::Update(const GameTimer &gt)
 {
 }
 
@@ -270,15 +287,15 @@ void D3D11App::Draw(const GameTimer &gt)
 
 	md3dImmediateContext->ClearDepthStencilView(mDepthStencilView, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0.0f);
 
-	md3dImmediateContext->RSSetState(mWireframeRS);
+	//md3dImmediateContext->RSSetState(mWireframeRS);
 
-	mCamera->Render();
+	//mCamera->Render();
 
-	mCamera->GetViewMatrix(mView);
+	//mCamera->GetViewMatrix(mView);
 
 	mTriangle->Render(md3dImmediateContext);
 
-	mColorShader->Render(md3dImmediateContext, mTriangle->GetIndexCount(), mWorld, mView, mProjection);
+	mBasicShader->Render(md3dImmediateContext, mTriangle->GetIndexCount());
 
 	mSwapChain->Present(0, 0);
 }
