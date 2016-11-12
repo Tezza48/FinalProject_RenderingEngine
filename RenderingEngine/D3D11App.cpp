@@ -241,7 +241,7 @@ void D3D11App::Start()
 	//mCamera = new CameraClass();
 	//mCamera->SetPosition(0.0f, 0.0f, -5.0f);
 
-	XMVECTOR pos = XMVectorSet(0.0f, 1.0f, -5.0f, 1.0f);
+	XMVECTOR pos = XMVectorSet(0.0f, 1.0f, -2.0f, 1.0f);
 	XMVECTOR target = XMVectorZero();
 	XMVECTOR up = XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f);
 
@@ -256,30 +256,30 @@ void D3D11App::Start()
 		unsigned long *indices = new unsigned long[36];
 
 		vertices[0].position = XMFLOAT3(-0.5f, -0.5f, -0.5f);
-		vertices[0].color = XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f);
+		vertices[0].color = XMFLOAT4(1.0f, 0.0f, 0.0f, 1.0f);
 
 		vertices[1].position = XMFLOAT3(-0.5f, 0.5f, -0.5f);
-		vertices[1].color = XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f);
+		vertices[1].color = XMFLOAT4(1.0f, 0.0f, 1.0f, 0.0f);
 
 		vertices[2].position = XMFLOAT3(0.5f, 0.5f, -0.5f);
-		vertices[2].color = XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f);
+		vertices[2].color = XMFLOAT4(1.0f, 1.0f, 0.0f, 0.0f);
 
 		vertices[3].position = XMFLOAT3(0.5f, -0.5f, -0.5f);
-		vertices[3].color = XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f);
+		vertices[3].color = XMFLOAT4(1.0f, 1.0f, 0.0f, 1.0f);
 
 
 
 		vertices[4].position = XMFLOAT3(-0.5f, -0.5f, 0.5f);
-		vertices[4].color = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
+		vertices[4].color = XMFLOAT4(1.0f, 0.0f, 1.0f, 1.0f);
 
 		vertices[5].position = XMFLOAT3(-0.5f, 0.5f, 0.5f);
-		vertices[5].color = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
+		vertices[5].color = XMFLOAT4(1.0f, 1.0f, 1.0f, 0.0f);
 
 		vertices[6].position = XMFLOAT3(0.5f, 0.5f, 0.5f);
 		vertices[6].color = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
 
 		vertices[7].position = XMFLOAT3(0.5f, -0.5f, 0.5f);
-		vertices[7].color = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
+		vertices[7].color = XMFLOAT4(1.0f, 0.0f, 0.0f, 0.0f);
 
 		//front
 		indices[0] = 0;
