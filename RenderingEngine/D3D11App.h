@@ -11,6 +11,7 @@
 #include "IRenderFramework.h"
 #include "utils.h"
 #include "BasicShader.h"
+//#include "ColorShaderClass.h"
 #include "ModelClass.h"
 #include "CameraClass.h"
 
@@ -27,13 +28,16 @@ LRESULT CALLBACK MainWndProc(HWND, UINT, WPARAM, LPARAM);
 
 class D3D11App : IRenderFramework
 {
-	CameraClass *mCamera;
+	//CameraClass *mCamera;
 	ModelClass *mTriangle;
 	BasicShader *mBasicShader;
+	//ColorShaderClass *mColorShader;
 
-	XMMATRIX mWorld, mView, mProjection;
+	float triRotY = 0.0f;
 
-	ID3D11RasterizerState *mWireframeRS;
+	XMMATRIX mWorld, mView, mProjection, mWorldViewProj;
+
+	ID3D11RasterizerState *mRS;
 
 protected:
 	HWND mMainWindow = 0;

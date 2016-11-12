@@ -193,7 +193,7 @@ bool D3D11App::InitPipeline()
 
 	D3D11_RASTERIZER_DESC rd;
 	rd.FillMode = D3D11_FILL_SOLID;
-	rd.CullMode = D3D11_CULL_NONE;
+	rd.CullMode = D3D11_CULL_BACK;
 	rd.FrontCounterClockwise = false;
 	rd.DepthBias = 0;
 	rd.DepthBiasClamp = 0.0f;
@@ -203,13 +203,20 @@ bool D3D11App::InitPipeline()
 	rd.MultisampleEnable = false;
 	rd.AntialiasedLineEnable = false;
 	
-	md3dDevice->CreateRasterizerState(&rd, &mWireframeRS);
+	md3dDevice->CreateRasterizerState(&rd, &mRS);
 	
 	mWorld = XMMatrixIdentity();
 	mView = XMMatrixIdentity();
 	mProjection = XMMatrixIdentity();
 
-	XMMATRIX P = XMMatrixPerspectiveFovLH(0.25f * XM_PI, AspectRatio(), 0.1f, 100.0f);
+	XMVECTOR pos = XMVectorSet(0.0f, 0.0f, -5.0f, 1.0f);
+	XMVECTOR target = XMVectorZero();
+	XMVECTOR up = XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f);
+
+	XMMATRIX  V = XMMatrixLookAtLH(pos, target, up);
+	mView = V;
+
+	XMMATRIX P = XMMatrixPerspectiveFovLH(XM_PI/4.0f, AspectRatio(), 1.0f, 100.0f);
 	mProjection = P;
 
 	mBasicShader = new BasicShader();
@@ -219,6 +226,11 @@ bool D3D11App::InitPipeline()
 		MessageBox(mMainWindow, L"Could not initialize the Basic Shader object", L"ERROR", MB_OK);
 		return false;
 	}
+
+	//mColorShader = new ColorShaderClass();
+
+	//if (!mColorShader->Init(md3dDevice, mMainWindow))
+	//	return false;
 
 	return true;
 }
@@ -231,30 +243,98 @@ void D3D11App::OnResize()
 void D3D11App::Start()
 {
 	mTimer = GameTimer();
+	mTimer.Reset();
 
-	mCamera = new CameraClass();
-	mCamera->SetPosition(0.0f, 0.0f, -5.0f);
+	//mCamera = new CameraClass();
+	//mCamera->SetPosition(0.0f, 0.0f, -5.0f);
 
 	mTriangle = new ModelClass();
 
-	ModelClass::VertexType *vertices = new ModelClass::VertexType[3];
+	ModelClass::VertexType *vertices = new ModelClass::VertexType[8];
 
-	unsigned long *indices = new unsigned long[3];
+	unsigned long *indices = new unsigned long[36];
 
-	vertices[0].position = XMFLOAT3(-0.5f, -0.5f, 0.0f);
-	vertices[0].color = XMFLOAT4(0.0f, 1.0f, 0.0f, 1.0f);
+	vertices[0].position = XMFLOAT3(-0.5f, -0.5f, -0.5f);
+	vertices[0].color = XMFLOAT4(1.0f, 0.0f, 0.0f, 1.0f);
 
-	vertices[1].position = XMFLOAT3(0.0f, 0.5f, 0.0f);
+	vertices[1].position = XMFLOAT3(-0.5f, 0.5f, -0.5f);
 	vertices[1].color = XMFLOAT4(0.0f, 1.0f, 0.0f, 1.0f);
 
-	vertices[2].position = XMFLOAT3(0.5f, -0.5f, 0.0f);
-	vertices[2].color = XMFLOAT4(0.0f, 1.0f, 0.0f, 1.0f);
+	vertices[2].position = XMFLOAT3(0.5f, 0.5f, -0.5f);
+	vertices[2].color = XMFLOAT4(0.0f, 0.0f, 1.0f, 1.0f);
 
+	vertices[3].position = XMFLOAT3(0.5f, -0.5f, -0.5f);
+	vertices[3].color = XMFLOAT4(0.0f, 0.0f, 1.0f, 1.0f);
+
+
+
+	vertices[4].position = XMFLOAT3(-0.5f, -0.5f, 0.5f);
+	vertices[4].color = XMFLOAT4(1.0f, 0.0f, 0.0f, 1.0f);
+
+	vertices[5].position = XMFLOAT3(-0.5f, 0.5f, 0.5f);
+	vertices[5].color = XMFLOAT4(0.0f, 1.0f, 0.0f, 1.0f);
+
+	vertices[6].position = XMFLOAT3(0.5f, 0.5f, 0.5f);
+	vertices[6].color = XMFLOAT4(0.0f, 0.0f, 1.0f, 1.0f);
+
+	vertices[7].position = XMFLOAT3(0.5f, -0.5f, 0.5f);
+	vertices[7].color = XMFLOAT4(0.0f, 0.0f, 1.0f, 1.0f);
+
+	//front
 	indices[0] = 0;
 	indices[1] = 1;
 	indices[2] = 2;
 
-	mTriangle->Init(md3dDevice, vertices, 3, indices, 3);
+	indices[3] = 0;
+	indices[4] = 2;
+	indices[5] = 3;
+
+	//right
+	indices[6] = 3;
+	indices[7] = 2;
+	indices[8] = 6;
+
+	indices[9] = 3;
+	indices[10] = 6;
+	indices[11] = 7;
+
+	//back
+	indices[12] = 4;
+	indices[13] = 7;
+	indices[14] = 6;
+
+	indices[15] = 4;
+	indices[16] = 6;
+	indices[17] = 5;
+
+	//left
+	indices[18] = 4;
+	indices[19] = 5;
+	indices[20] = 1;
+
+	indices[21] = 4;
+	indices[22] = 1;
+	indices[23] = 0;
+
+	//top
+	indices[24] = 1;
+	indices[25] = 5;
+	indices[26] = 6;
+
+	indices[27] = 1;
+	indices[28] = 6;
+	indices[29] = 2;
+
+	//bottom
+	indices[30] = 4;
+	indices[31] = 0;
+	indices[32] = 3;
+
+	indices[33] = 4;
+	indices[34] = 3;
+	indices[35] = 7;
+
+	mTriangle->Init(md3dDevice, vertices, 8, indices, 36);
 
 }
 
@@ -270,7 +350,8 @@ int D3D11App::Run()
 		}
 		else
 		{
-			//Update();
+			mTimer.Tick();
+			Update(mTimer);
 			Draw(mTimer);
 		}
 	}
@@ -279,6 +360,7 @@ int D3D11App::Run()
 
 void D3D11App::Update(const GameTimer &gt)
 {
+
 }
 
 void D3D11App::Draw(const GameTimer &gt)
@@ -287,7 +369,17 @@ void D3D11App::Draw(const GameTimer &gt)
 
 	md3dImmediateContext->ClearDepthStencilView(mDepthStencilView, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0.0f);
 
-	//md3dImmediateContext->RSSetState(mWireframeRS);
+	md3dImmediateContext->RSSetState(mRS);
+
+	XMFLOAT3 up = XMFLOAT3(0.0f, 1.0f, 0.0f);
+
+	XMVECTOR upV;
+
+	upV = XMLoadFloat3(&up);
+
+	mWorld *= XMMatrixRotationAxis(upV, gt.DeltaTime());
+
+	mWorldViewProj = mWorld * mView * mProjection;
 
 	//mCamera->Render();
 
@@ -295,7 +387,7 @@ void D3D11App::Draw(const GameTimer &gt)
 
 	mTriangle->Render(md3dImmediateContext);
 
-	mBasicShader->Render(md3dImmediateContext, mTriangle->GetIndexCount());
+	mBasicShader->Render(md3dImmediateContext, mTriangle->GetIndexCount(), mWorldViewProj);
 
 	mSwapChain->Present(0, 0);
 }

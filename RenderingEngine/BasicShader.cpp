@@ -11,9 +11,7 @@ BasicShader::~BasicShader()
 bool BasicShader::Init(ID3D11Device *device)
 {
 	HRESULT hr;
-
 	ID3D10Blob *vertexShaderBuffer, *pixelShaderBuffer;
-	D3D11_INPUT_ELEMENT_DESC polygonLayout[2];
 	UINT numElements;
 
 	hr = D3DX11CompileFromFile(L"basicVS.hlsl", NULL, NULL, "main", "vs_5_0", D3D10_SHADER_ENABLE_STRICTNESS, 0, NULL, &vertexShaderBuffer, nullptr, NULL);
@@ -31,6 +29,8 @@ bool BasicShader::Init(ID3D11Device *device)
 	hr = device->CreatePixelShader(pixelShaderBuffer->GetBufferPointer(), pixelShaderBuffer->GetBufferSize(), NULL, &mPixelShader);
 	if (FAILED(hr))
 		return false;
+
+	D3D11_INPUT_ELEMENT_DESC polygonLayout[2];
 
 	polygonLayout[0].SemanticName = "POSITION";
 	polygonLayout[0].SemanticIndex = 0;
@@ -62,11 +62,41 @@ bool BasicShader::Init(ID3D11Device *device)
 	pixelShaderBuffer->Release();
 	pixelShaderBuffer = nullptr;
 
+	D3D11_BUFFER_DESC matrixBufferDesc;
+	matrixBufferDesc.Usage = D3D11_USAGE_DYNAMIC;
+	matrixBufferDesc.ByteWidth = sizeof(MatrixBufferType);
+	matrixBufferDesc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
+	matrixBufferDesc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
+	matrixBufferDesc.MiscFlags = 0;
+	matrixBufferDesc.StructureByteStride = 0;
+
+	hr = device->CreateBuffer(&matrixBufferDesc, NULL, &mMatrixBuffer);
+
 	return true;
 }
 
-void BasicShader::Render(ID3D11DeviceContext *deviceContext, int indexCount)
+void XM_CALLCONV BasicShader::Render(ID3D11DeviceContext *deviceContext, int indexCount, XMMATRIX worldViewProj)
 {
+	HRESULT hr;
+	D3D11_MAPPED_SUBRESOURCE mappedResource;
+	MatrixBufferType *dataPtr;
+	unsigned int bufferNumber;
+
+	worldViewProj = XMMatrixTranspose(worldViewProj);
+
+	hr = deviceContext->Map(mMatrixBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
+	DX::ThrowIfFailed(hr);
+	
+	dataPtr = (MatrixBufferType*)mappedResource.pData;
+
+	dataPtr->worldViewProj = worldViewProj;
+
+	deviceContext->Unmap(mMatrixBuffer, 0);
+
+	bufferNumber = 0;
+
+	deviceContext->VSSetConstantBuffers(bufferNumber, 1, &mMatrixBuffer);
+
 	deviceContext->IASetInputLayout(mInputLayout);
 
 	deviceContext->VSSetShader(mVertexShader, NULL, 0);

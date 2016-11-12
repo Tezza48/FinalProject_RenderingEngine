@@ -1,3 +1,8 @@
+cbuffer cnPerObject
+{
+	float4x4 gWorldViewProj;
+};
+
 struct VertexInputType
 {
 	float4 position : POSITION;
@@ -16,7 +21,7 @@ PixelInputType main(VertexInputType input )
 
 	input.position.w = 1.0f;
 
-	output.position = input.position;
+	output.position = mul(input.position, gWorldViewProj);
 	output.color = input.color;
 
 	return output;
