@@ -32,7 +32,7 @@ void GameTimer::Reset()
 void GameTimer::Start()
 {
 	__int64 startTime;
-	QueryPerformanceCounter((LARGE_INTEGER *)startTime);
+	QueryPerformanceCounter((LARGE_INTEGER *)&startTime);
 
 	if (mStopped)
 	{

@@ -4,6 +4,10 @@ D3D11App::D3D11App()
 {
 	assert(mApp == nullptr);
 	mApp = this;
+
+	mWorld = XMMatrixIdentity();
+	mView = XMMatrixIdentity();
+	mProjection = XMMatrixIdentity();
 }
 
 D3D11App::~D3D11App()
@@ -22,6 +26,7 @@ bool D3D11App::Init(HINSTANCE hInstance, int nShowCmd)
 		return false;
 
 	Start();
+	isRunning = true;
 	return true;
 }
 
@@ -46,7 +51,7 @@ bool D3D11App::InitWindowsApp(HINSTANCE hInstance, int nShowCmd)
 
 	mMainWindow = CreateWindow(
 		L"DX11RE",
-		L"DX11 Rendering Engine",
+		mClientTitle.c_str(),
 		WS_OVERLAPPEDWINDOW,
 		CW_USEDEFAULT,
 		CW_USEDEFAULT,
@@ -108,6 +113,13 @@ bool D3D11App::InitD3D()
 
 	assert(m4xMsaaQuality > 0);
 
+	OnResize();
+
+	return true;
+}
+
+void D3D11App::OnResize()
+{
 	DXGI_SWAP_CHAIN_DESC sd;// swap chain description
 	sd.BufferDesc.Width = mClientWidth;
 	sd.BufferDesc.Height = mClientHeight;
@@ -125,7 +137,7 @@ bool D3D11App::InitD3D()
 	sd.SwapEffect = DXGI_SWAP_EFFECT_DISCARD;
 	sd.Flags = 0;
 
-	
+
 	IDXGIDevice *dxgiDevice = 0;
 	ThrowIfFailed(md3dDevice->QueryInterface(__uuidof(IDXGIDevice), (void**)&dxgiDevice));
 
@@ -136,17 +148,18 @@ bool D3D11App::InitD3D()
 	ThrowIfFailed(dxgiAdapter->GetParent(__uuidof(IDXGIFactory), (void**)&dxgiFactory));
 
 	ThrowIfFailed(dxgiFactory->CreateSwapChain(md3dDevice, &sd, &mSwapChain));
+	dxgiFactory->MakeWindowAssociation(mMainWindow, DXGI_MWA_NO_ALT_ENTER);
 
 	dxgiDevice->Release();
 	dxgiAdapter->Release();
 	dxgiFactory->Release();
-	
+
 	ID3D11Texture2D *backBuffer;
 	mSwapChain->GetBuffer(0, __uuidof(ID3D11Texture2D),
 		reinterpret_cast<void**>(&backBuffer));
 	md3dDevice->CreateRenderTargetView(backBuffer, 0, &mRenderTargetView);
 	backBuffer->Release();
-	
+
 
 	D3D11_TEXTURE2D_DESC dsd;// depth stencil description
 	dsd.Width = mClientWidth;
@@ -176,16 +189,15 @@ bool D3D11App::InitD3D()
 	D3D11_VIEWPORT vp;
 	vp.TopLeftX = 0;
 	vp.TopLeftY = 0;
-	vp.Width = static_cast<float>(mClientWidth);
-	vp.Height = static_cast<float>(mClientHeight);
+	vp.Width = (float)(mClientWidth);
+	vp.Height = (float)(mClientHeight);
 	vp.MinDepth = 0.0f;
 	vp.MaxDepth = 1.0f;
 
 	md3dImmediateContext->RSSetViewports(1, &vp);
 
-	OnResize();
-
-	return true;
+	XMMATRIX P = XMMatrixPerspectiveFovLH(XM_PI / 4.0f, AspectRatio(), 1.0f, 100.0f);
+	mProjection = P;
 }
 
 bool D3D11App::InitPipeline()
@@ -193,7 +205,7 @@ bool D3D11App::InitPipeline()
 
 	D3D11_RASTERIZER_DESC rd;
 	rd.FillMode = D3D11_FILL_SOLID;
-	rd.CullMode = D3D11_CULL_BACK;
+	rd.CullMode = D3D11_CULL_NONE;
 	rd.FrontCounterClockwise = false;
 	rd.DepthBias = 0;
 	rd.DepthBiasClamp = 0.0f;
@@ -204,20 +216,6 @@ bool D3D11App::InitPipeline()
 	rd.AntialiasedLineEnable = false;
 	
 	md3dDevice->CreateRasterizerState(&rd, &mRS);
-	
-	mWorld = XMMatrixIdentity();
-	mView = XMMatrixIdentity();
-	mProjection = XMMatrixIdentity();
-
-	XMVECTOR pos = XMVectorSet(0.0f, 0.0f, -5.0f, 1.0f);
-	XMVECTOR target = XMVectorZero();
-	XMVECTOR up = XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f);
-
-	XMMATRIX  V = XMMatrixLookAtLH(pos, target, up);
-	mView = V;
-
-	XMMATRIX P = XMMatrixPerspectiveFovLH(XM_PI/4.0f, AspectRatio(), 1.0f, 100.0f);
-	mProjection = P;
 
 	mBasicShader = new BasicShader();
 
@@ -235,11 +233,6 @@ bool D3D11App::InitPipeline()
 	return true;
 }
 
-void D3D11App::OnResize()
-{
-	//mSwapChain->ResizeBuffers()
-}
-
 void D3D11App::Start()
 {
 	mTimer = GameTimer();
@@ -248,93 +241,101 @@ void D3D11App::Start()
 	//mCamera = new CameraClass();
 	//mCamera->SetPosition(0.0f, 0.0f, -5.0f);
 
-	mTriangle = new ModelClass();
+	XMVECTOR pos = XMVectorSet(0.0f, 1.0f, -5.0f, 1.0f);
+	XMVECTOR target = XMVectorZero();
+	XMVECTOR up = XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f);
 
-	ModelClass::VertexType *vertices = new ModelClass::VertexType[8];
+	XMMATRIX  V = XMMatrixLookAtLH(pos, target, up);
+	mView = V;
 
-	unsigned long *indices = new unsigned long[36];
+	{
+		mTriangle = new ModelClass();
 
-	vertices[0].position = XMFLOAT3(-0.5f, -0.5f, -0.5f);
-	vertices[0].color = XMFLOAT4(1.0f, 0.0f, 0.0f, 1.0f);
+		ModelClass::VertexType *vertices = new ModelClass::VertexType[8];
 
-	vertices[1].position = XMFLOAT3(-0.5f, 0.5f, -0.5f);
-	vertices[1].color = XMFLOAT4(0.0f, 1.0f, 0.0f, 1.0f);
+		unsigned long *indices = new unsigned long[36];
 
-	vertices[2].position = XMFLOAT3(0.5f, 0.5f, -0.5f);
-	vertices[2].color = XMFLOAT4(0.0f, 0.0f, 1.0f, 1.0f);
+		vertices[0].position = XMFLOAT3(-0.5f, -0.5f, -0.5f);
+		vertices[0].color = XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f);
 
-	vertices[3].position = XMFLOAT3(0.5f, -0.5f, -0.5f);
-	vertices[3].color = XMFLOAT4(0.0f, 0.0f, 1.0f, 1.0f);
+		vertices[1].position = XMFLOAT3(-0.5f, 0.5f, -0.5f);
+		vertices[1].color = XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f);
+
+		vertices[2].position = XMFLOAT3(0.5f, 0.5f, -0.5f);
+		vertices[2].color = XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f);
+
+		vertices[3].position = XMFLOAT3(0.5f, -0.5f, -0.5f);
+		vertices[3].color = XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f);
 
 
 
-	vertices[4].position = XMFLOAT3(-0.5f, -0.5f, 0.5f);
-	vertices[4].color = XMFLOAT4(1.0f, 0.0f, 0.0f, 1.0f);
+		vertices[4].position = XMFLOAT3(-0.5f, -0.5f, 0.5f);
+		vertices[4].color = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
 
-	vertices[5].position = XMFLOAT3(-0.5f, 0.5f, 0.5f);
-	vertices[5].color = XMFLOAT4(0.0f, 1.0f, 0.0f, 1.0f);
+		vertices[5].position = XMFLOAT3(-0.5f, 0.5f, 0.5f);
+		vertices[5].color = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
 
-	vertices[6].position = XMFLOAT3(0.5f, 0.5f, 0.5f);
-	vertices[6].color = XMFLOAT4(0.0f, 0.0f, 1.0f, 1.0f);
+		vertices[6].position = XMFLOAT3(0.5f, 0.5f, 0.5f);
+		vertices[6].color = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
 
-	vertices[7].position = XMFLOAT3(0.5f, -0.5f, 0.5f);
-	vertices[7].color = XMFLOAT4(0.0f, 0.0f, 1.0f, 1.0f);
+		vertices[7].position = XMFLOAT3(0.5f, -0.5f, 0.5f);
+		vertices[7].color = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
 
-	//front
-	indices[0] = 0;
-	indices[1] = 1;
-	indices[2] = 2;
+		//front
+		indices[0] = 0;
+		indices[1] = 1;
+		indices[2] = 2;
 
-	indices[3] = 0;
-	indices[4] = 2;
-	indices[5] = 3;
+		indices[3] = 0;
+		indices[4] = 2;
+		indices[5] = 3;
 
-	//right
-	indices[6] = 3;
-	indices[7] = 2;
-	indices[8] = 6;
+		//right
+		indices[6] = 3;
+		indices[7] = 2;
+		indices[8] = 6;
 
-	indices[9] = 3;
-	indices[10] = 6;
-	indices[11] = 7;
+		indices[9] = 3;
+		indices[10] = 6;
+		indices[11] = 7;
 
-	//back
-	indices[12] = 4;
-	indices[13] = 7;
-	indices[14] = 6;
+		//back
+		indices[12] = 7;
+		indices[13] = 6;
+		indices[14] = 5;
 
-	indices[15] = 4;
-	indices[16] = 6;
-	indices[17] = 5;
+		indices[15] = 7;
+		indices[16] = 5;
+		indices[17] = 4;
 
-	//left
-	indices[18] = 4;
-	indices[19] = 5;
-	indices[20] = 1;
+		//left
+		indices[18] = 4;
+		indices[19] = 5;
+		indices[20] = 1;
 
-	indices[21] = 4;
-	indices[22] = 1;
-	indices[23] = 0;
+		indices[21] = 4;
+		indices[22] = 1;
+		indices[23] = 0;
 
-	//top
-	indices[24] = 1;
-	indices[25] = 5;
-	indices[26] = 6;
+		//top
+		indices[24] = 1;
+		indices[25] = 5;
+		indices[26] = 6;
 
-	indices[27] = 1;
-	indices[28] = 6;
-	indices[29] = 2;
+		indices[27] = 1;
+		indices[28] = 6;
+		indices[29] = 2;
 
-	//bottom
-	indices[30] = 4;
-	indices[31] = 0;
-	indices[32] = 3;
+		//bottom
+		indices[30] = 4;
+		indices[31] = 0;
+		indices[32] = 3;
 
-	indices[33] = 4;
-	indices[34] = 3;
-	indices[35] = 7;
-
-	mTriangle->Init(md3dDevice, vertices, 8, indices, 36);
+		indices[33] = 4;
+		indices[34] = 3;
+		indices[35] = 7;
+		mTriangle->Init(md3dDevice, vertices, 8, indices, 36);
+	}
 
 }
 
@@ -360,7 +361,12 @@ int D3D11App::Run()
 
 void D3D11App::Update(const GameTimer &gt)
 {
+	std::wstring title;
 
+	int fps = 1.0f / gt.DeltaTime();	
+	title = mClientTitle + L". FPS: " + std::to_wstring(fps);
+
+	SetWindowText(mMainWindow, title.c_str());
 }
 
 void D3D11App::Draw(const GameTimer &gt)
@@ -394,7 +400,7 @@ void D3D11App::Draw(const GameTimer &gt)
 
 float D3D11App::AspectRatio()
 {
-	return static_cast<float>(mClientWidth/mClientHeight);
+	return (float)(mClientWidth) / (float)(mClientHeight);
 }
 
 LRESULT CALLBACK MainWndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
@@ -412,6 +418,20 @@ LRESULT CALLBACK D3D11App::WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lP
 		return 0;
 	case WM_DESTROY:
 		PostQuitMessage(0);
+		return 0;
+	case WM_ENTERSIZEMOVE:
+		mTimer.Stop();
+		return 0;
+	case WM_EXITSIZEMOVE:
+		mTimer.Start();
+		return 0;
+	case WM_SIZE:
+		if (isRunning)
+		{
+			mClientWidth = LOWORD(lParam);
+			mClientHeight = HIWORD(lParam);
+			OnResize();
+		}
 		return 0;
 	}
 	return DefWindowProc(hWnd, msg, wParam, lParam);

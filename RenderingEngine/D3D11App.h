@@ -3,6 +3,7 @@
 #include <Windows.h>
 #include <WRL.h>
 #include <assert.h>
+#include <string>
 #include <d3d11.h>
 #include <D3DX11.h>
 #include <D3DX10.h>
@@ -28,6 +29,9 @@ LRESULT CALLBACK MainWndProc(HWND, UINT, WPARAM, LPARAM);
 
 class D3D11App : IRenderFramework
 {
+
+	bool isRunning = false;
+
 	//CameraClass *mCamera;
 	ModelClass *mTriangle;
 	BasicShader *mBasicShader;
@@ -40,8 +44,9 @@ class D3D11App : IRenderFramework
 	ID3D11RasterizerState *mRS;
 
 protected:
-	HWND mMainWindow = 0;
 	static D3D11App *mApp;
+
+	HWND mMainWindow = 0;
 
 	ID3D11Device *md3dDevice;
 	ID3D11DeviceContext *md3dImmediateContext;
@@ -71,6 +76,8 @@ protected:
 	void OnResize();
 
 	int mClientWidth = 1280, mClientHeight = 720;
+	std::wstring mClientTitle = L"DX11 Rendering Engine";
+	
 public:
 	D3D11App();
 	virtual ~D3D11App();
