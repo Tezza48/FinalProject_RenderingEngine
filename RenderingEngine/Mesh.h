@@ -5,7 +5,7 @@
 
 using namespace DirectX;
 
-class ModelClass
+class Mesh
 {
 public:
 	struct VertexType
@@ -14,9 +14,9 @@ public:
 		XMFLOAT4 color;
 	};
 public:
-	ModelClass();
-	ModelClass(const ModelClass&);
-	~ModelClass();
+	Mesh();
+	Mesh(const Mesh&);
+	~Mesh();
 
 	bool Init(ID3D11Device*);
 	bool Init(ID3D11Device*, VertexType*, unsigned long, unsigned long*, unsigned long);
@@ -24,6 +24,8 @@ public:
 	void Render(ID3D11DeviceContext*);
 
 	int GetIndexCount();
+	void XM_CALLCONV GetWorldMatrix(XMMATRIX&);
+	void XM_CALLCONV SetWorldMatrix(XMMATRIX);
 
 private:
 	bool InitBuffers(ID3D11Device*);
@@ -32,6 +34,7 @@ private:
 	void RenderBuffers(ID3D11DeviceContext*);
 
 private:
+	XMMATRIX mWorld;
 	ID3D11Buffer *mVertexBuffer, *mIndexBuffer;
 	int mVertexCount, mIndexCount;
 };

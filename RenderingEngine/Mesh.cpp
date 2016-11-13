@@ -1,50 +1,60 @@
-#include "ModelClass.h"
+#include "Mesh.h"
 
-ModelClass::ModelClass()
+Mesh::Mesh()
 {
 	mVertexBuffer = nullptr;
 	mIndexBuffer = nullptr;
 }
 
-ModelClass::ModelClass(const ModelClass &)
+Mesh::Mesh(const Mesh &)
 {
 }
 
-ModelClass::~ModelClass()
+Mesh::~Mesh()
 {
 }
 
 // Model will be a green triangle
-bool ModelClass::Init(ID3D11Device *device)
+bool Mesh::Init(ID3D11Device *device)
 {
 	return InitBuffers(device);
 }
 
-bool ModelClass::Init(ID3D11Device *device,
+bool Mesh::Init(ID3D11Device *device,
 	VertexType *vertices, unsigned long numVertices,
 	unsigned long *indices, unsigned long numIndices)
 {
 	return InitBuffers(device, vertices, numVertices, indices, numIndices);
 }
 
-void ModelClass::Shutdown()
+void Mesh::Shutdown()
 {
 	ShutdownBuffers();
 }
 
-void ModelClass::Render(ID3D11DeviceContext *deviceContext)
+void Mesh::Render(ID3D11DeviceContext *deviceContext)
 {
 	RenderBuffers(deviceContext);
 
 	return;
 }
 
-int ModelClass::GetIndexCount()
+int Mesh::GetIndexCount()
 {
 	return mIndexCount;
 }
 
-bool ModelClass::InitBuffers(ID3D11Device *device)
+void XM_CALLCONV Mesh::GetWorldMatrix(XMMATRIX &other)
+{
+	other = mWorld;
+}
+
+void XM_CALLCONV Mesh::SetWorldMatrix(XMMATRIX world)
+{
+	mWorld = world;
+}
+
+bool Mesh::InitBuffers(ID3D11Device *device)
 {
 	HRESULT hr;
 	VertexType *vertices;
@@ -125,7 +135,7 @@ bool ModelClass::InitBuffers(ID3D11Device *device)
 	return true;
 }
 
-bool ModelClass::InitBuffers(ID3D11Device *device, 
+bool Mesh::InitBuffers(ID3D11Device *device, 
 	VertexType *vertices, unsigned long numVertices, 
 	unsigned long *indices, unsigned long numIndices)
 {
@@ -173,7 +183,7 @@ bool ModelClass::InitBuffers(ID3D11Device *device,
 	return true;
 }
 
-void ModelClass::ShutdownBuffers()
+void Mesh::ShutdownBuffers()
 {
 	if (mIndexBuffer)
 	{
@@ -187,7 +197,7 @@ void ModelClass::ShutdownBuffers()
 	}
 }
 
-void ModelClass::RenderBuffers(ID3D11DeviceContext *deviceContext)
+void Mesh::RenderBuffers(ID3D11DeviceContext *deviceContext)
 {
 	unsigned int stride;
 	unsigned int offset;

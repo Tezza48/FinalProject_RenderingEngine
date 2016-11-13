@@ -5,14 +5,46 @@ D3D11App::D3D11App()
 	assert(mApp == nullptr);
 	mApp = this;
 
+	mIsRunning = false;
+
+	mMainCamera = nullptr;
+	mCube = nullptr;
+	mBasicShader = nullptr;
+
 	mWorld = XMMatrixIdentity();
 	mView = XMMatrixIdentity();
 	mProjection = XMMatrixIdentity();
+
+	mRS = nullptr;
+
+	mMainWindow = 0;
+
+	md3dDevice = nullptr;
+	md3dImmediateContext = nullptr;
+	mSwapChain = nullptr;
+
+	mDepthStencilBuffer = nullptr;
+	mRenderTargetView = nullptr;
+	mDepthStencilView = nullptr;
 }
 
 D3D11App::~D3D11App()
 {
+	mDepthStencilView->Release();
+	mRenderTargetView->Release();
+	mDepthStencilBuffer->Release();
 
+	mSwapChain->Release();
+	md3dImmediateContext->Release();
+	md3dDevice->Release();
+	
+	mRS->Release();
+	
+	delete mBasicShader;
+	delete mCube;
+	delete mMainCamera;
+
+	mApp = nullptr;
 }
 
 bool D3D11App::Init(HINSTANCE hInstance, int nShowCmd)
@@ -26,10 +58,11 @@ bool D3D11App::Init(HINSTANCE hInstance, int nShowCmd)
 		return false;
 
 	Start();
-	isRunning = true;
+	mIsRunning = true;
 	return true;
 }
 
+// Standard Win32 initialization
 bool D3D11App::InitWindowsApp(HINSTANCE hInstance, int nShowCmd)
 {
 	WNDCLASS wc;
@@ -78,12 +111,14 @@ bool D3D11App::InitD3D()
 
 	UINT createDeviceFlags = 0;
 
+	// if we're in debug, enable the debug layer
 	#if defined(DEBUG) || defined(_DEBUG)
 	createDeviceFlags |= D3D11_CREATE_DEVICE_DEBUG;
 	#endif
 
 	D3D_FEATURE_LEVEL featureLevel;
 
+	// Create Device
 	HRESULT hr = D3D11CreateDevice(
 		0,
 		D3D_DRIVER_TYPE_HARDWARE,
@@ -108,19 +143,24 @@ bool D3D11App::InitD3D()
 		return false;
 	}
 
+	// Check availablity of 4X MSAA (All DX11 devices should be capable)
 	ThrowIfFailed(md3dDevice->CheckMultisampleQualityLevels(
 		DXGI_FORMAT_R8G8B8A8_UNORM, 4, &m4xMsaaQuality));
 
 	assert(m4xMsaaQuality > 0);
 
-	OnResize();
+	// For ease (and laziness) We initialize the rest by calling OnResize
+	OnResize(mIsRunning);
 
 	return true;
 }
 
-void D3D11App::OnResize()
+// Resize the buffers we're using
+// If it's running, also remake the camera's projection.
+void D3D11App::OnResize(bool isRunning)
 {
-	DXGI_SWAP_CHAIN_DESC sd;// swap chain description
+	// Describe the Swap Chain
+	DXGI_SWAP_CHAIN_DESC sd;
 	sd.BufferDesc.Width = mClientWidth;
 	sd.BufferDesc.Height = mClientHeight;
 	sd.BufferDesc.RefreshRate.Numerator = 60;
@@ -137,7 +177,7 @@ void D3D11App::OnResize()
 	sd.SwapEffect = DXGI_SWAP_EFFECT_DISCARD;
 	sd.Flags = 0;
 
-
+	// Create the swap chain using the given description
 	IDXGIDevice *dxgiDevice = 0;
 	ThrowIfFailed(md3dDevice->QueryInterface(__uuidof(IDXGIDevice), (void**)&dxgiDevice));
 
@@ -150,18 +190,20 @@ void D3D11App::OnResize()
 	ThrowIfFailed(dxgiFactory->CreateSwapChain(md3dDevice, &sd, &mSwapChain));
 	dxgiFactory->MakeWindowAssociation(mMainWindow, DXGI_MWA_NO_ALT_ENTER);
 
+	// release the helper objects
 	dxgiDevice->Release();
 	dxgiAdapter->Release();
 	dxgiFactory->Release();
 
+	// set up the back buffer
 	ID3D11Texture2D *backBuffer;
 	mSwapChain->GetBuffer(0, __uuidof(ID3D11Texture2D),
 		reinterpret_cast<void**>(&backBuffer));
 	md3dDevice->CreateRenderTargetView(backBuffer, 0, &mRenderTargetView);
 	backBuffer->Release();
 
-
-	D3D11_TEXTURE2D_DESC dsd;// depth stencil description
+	// Describe the Depth Stencil
+	D3D11_TEXTURE2D_DESC dsd;
 	dsd.Width = mClientWidth;
 	dsd.Height = mClientHeight;
 	dsd.MipLevels = 1;
@@ -174,6 +216,7 @@ void D3D11App::OnResize()
 	dsd.CPUAccessFlags = 0;
 	dsd.MiscFlags = 0;
 
+	// Create the Depth Stencil buffer and view
 	ThrowIfFailed(md3dDevice->CreateTexture2D(
 		&dsd,
 		0,
@@ -184,8 +227,10 @@ void D3D11App::OnResize()
 		0,
 		&mDepthStencilView));
 
+	// Set the RTV and DSV as render targets
 	md3dImmediateContext->OMSetRenderTargets(1, &mRenderTargetView, mDepthStencilView);
 
+	// Set up the viewport
 	D3D11_VIEWPORT vp;
 	vp.TopLeftX = 0;
 	vp.TopLeftY = 0;
@@ -195,14 +240,14 @@ void D3D11App::OnResize()
 	vp.MaxDepth = 1.0f;
 
 	md3dImmediateContext->RSSetViewports(1, &vp);
-
-	XMMATRIX P = XMMatrixPerspectiveFovLH(XM_PI / 4.0f, AspectRatio(), 1.0f, 100.0f);
-	mProjection = P;
 }
 
 bool D3D11App::InitPipeline()
 {
-
+	// Rasterizer Description.
+	// Only using it for quick debugging.
+	// May possibly add multiple so
+	// i can draw some objects differently
 	D3D11_RASTERIZER_DESC rd;
 	rd.FillMode = D3D11_FILL_SOLID;
 	rd.CullMode = D3D11_CULL_NONE;
@@ -212,46 +257,48 @@ bool D3D11App::InitPipeline()
 	rd.SlopeScaledDepthBias = 0.0f;
 	rd.DepthClipEnable = true;
 	rd.ScissorEnable = false;
-	rd.MultisampleEnable = false;
+	rd.MultisampleEnable = true;
 	rd.AntialiasedLineEnable = false;
 	
 	md3dDevice->CreateRasterizerState(&rd, &mRS);
 
 	mBasicShader = new BasicShader();
 
+	// Initialize the basic shader we're using
 	if (!mBasicShader->Init(md3dDevice))
 	{
 		MessageBox(mMainWindow, L"Could not initialize the Basic Shader object", L"ERROR", MB_OK);
 		return false;
 	}
 
-	//mColorShader = new ColorShaderClass();
-
-	//if (!mColorShader->Init(md3dDevice, mMainWindow))
-	//	return false;
-
 	return true;
 }
 
 void D3D11App::Start()
 {
+	// Set up the Game timer
 	mTimer = GameTimer();
 	mTimer.Reset();
 
-	//mCamera = new CameraClass();
-	//mCamera->SetPosition(0.0f, 0.0f, -5.0f);
+	mMainCamera = new Camera();
 
+	// Set up the camera's projection
+	mMainCamera->CreateProjection(XM_PI / 4.0f, AspectRatio(), 1.0f, 100.0f);
+
+	// Place the camera at 0, 1, -2,
+	// looking at the origin
 	XMVECTOR pos = XMVectorSet(0.0f, 1.0f, -2.0f, 1.0f);
 	XMVECTOR target = XMVectorZero();
 	XMVECTOR up = XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f);
 
 	XMMATRIX  V = XMMatrixLookAtLH(pos, target, up);
-	mView = V;
+	mMainCamera->SetViewMatrix(V);
 
+	// Manually Set the cube's verts and indices
 	{
-		mTriangle = new ModelClass();
+		mCube = new Mesh();
 
-		ModelClass::VertexType *vertices = new ModelClass::VertexType[8];
+		Mesh::VertexType *vertices = new Mesh::VertexType[8];
 
 		unsigned long *indices = new unsigned long[36];
 
@@ -334,7 +381,10 @@ void D3D11App::Start()
 		indices[33] = 4;
 		indices[34] = 3;
 		indices[35] = 7;
-		mTriangle->Init(md3dDevice, vertices, 8, indices, 36);
+		
+		mCube->Init(md3dDevice, vertices, 8, indices, 36);
+
+		mCube->SetWorldMatrix(XMMatrixIdentity());
 	}
 
 }
@@ -361,6 +411,7 @@ int D3D11App::Run()
 
 void D3D11App::Update(const GameTimer &gt)
 {
+	// Adding the FPS to the window title
 	std::wstring title;
 
 	int fps = 1.0f / gt.DeltaTime();	
@@ -371,30 +422,46 @@ void D3D11App::Update(const GameTimer &gt)
 
 void D3D11App::Draw(const GameTimer &gt)
 {
-	md3dImmediateContext->ClearRenderTargetView(mRenderTargetView, D3DXCOLOR(0.0f, 0.0f, 0.0f, 1.0f));
+	// Clear the RTV and DSV in preparation for drawing
+	md3dImmediateContext->ClearRenderTargetView(mRenderTargetView,
+		D3DXCOLOR(0.0f, 0.0f, 0.0f, 1.0f));
 
-	md3dImmediateContext->ClearDepthStencilView(mDepthStencilView, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0.0f);
+	md3dImmediateContext->ClearDepthStencilView(mDepthStencilView,
+		D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0.0f);
 
+	// Set the rasterizer state to
+	// our settings
 	md3dImmediateContext->RSSetState(mRS);
 
+	// Rotate the cube in y by the deltatime
 	XMFLOAT3 up = XMFLOAT3(0.0f, 1.0f, 0.0f);
-
 	XMVECTOR upV;
-
 	upV = XMLoadFloat3(&up);
 
-	mWorld *= XMMatrixRotationAxis(upV, gt.DeltaTime());
+	XMMATRIX world;
+	mCube->GetWorldMatrix(world);
+	world *= XMMatrixRotationAxis(upV, gt.DeltaTime());
+	mCube->SetWorldMatrix(world);
 
+	// set mWorld th the cube's world matrix
+	mCube->GetWorldMatrix(mWorld);
+
+	// set our view matrix and projection fo rendering
+	mMainCamera->GetViewMatrix(mView);
+	mMainCamera->GetProjectionMatrix(mProjection);
+
+	// Combine the world, view and projection
+	// we send this to the VS's constant buffer
 	mWorldViewProj = mWorld * mView * mProjection;
 
-	//mCamera->Render();
+	// Add the cube's verts and indices to the
+	// context
+	mCube->Render(md3dImmediateContext);
 
-	//mCamera->GetViewMatrix(mView);
+	// Render the scene on the back buffer
+	mBasicShader->Render(md3dImmediateContext, mCube->GetIndexCount(), mWorldViewProj);
 
-	mTriangle->Render(md3dImmediateContext);
-
-	mBasicShader->Render(md3dImmediateContext, mTriangle->GetIndexCount(), mWorldViewProj);
-
+	// present the back buffer
 	mSwapChain->Present(0, 0);
 }
 
@@ -426,7 +493,7 @@ LRESULT CALLBACK D3D11App::WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lP
 		mTimer.Start();
 		return 0;
 	case WM_SIZE:
-		if (isRunning)
+		if (mIsRunning)
 		{
 			mClientWidth = LOWORD(lParam);
 			mClientHeight = HIWORD(lParam);

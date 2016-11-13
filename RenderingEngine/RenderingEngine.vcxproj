@@ -145,23 +145,23 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="BasicShader.cpp" />
-    <ClCompile Include="CameraClass.cpp" />
+    <ClCompile Include="Camera.cpp" />
     <ClCompile Include="ColorShaderClass.cpp" />
     <ClCompile Include="D3D11App.cpp" />
     <ClCompile Include="GameTimer.cpp" />
     <ClCompile Include="IRenderFramework.cpp" />
-    <ClCompile Include="ModelClass.cpp" />
+    <ClCompile Include="Mesh.cpp" />
     <ClCompile Include="Source.cpp" />
     <ClCompile Include="utils.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="BasicShader.h" />
-    <ClInclude Include="CameraClass.h" />
+    <ClInclude Include="Camera.h" />
     <ClInclude Include="ColorShaderClass.h" />
     <ClInclude Include="D3D11App.h" />
     <ClInclude Include="GameTimer.h" />
     <ClInclude Include="IRenderFramework.h" />
-    <ClInclude Include="ModelClass.h" />
+    <ClInclude Include="Mesh.h" />
     <ClInclude Include="utils.h" />
   </ItemGroup>
   <ItemGroup>

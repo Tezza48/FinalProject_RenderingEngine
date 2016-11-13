@@ -14,6 +14,7 @@ bool BasicShader::Init(ID3D11Device *device)
 	ID3D10Blob *vertexShaderBuffer, *pixelShaderBuffer;
 	UINT numElements;
 
+	// Compile the PS and the VS
 	hr = D3DX11CompileFromFile(L"basicVS.hlsl", NULL, NULL, "main", "vs_5_0", D3D10_SHADER_ENABLE_STRICTNESS, 0, NULL, &vertexShaderBuffer, nullptr, NULL);
 	if (FAILED(hr))
 		return false;
@@ -30,6 +31,7 @@ bool BasicShader::Init(ID3D11Device *device)
 	if (FAILED(hr))
 		return false;
 
+	// Describe the input elements our VS requires
 	D3D11_INPUT_ELEMENT_DESC polygonLayout[2];
 
 	polygonLayout[0].SemanticName = "POSITION";
@@ -50,18 +52,26 @@ bool BasicShader::Init(ID3D11Device *device)
 
 	numElements = sizeof(polygonLayout) / sizeof(polygonLayout[0]);
 
-	hr = device->CreateInputLayout(polygonLayout, numElements, vertexShaderBuffer->GetBufferPointer(), vertexShaderBuffer->GetBufferSize(), &mInputLayout);
+	// Create the input layout
+	hr = device->CreateInputLayout(polygonLayout,
+		numElements,
+		vertexShaderBuffer->GetBufferPointer(),
+		vertexShaderBuffer->GetBufferSize(),
+		&mInputLayout);
+
 	if (FAILED(hr))
 	{
 		return false;
 	}
 
+	// Release the helper buffers we no longer need
 	vertexShaderBuffer->Release();
 	vertexShaderBuffer = nullptr;
 
 	pixelShaderBuffer->Release();
 	pixelShaderBuffer = nullptr;
 
+	// Describe the matrix buffer for the shader
 	D3D11_BUFFER_DESC matrixBufferDesc;
 	matrixBufferDesc.Usage = D3D11_USAGE_DYNAMIC;
 	matrixBufferDesc.ByteWidth = sizeof(MatrixBufferType);
@@ -70,6 +80,7 @@ bool BasicShader::Init(ID3D11Device *device)
 	matrixBufferDesc.MiscFlags = 0;
 	matrixBufferDesc.StructureByteStride = 0;
 
+	// Create that buffer
 	hr = device->CreateBuffer(&matrixBufferDesc, NULL, &mMatrixBuffer);
 
 	return true;
@@ -82,8 +93,11 @@ void XM_CALLCONV BasicShader::Render(ID3D11DeviceContext *deviceContext, int ind
 	MatrixBufferType *dataPtr;
 	unsigned int bufferNumber;
 
+	// DX requires we transpose the matrices we
+	// send to our shaders
 	worldViewProj = XMMatrixTranspose(worldViewProj);
 
+	// map the matrix buffer to the GPU
 	hr = deviceContext->Map(mMatrixBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
 	DX::ThrowIfFailed(hr);
 	
@@ -95,6 +109,7 @@ void XM_CALLCONV BasicShader::Render(ID3D11DeviceContext *deviceContext, int ind
 
 	bufferNumber = 0;
 
+	// Actually set the shader constant buffers
 	deviceContext->VSSetConstantBuffers(bufferNumber, 1, &mMatrixBuffer);
 
 	deviceContext->IASetInputLayout(mInputLayout);
@@ -102,5 +117,6 @@ void XM_CALLCONV BasicShader::Render(ID3D11DeviceContext *deviceContext, int ind
 	deviceContext->VSSetShader(mVertexShader, NULL, 0);
 	deviceContext->PSSetShader(mPixelShader, NULL, 0);
 
+	// Draw the buffers on the GPU memory
 	deviceContext->DrawIndexed(indexCount, 0, 0);
 }

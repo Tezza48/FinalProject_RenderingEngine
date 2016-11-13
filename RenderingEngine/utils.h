@@ -5,17 +5,9 @@
 
 namespace DX
 {
-
-//#ifndef ThrowIfFailed
-//#define ThrowIfFailed(x)		\
-//	HRESULT hr = x;				\
-//	if(FAILED(hr))				\
-//	{							\
-//		throw std::exception;	\
-//	}
-//
-//#endif
-
+	// Default throw if failed,
+	// saves me from having to handle
+	// failed HRESULTS each time
 	inline void ThrowIfFailed(HRESULT hr)
 	{
 		if (FAILED(hr))

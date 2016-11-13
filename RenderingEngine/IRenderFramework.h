@@ -1,6 +1,7 @@
 #pragma once
 #include "GameTimer.h"
 
+// Interface new API implimentarions should derive from
 class IRenderFramework
 {
 protected:
@@ -11,7 +12,7 @@ protected:
 	virtual void Draw(const GameTimer &gt) = 0;;
 
 public:
-	virtual void OnResize() = 0;
+	virtual void OnResize(bool) = 0;
 	virtual int Run() = 0;
 
 	IRenderFramework();
