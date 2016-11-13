@@ -19,10 +19,10 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectGuid>{661C5BC4-4C06-4802-95C3-42C51F55AD6D}</ProjectGuid>
+    <ProjectGuid>{175CE973-D908-4032-9AD7-AE107239EC47}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
     <RootNamespace>RenderingEngine</RootNamespace>
-    <WindowsTargetPlatformVersion>10.0.10586.0</WindowsTargetPlatformVersion>
+    <WindowsTargetPlatformVersion>8.1</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
@@ -71,6 +71,8 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
+    <IncludePath>C:\Program Files (x86)\Microsoft DirectX SDK (June 2010)\Include;$(IncludePath)</IncludePath>
+    <LibraryPath>C:\Program Files (x86)\Microsoft DirectX SDK (June 2010)\Lib\x86;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
@@ -142,23 +144,44 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-<<<<<<< HEAD
-    <ClCompile Include="d3dEnvironment.cpp" />
-    <ClCompile Include="Main.cpp" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="d3dEnvironment.h" />
-=======
-    <ClCompile Include="D3DApplication.cpp" />
+    <ClCompile Include="BasicShader.cpp" />
+    <ClCompile Include="Camera.cpp" />
+    <ClCompile Include="ColorShaderClass.cpp" />
+    <ClCompile Include="D3D11App.cpp" />
     <ClCompile Include="GameTimer.cpp" />
-    <ClCompile Include="Main.cpp" />
+    <ClCompile Include="IRenderFramework.cpp" />
+    <ClCompile Include="Mesh.cpp" />
+    <ClCompile Include="Source.cpp" />
+    <ClCompile Include="utils.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="D3DApplication.h" />
->>>>>>> refs/remotes/origin/d3d-initialisation
-    <ClInclude Include="d3dx12.h" />
+    <ClInclude Include="BasicShader.h" />
+    <ClInclude Include="Camera.h" />
+    <ClInclude Include="ColorShaderClass.h" />
+    <ClInclude Include="D3D11App.h" />
     <ClInclude Include="GameTimer.h" />
+    <ClInclude Include="IRenderFramework.h" />
+    <ClInclude Include="Mesh.h" />
     <ClInclude Include="utils.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="colorPS.hlsl" />
+    <None Include="colorVS.hlsl" />
+    <None Include="shaders.shader" />
+  </ItemGroup>
+  <ItemGroup>
+    <FxCompile Include="basicPS.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
+    </FxCompile>
+    <FxCompile Include="basicVS.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Vertex</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Vertex</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Vertex</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Vertex</ShaderType>
+    </FxCompile>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
