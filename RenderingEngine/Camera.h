@@ -9,6 +9,8 @@ class Camera
 {
 private:
 	XMMATRIX mView, mProjection;
+
+	float fov, aspectRatio, nearClip, farClip;
 public:
 	Camera();
 	virtual ~Camera();
@@ -21,6 +23,7 @@ public:
 
 	void XM_CALLCONV SetViewMatrix(XMMATRIX);
 
-	void CreateProjection(float fov, float aspectRatio, float nearClip, float farClip);
+	void CreateProjection(float _fov, float _aspectRatio, float _nearClip, float _farClip);
+	void ResizeAspectRatio(float _aspectRatio);
 };
 

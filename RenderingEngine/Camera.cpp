@@ -31,7 +31,19 @@ void XM_CALLCONV Camera::SetViewMatrix(XMMATRIX other)
 }
 
 
-void Camera::CreateProjection(float fov, float aspectRatio, float nearClip, float farClip)
+void Camera::CreateProjection(float _fov, float _aspectRatio, float _nearClip, float _farClip)
 {
+	fov = _fov;
+	aspectRatio = _aspectRatio;
+	nearClip = _nearClip;
+	farClip = _farClip;
+
+	mProjection = XMMatrixPerspectiveFovLH(fov, aspectRatio, nearClip, farClip);
+}
+
+void Camera::ResizeAspectRatio(float _aspectRatio)
+{
+	aspectRatio = _aspectRatio;
+
 	mProjection = XMMatrixPerspectiveFovLH(fov, aspectRatio, nearClip, farClip);
 }
