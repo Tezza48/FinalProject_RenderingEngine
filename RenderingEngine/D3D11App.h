@@ -13,7 +13,7 @@
 #include "utils.h"
 #include "Mesh.h"
 #include "Camera.h"
-#include "BasicShader.h"
+#include "LitColorShader.h"
 
 #pragma comment(lib, "d3d11.lib")
 #pragma comment(lib, "d3dx11.lib")
@@ -37,7 +37,7 @@ class D3D11App : IRenderFramework
 	// Cube Mesh we're rendering
 	Mesh *mCube;
 	// Class with vertex color VS and PS
-	BasicShader *mBasicShader;
+	LitColorShader *mLitColorShader;
 
 	// we're rotating mCube for the demonstration
 	float triRotY = 0.0f;

@@ -28,6 +28,9 @@
     <ClCompile Include="Camera.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="LitColorShader.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="D3D11App.h">
@@ -52,6 +55,12 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Camera.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="LitColorShader.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="LightStructs.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -100,6 +109,12 @@
     </FxCompile>
     <FxCompile Include="basicVS.hlsl">
       <Filter>Resources\Vertex Shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="litColorVS.hlsl">
+      <Filter>Resources</Filter>
+    </FxCompile>
+    <FxCompile Include="litColorPS.hlsl">
+      <Filter>Resources</Filter>
     </FxCompile>
   </ItemGroup>
 </Project>
