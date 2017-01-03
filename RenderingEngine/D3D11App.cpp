@@ -9,7 +9,7 @@ D3D11App::D3D11App()
 
 	mMainCamera = nullptr;
 	mCube = nullptr;
-	mBasicShader = nullptr;
+	mLitColorShader = nullptr;
 
 	mWorld = XMMatrixIdentity();
 	mView = XMMatrixIdentity();
@@ -40,7 +40,7 @@ D3D11App::~D3D11App()
 	
 	mRS->Release();
 	
-	delete mBasicShader;
+	delete mLitColorShader;
 	delete mCube;
 	delete mMainCamera;
 
@@ -262,10 +262,10 @@ bool D3D11App::InitPipeline()
 	
 	md3dDevice->CreateRasterizerState(&rd, &mRS);
 
-	mBasicShader = new BasicShader();
+	mLitColorShader = new LitColorShader();
 
 	// Initialize the basic shader we're using
-	if (!mBasicShader->Init(md3dDevice))
+	if (!mLitColorShader->Init(md3dDevice))
 	{
 		MessageBox(mMainWindow, L"Could not initialize the Basic Shader object", L"ERROR", MB_OK);
 		return false;
@@ -459,7 +459,7 @@ void D3D11App::Draw(const GameTimer &gt)
 	mCube->Render(md3dImmediateContext);
 
 	// Render the scene on the back buffer
-	mBasicShader->Render(md3dImmediateContext, mCube->GetIndexCount(), mWorldViewProj);
+	mLitColorShader->Render(md3dImmediateContext, mCube->GetIndexCount(), mWorldViewProj);
 
 	// present the back buffer
 	mSwapChain->Present(0, 0);

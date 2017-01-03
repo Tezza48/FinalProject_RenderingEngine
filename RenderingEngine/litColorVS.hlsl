@@ -1,6 +1,12 @@
+struct AmbientLight
+{
+	float4 Ambient;
+};
+
 cbuffer cbPerObject
 {
 	float4x4 gWorldViewProj;
+	AmbientLight gAmbientLight;
 };
 
 struct VertexInputType
@@ -15,7 +21,7 @@ struct PixelInputType
 	float4 color : COLOR;
 };
 
-PixelInputType main(VertexInputType input )
+PixelInputType main(VertexInputType input)
 {
 	PixelInputType output;
 
