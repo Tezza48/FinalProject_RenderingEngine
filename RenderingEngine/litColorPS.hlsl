@@ -3,6 +3,12 @@ struct AmbientLight
 	float4 Ambient;
 };
 
+cbuffer cbPerObject
+{
+	float4x4 gWorldViewProj;
+	AmbientLight gAmbientLight;
+};
+
 //struct DirectonalLight
 //{
 //	float4 Ambient;
@@ -12,12 +18,6 @@ struct AmbientLight
 //	float pad;
 //};
 
-cbuffer cbPerFrame
-{
-	AmbientLight gAmbientLight;
-	//DirectionalLight gDirLight;
-};
-
 struct PixelInputType
 {
 	float4 position : SV_POSITION;
@@ -26,9 +26,9 @@ struct PixelInputType
 
 float4 main(PixelInputType input) : SV_TARGET
 {
-	float4 output;
+	float4 output;output = input.color;
 
-	output = mul(input.color, gAmbientLight.Ambient);
+	output = input.color * gAmbientLight.Ambient;
 
 	return output;
 }

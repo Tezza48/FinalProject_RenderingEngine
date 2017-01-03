@@ -459,7 +459,7 @@ void D3D11App::Draw(const GameTimer &gt)
 	mCube->Render(md3dImmediateContext);
 
 	// Render the scene on the back buffer
-	mLitColorShader->Render(md3dImmediateContext, mCube->GetIndexCount(), mWorldViewProj, {XMFLOAT4( 0.1f, 0.1f, 0.1f, 0.1f) });
+	mLitColorShader->Render(md3dImmediateContext, mCube->GetIndexCount(), mWorldViewProj);
 
 	// present the back buffer
 	mSwapChain->Present(0, 0);

@@ -1,6 +1,12 @@
+struct AmbientLight
+{
+	float4 Ambient;
+};
+
 cbuffer cbPerObject
 {
 	float4x4 gWorldViewProj;
+	AmbientLight gAmbientLight;
 };
 
 struct VertexInputType

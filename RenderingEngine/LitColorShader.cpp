@@ -4,6 +4,7 @@
 
 LitColorShader::LitColorShader()
 {
+	defaultAmbient = { XMFLOAT4(0.5f, 0.5f, 0.5f, 1.0f) };
 }
 
 
@@ -24,6 +25,14 @@ bool LitColorShader::Init(ID3D11Device *device)
 		return false;
 
 	hr = D3DX11CompileFromFile(L"litColorPS.hlsl", NULL, NULL, "main", "ps_5_0", D3D10_SHADER_ENABLE_STRICTNESS, 0, NULL, &pixelShaderBuffer, nullptr, NULL);
+	if (FAILED(hr))
+		return false;
+
+	hr = device->CreateVertexShader(vertexShaderBuffer->GetBufferPointer(), vertexShaderBuffer->GetBufferSize(), NULL, &mVertexShader);
+	if (FAILED(hr))
+		return false;
+
+	hr = device->CreatePixelShader(pixelShaderBuffer->GetBufferPointer(), pixelShaderBuffer->GetBufferSize(), NULL, &mPixelShader);
 	if (FAILED(hr))
 		return false;
 
@@ -67,7 +76,7 @@ bool LitColorShader::Init(ID3D11Device *device)
 	// Describe matrix buffer
 	D3D11_BUFFER_DESC matrixBufferDesc;
 	matrixBufferDesc.Usage = D3D11_USAGE_DYNAMIC;
-	matrixBufferDesc.ByteWidth = sizeof(MatrixBufferType);
+	matrixBufferDesc.ByteWidth = sizeof(PerObjectBuffer);
 	matrixBufferDesc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
 	matrixBufferDesc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
 	matrixBufferDesc.MiscFlags = 0;
@@ -78,28 +87,14 @@ bool LitColorShader::Init(ID3D11Device *device)
 	if (FAILED(hr))
 		return false;
 
-	// Describe the Light Buffer
-	D3D11_BUFFER_DESC lightBufferDesc;
-	lightBufferDesc.Usage = D3D11_USAGE_DYNAMIC; // is used at least once per frame => https://msdn.microsoft.com/en-us/library/windows/desktop/ff476259(v=vs.85).aspx
-	lightBufferDesc.ByteWidth = sizeof(LightBufferType);
-	lightBufferDesc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
-	lightBufferDesc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
-	lightBufferDesc.MiscFlags = 0;
-	lightBufferDesc.StructureByteStride = 0;
-
-	hr = device->CreateBuffer(&lightBufferDesc, NULL, &mLightBuffer);
-	if (FAILED(hr))
-		return false;
-
 	return true;
 }
 
-void XM_CALLCONV LitColorShader::Render(ID3D11DeviceContext *deviceContext, int indexCount, XMMATRIX worldViewProj, AmbientLight ambient)
+void XM_CALLCONV LitColorShader::Render(ID3D11DeviceContext *deviceContext, int indexCount, XMMATRIX worldViewProj)
 {
 	HRESULT hr;
 	D3D11_MAPPED_SUBRESOURCE mappedResource;
-	MatrixBufferType *dataPtrMatrix;
-	LightBufferType *dataPtrLight;
+	PerObjectBuffer *dataPtr;
 	unsigned int bufferNumber;
 
 	// DX requires we transpose the matrices we
@@ -110,23 +105,17 @@ void XM_CALLCONV LitColorShader::Render(ID3D11DeviceContext *deviceContext, int 
 	hr = deviceContext->Map(mMatrixBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
 		DX::ThrowIfFailed(hr);
 
-	dataPtrMatrix = (MatrixBufferType*)mappedResource.pData;
-	dataPtrMatrix->worldViewProj = worldViewProj;
+	dataPtr = (PerObjectBuffer*)mappedResource.pData;
+	dataPtr->worldViewProj = worldViewProj;
+	dataPtr->Abmient = defaultAmbient;
 	deviceContext->Unmap(mMatrixBuffer, 0);
-
-	hr = deviceContext->Map(mLightBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
-	DX::ThrowIfFailed(hr);
-
-	dataPtrLight = (LightBufferType*)mappedResource.pData;
-	dataPtrLight->Abmient = ambient;
-	deviceContext->Unmap(mLightBuffer, 0);
 
 	bufferNumber = 0;
 
 	// Actually set the shader constant buffers
 	deviceContext->VSSetConstantBuffers(bufferNumber, 1, &mMatrixBuffer);
 
-	deviceContext->PSSetConstantBuffers(bufferNumber, 1, &mLightBuffer);
+	deviceContext->PSSetConstantBuffers(bufferNumber, 1, &mMatrixBuffer);
 
 	deviceContext->IASetInputLayout(mInputLayout);
 

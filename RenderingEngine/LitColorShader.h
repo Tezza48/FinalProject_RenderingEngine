@@ -13,13 +13,9 @@ using namespace DirectX;
 class LitColorShader
 {
 
-	struct MatrixBufferType
+	struct PerObjectBuffer
 	{
 		XMMATRIX worldViewProj;
-	};
-
-	struct LightBufferType
-	{
 		AmbientLight Abmient;
 	};
 
@@ -28,13 +24,14 @@ public:
 	~LitColorShader();
 
 	bool Init(ID3D11Device*);
-	void XM_CALLCONV Render(ID3D11DeviceContext*, int, XMMATRIX, AmbientLight);
+	void XM_CALLCONV Render(ID3D11DeviceContext*, int, XMMATRIX);
 
 private:
 	ID3D11VertexShader *mVertexShader;
 	ID3D11PixelShader *mPixelShader;
 	ID3D11InputLayout *mInputLayout;
 	ID3D11Buffer *mMatrixBuffer;
-	ID3D11Buffer *mLightBuffer;
+
+	AmbientLight defaultAmbient;
 };
 
