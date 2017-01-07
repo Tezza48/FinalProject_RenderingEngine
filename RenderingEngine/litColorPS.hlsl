@@ -21,14 +21,17 @@ cbuffer cbPerObject
 struct PixelInputType
 {
 	float4 position : SV_POSITION;
+	float4 normal : NORMAL;
 	float4 color : COLOR;
 };
 
 float4 main(PixelInputType input) : SV_TARGET
 {
-	float4 output;output = input.color;
+	float4 output;
 
-	output = input.color * gAmbientLight.Ambient;
+	output = input.color;
+
+	output = input.color/* * gAmbientLight.Ambient*/;
 
 	return output;
 }

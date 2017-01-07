@@ -250,7 +250,7 @@ bool D3D11App::InitPipeline()
 	// i can draw some objects differently
 	D3D11_RASTERIZER_DESC rd;
 	rd.FillMode = D3D11_FILL_SOLID;
-	rd.CullMode = D3D11_CULL_NONE;
+	rd.CullMode = D3D11_CULL_BACK;
 	rd.FrontCounterClockwise = false;
 	rd.DepthBias = 0;
 	rd.DepthBiasClamp = 0.0f;
@@ -298,91 +298,7 @@ void D3D11App::Start()
 	{
 		mCube = new Mesh();
 
-		Mesh::VertexType *vertices = new Mesh::VertexType[8];
-
-		unsigned long *indices = new unsigned long[36];
-
-		vertices[0].position = XMFLOAT3(-0.5f, -0.5f, -0.5f);
-		vertices[0].color = XMFLOAT4(1.0f, 0.0f, 0.0f, 1.0f);
-
-		vertices[1].position = XMFLOAT3(-0.5f, 0.5f, -0.5f);
-		vertices[1].color = XMFLOAT4(1.0f, 0.0f, 1.0f, 0.0f);
-
-		vertices[2].position = XMFLOAT3(0.5f, 0.5f, -0.5f);
-		vertices[2].color = XMFLOAT4(1.0f, 1.0f, 0.0f, 0.0f);
-
-		vertices[3].position = XMFLOAT3(0.5f, -0.5f, -0.5f);
-		vertices[3].color = XMFLOAT4(1.0f, 1.0f, 0.0f, 1.0f);
-
-
-
-		vertices[4].position = XMFLOAT3(-0.5f, -0.5f, 0.5f);
-		vertices[4].color = XMFLOAT4(1.0f, 0.0f, 1.0f, 1.0f);
-
-		vertices[5].position = XMFLOAT3(-0.5f, 0.5f, 0.5f);
-		vertices[5].color = XMFLOAT4(1.0f, 1.0f, 1.0f, 0.0f);
-
-		vertices[6].position = XMFLOAT3(0.5f, 0.5f, 0.5f);
-		vertices[6].color = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
-
-		vertices[7].position = XMFLOAT3(0.5f, -0.5f, 0.5f);
-		vertices[7].color = XMFLOAT4(1.0f, 0.0f, 0.0f, 0.0f);
-
-		//front
-		indices[0] = 0;
-		indices[1] = 1;
-		indices[2] = 2;
-
-		indices[3] = 0;
-		indices[4] = 2;
-		indices[5] = 3;
-
-		//right
-		indices[6] = 3;
-		indices[7] = 2;
-		indices[8] = 6;
-
-		indices[9] = 3;
-		indices[10] = 6;
-		indices[11] = 7;
-
-		//back
-		indices[12] = 7;
-		indices[13] = 6;
-		indices[14] = 5;
-
-		indices[15] = 7;
-		indices[16] = 5;
-		indices[17] = 4;
-
-		//left
-		indices[18] = 4;
-		indices[19] = 5;
-		indices[20] = 1;
-
-		indices[21] = 4;
-		indices[22] = 1;
-		indices[23] = 0;
-
-		//top
-		indices[24] = 1;
-		indices[25] = 5;
-		indices[26] = 6;
-
-		indices[27] = 1;
-		indices[28] = 6;
-		indices[29] = 2;
-
-		//bottom
-		indices[30] = 4;
-		indices[31] = 0;
-		indices[32] = 3;
-
-		indices[33] = 4;
-		indices[34] = 3;
-		indices[35] = 7;
-		
-		mCube->Init(md3dDevice, vertices, 8, indices, 36);
+		mCube->Init(md3dDevice, Mesh::MESH_CUBE);
 
 		mCube->SetWorldMatrix(XMMatrixIdentity());
 	}
@@ -434,13 +350,13 @@ void D3D11App::Draw(const GameTimer &gt)
 	md3dImmediateContext->RSSetState(mRS);
 
 	// Rotate the cube in y by the deltatime
-	XMFLOAT3 up = XMFLOAT3(0.0f, 1.0f, 0.0f);
-	XMVECTOR upV;
-	upV = XMLoadFloat3(&up);
+	XMFLOAT3 diag = XMFLOAT3(0.5773f, 0.5773f, 0.5773f);
+	XMVECTOR diagV;
+	diagV = XMLoadFloat3(&diag);
 
 	XMMATRIX world;
 	mCube->GetWorldMatrix(world);
-	world *= XMMatrixRotationAxis(upV, gt.DeltaTime());
+	world *= XMMatrixRotationAxis(diagV, gt.DeltaTime());
 	mCube->SetWorldMatrix(world);
 
 	// set mWorld th the cube's world matrix
