@@ -110,11 +110,11 @@
     <FxCompile Include="basicVS.hlsl">
       <Filter>Resources\Vertex Shaders</Filter>
     </FxCompile>
-    <FxCompile Include="litColorVS.hlsl">
-      <Filter>Resources</Filter>
-    </FxCompile>
     <FxCompile Include="litColorPS.hlsl">
-      <Filter>Resources</Filter>
+      <Filter>Resources\Pixel Shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="litColorVS.hlsl">
+      <Filter>Resources\Vertex Shaders</Filter>
     </FxCompile>
   </ItemGroup>
 </Project>

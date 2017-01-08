@@ -5,8 +5,10 @@ struct AmbientLight
 
 cbuffer cbPerObject
 {
-	float4x4 gWorldViewProj;
-	AmbientLight gAmbientLight;
+	float4x4 gWorld;
+	float4x4 gView;
+	float4x4 gProj;
+	//AmbientLight gAmbientLight;
 };
 
 struct VertexInputType
@@ -29,7 +31,9 @@ PixelInputType main(VertexInputType input)
 
 	input.position.w = 1.0f;
 
-	output.position = mul(input.position, gWorldViewProj);
+	output.position = mul(input.position, gWorld);
+	output.position = mul(output.position, gView);
+	output.position = mul(output.position, gProj);
 
 	output.normal = input.normal;
 	output.color = input.color;

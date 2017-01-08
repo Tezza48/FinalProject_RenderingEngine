@@ -3,20 +3,27 @@ struct AmbientLight
 	float4 Ambient;
 };
 
-cbuffer cbPerObject
+struct DirectionalLight
 {
-	float4x4 gWorldViewProj;
-	AmbientLight gAmbientLight;
+	float4 Ambient;
+	float4 Diffuse;
+	float4 Specular;
+	float3 Direction;
+	float pad;
 };
 
-//struct DirectonalLight
-//{
-//	float4 Ambient;
-//	float4 Diffuse;
-//	float4 Specular;
-//	float3 Direction;
-//	float pad;
-//};
+cbuffer cbPerObject
+{
+	float4x4 gWorld;
+	float4x4 gView;
+	float4x4 gProj;
+};
+
+cbuffer cbPerFrame
+{
+	AmbientLight gAmbientLight;
+	DirectionalLight gDirLight;
+};
 
 struct PixelInputType
 {
@@ -31,7 +38,9 @@ float4 main(PixelInputType input) : SV_TARGET
 
 	output = input.color;
 
-	output = input.color/* * gAmbientLight.Ambient*/;
+	// ambient
+	output = input.color * gAmbientLight.Ambient;
+
 
 	return output;
 }

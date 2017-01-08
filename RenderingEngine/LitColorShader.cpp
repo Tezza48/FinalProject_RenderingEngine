@@ -4,12 +4,26 @@
 
 LitColorShader::LitColorShader()
 {
-	defaultAmbient = { XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f) };
+	defaultAmbient.Ambient = XMFLOAT4(0.05f, 0.05f, 0.05f, 1.0f);
 }
 
 
 LitColorShader::~LitColorShader()
 {
+	mVertexShader->Release();
+	mVertexShader = nullptr;
+
+	mPixelShader->Release();
+	mPixelShader = nullptr;
+
+	mInputLayout->Release();
+	mInputLayout = nullptr;
+
+	mPerObjectBuffer->Release();
+	mPerObjectBuffer = nullptr;
+
+	mPerFrameBuffer->Release();
+	mPerFrameBuffer = nullptr;
 }
 
 bool LitColorShader::Init(ID3D11Device *device)
@@ -81,49 +95,67 @@ bool LitColorShader::Init(ID3D11Device *device)
 	pixelShaderBuffer->Release();
 	pixelShaderBuffer = nullptr;
 
-	// Describe matrix buffer
-	D3D11_BUFFER_DESC matrixBufferDesc;
-	matrixBufferDesc.Usage = D3D11_USAGE_DYNAMIC;
-	matrixBufferDesc.ByteWidth = sizeof(PerObjectBuffer);
-	matrixBufferDesc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
-	matrixBufferDesc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
-	matrixBufferDesc.MiscFlags = 0;
-	matrixBufferDesc.StructureByteStride = 0;
+	// Describe per object constant buffer buffer
+	D3D11_BUFFER_DESC perObjectBufferDesc;
+	perObjectBufferDesc.Usage = D3D11_USAGE_DYNAMIC;
+	perObjectBufferDesc.ByteWidth = sizeof(PerObjectBuffer);
+	perObjectBufferDesc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
+	perObjectBufferDesc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
+	perObjectBufferDesc.MiscFlags = 0;
+	perObjectBufferDesc.StructureByteStride = 0;
+
+	D3D11_BUFFER_DESC perFrameBufferDesc;
+	perFrameBufferDesc.Usage = D3D11_USAGE_DYNAMIC;
+	perFrameBufferDesc.ByteWidth = sizeof(PerFrameBuffer);
+	perFrameBufferDesc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
+	perFrameBufferDesc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
+	perFrameBufferDesc.MiscFlags = 0;
+	perFrameBufferDesc.StructureByteStride = 0;
 
 	// Create that buffer
-	hr = device->CreateBuffer(&matrixBufferDesc, NULL, &mMatrixBuffer);
+	hr = device->CreateBuffer(&perObjectBufferDesc, NULL, &mPerObjectBuffer);
+	if (FAILED(hr))
+		return false;
+
+	hr = device->CreateBuffer(&perFrameBufferDesc, NULL, &mPerFrameBuffer);
 	if (FAILED(hr))
 		return false;
 
 	return true;
 }
 
-void XM_CALLCONV LitColorShader::Render(ID3D11DeviceContext *deviceContext, int indexCount, XMMATRIX worldViewProj)
+void XM_CALLCONV LitColorShader::Render(ID3D11DeviceContext *deviceContext, int indexCount, XMMATRIX world, XMMATRIX view, XMMATRIX projection)
 {
 	HRESULT hr;
 	D3D11_MAPPED_SUBRESOURCE mappedResource;
 	PerObjectBuffer *dataPtr;
 	unsigned int bufferNumber;
 
+	//{
+	//	world = world * view * projection;
+	//}
+
 	// DX requires we transpose the matrices we
 	// send to our shaders
-	worldViewProj = XMMatrixTranspose(worldViewProj);
+	world = XMMatrixTranspose(world);
+	view = XMMatrixTranspose(view);
+	projection = XMMatrixTranspose(projection);
 
 	// map the matrix buffer to the GPU
-	hr = deviceContext->Map(mMatrixBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
+	hr = deviceContext->Map(mPerObjectBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
 		DX::ThrowIfFailed(hr);
 
 	dataPtr = (PerObjectBuffer*)mappedResource.pData;
-	dataPtr->worldViewProj = worldViewProj;
-	dataPtr->Abmient = defaultAmbient;
-	deviceContext->Unmap(mMatrixBuffer, 0);
+	dataPtr->world = world;
+	dataPtr->view = view;
+	dataPtr->projection = projection;
+	deviceContext->Unmap(mPerObjectBuffer, 0);
 
 	bufferNumber = 0;
 
 	// Actually set the shader constant buffers
-	deviceContext->VSSetConstantBuffers(bufferNumber, 1, &mMatrixBuffer);
-
-	deviceContext->PSSetConstantBuffers(bufferNumber, 1, &mMatrixBuffer);
+	deviceContext->VSSetConstantBuffers(bufferNumber, 1, &mPerObjectBuffer);
+	deviceContext->PSSetConstantBuffers(bufferNumber, 1, &mPerObjectBuffer);
 
 	deviceContext->IASetInputLayout(mInputLayout);
 
@@ -132,4 +164,25 @@ void XM_CALLCONV LitColorShader::Render(ID3D11DeviceContext *deviceContext, int 
 
 	// Draw the buffers on the GPU memory
 	deviceContext->DrawIndexed(indexCount, 0, 0);
+}
+
+void XM_CALLCONV LitColorShader::Frame(ID3D11DeviceContext *deviceContext, AmbientLight ambient, DirectionalLight directional)
+{
+	HRESULT hr;
+	D3D11_MAPPED_SUBRESOURCE mappedSubresource;
+	PerFrameBuffer *dataPtr;
+	unsigned int bufferNumber;
+
+	hr = deviceContext->Map(mPerFrameBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedSubresource);
+	DX::ThrowIfFailed(hr);
+
+	dataPtr = (PerFrameBuffer*)mappedSubresource.pData;
+	dataPtr->Abmient = ambient;
+	dataPtr->Directional = directional;
+	deviceContext->Unmap(mPerFrameBuffer, 0);
+
+	bufferNumber = 1;
+
+	deviceContext->PSSetConstantBuffers(bufferNumber, 1, &mPerFrameBuffer);
+
 }

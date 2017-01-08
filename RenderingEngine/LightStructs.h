@@ -7,6 +7,8 @@ using namespace DirectX;
 
 struct AmbientLight
 {
+	AmbientLight() {ZeroMemory(this, sizeof(this)); }
+
 	XMFLOAT4 Ambient;
 };
 

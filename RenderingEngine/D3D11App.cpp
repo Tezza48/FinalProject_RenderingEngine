@@ -349,6 +349,8 @@ void D3D11App::Draw(const GameTimer &gt)
 	// our settings
 	md3dImmediateContext->RSSetState(mRS);
 
+	mLitColorShader->Frame(md3dImmediateContext, mLitColorShader->defaultAmbient, DirectionalLight());
+
 	// Rotate the cube in y by the deltatime
 	XMFLOAT3 diag = XMFLOAT3(0.5773f, 0.5773f, 0.5773f);
 	XMVECTOR diagV;
@@ -359,7 +361,7 @@ void D3D11App::Draw(const GameTimer &gt)
 	world *= XMMatrixRotationAxis(diagV, gt.DeltaTime());
 	mCube->SetWorldMatrix(world);
 
-	// set mWorld th the cube's world matrix
+	// set mWorld to the cube's world matrix
 	mCube->GetWorldMatrix(mWorld);
 
 	// set our view matrix and projection fo rendering
@@ -368,14 +370,14 @@ void D3D11App::Draw(const GameTimer &gt)
 
 	// Combine the world, view and projection
 	// we send this to the VS's constant buffer
-	mWorldViewProj = mWorld * mView * mProjection;
+	//mWorldViewProj = mWorld * mView * mProjection;
 
 	// Add the cube's verts and indices to the
 	// context
 	mCube->Render(md3dImmediateContext);
 
 	// Render the scene on the back buffer
-	mLitColorShader->Render(md3dImmediateContext, mCube->GetIndexCount(), mWorldViewProj);
+	mLitColorShader->Render(md3dImmediateContext, mCube->GetIndexCount(), mWorld, mView, mProjection);
 
 	// present the back buffer
 	mSwapChain->Present(0, 0);
