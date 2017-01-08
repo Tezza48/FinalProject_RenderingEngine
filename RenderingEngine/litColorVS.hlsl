@@ -3,8 +3,8 @@
 cbuffer cbPerObject
 {
 	float4x4 gWorld;
-	float4x4 gView;
-	float4x4 gProj;
+	float4x4 gWorldInvTrans;
+	float4x4 gWorldViewProj;
 	AmbientLight gAmbientLight;
 	DirectionalLight gDirLight;
 	float3 gEyePosW;
@@ -29,16 +29,15 @@ PixelInputType main(VertexInputType input)
 {
 	PixelInputType output;
 
-	float4x4 worldViewProj = mul(mul(gWorld, gView), gProj);
-	float4x4 worldInverse = transpose(gWorld);
+	float4x4 worldInverseTranspose = transpose(gWorld);
 
 	//output.positionH = float4(input.positionL, 1.0f);
 
-	output.positionH = mul(float4(input.positionL, 1.0f), worldViewProj);
+	output.positionH = mul(float4(input.positionL, 1.0f), gWorldViewProj);
 
 	output.positionW = mul(float4(input.positionL, 1.0f), gWorld).xyz;
 
-	output.normalW = mul(input.normalL, (float3x3)worldInverse);
+	output.normalW = mul(input.normalL, (float3x3)gWorldInvTrans);
 	output.color = input.color;
 
 	return output;

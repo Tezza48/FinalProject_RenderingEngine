@@ -135,7 +135,9 @@ bool LitColorShader::Init(ID3D11Device *device)
 	return true;
 }
 
-void XM_CALLCONV LitColorShader::Render(ID3D11DeviceContext *deviceContext, int indexCount, XMMATRIX world, XMMATRIX view, XMMATRIX projection, AmbientLight ambient, DirectionalLight directional)
+void XM_CALLCONV LitColorShader::Render(ID3D11DeviceContext *deviceContext, int indexCount,
+	XMMATRIX world, XMMATRIX worldViewProj, XMMATRIX worldInvTrans,
+	AmbientLight ambient, DirectionalLight directional, XMMATRIX view)
 {
 	HRESULT hr;
 	D3D11_MAPPED_SUBRESOURCE mappedResource;
@@ -150,8 +152,8 @@ void XM_CALLCONV LitColorShader::Render(ID3D11DeviceContext *deviceContext, int 
 	// DX requires we transpose the matrices we
 	// send to our shaders
 	world = XMMatrixTranspose(world);
-	view = XMMatrixTranspose(view);
-	projection = XMMatrixTranspose(projection);
+	worldViewProj = XMMatrixTranspose(worldViewProj);
+	worldInvTrans = XMMatrixTranspose(worldInvTrans);
 
 	// map the matrix buffer to the GPU
 	hr = deviceContext->Map(mPerObjectBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
@@ -159,17 +161,17 @@ void XM_CALLCONV LitColorShader::Render(ID3D11DeviceContext *deviceContext, int 
 
 	XMVECTOR nullVector;
 	XMVECTOR eyePosVec;
-	XMFLOAT3 eyePosFlo;
+	XMFLOAT3 eyePos;
 	XMMatrixDecompose(&nullVector, &nullVector, &eyePosVec, view);
-	XMStoreFloat3(&eyePosFlo, eyePosVec);
+	XMStoreFloat3(&eyePos, eyePosVec);
 
 	dataPtrPerObj = (PerObjectBuffer*)mappedResource.pData;
 	dataPtrPerObj->world = world;
-	dataPtrPerObj->view = view;
-	dataPtrPerObj->projection = projection;
+	dataPtrPerObj->worldViewProj = worldViewProj;
+	dataPtrPerObj->worldInvTrans = worldInvTrans;
 	dataPtrPerObj->Abmient = ambient;
 	dataPtrPerObj->Directional = directional;
-	dataPtrPerObj->EyePos = eyePosFlo;
+	dataPtrPerObj->EyePos = eyePos;
 
 	deviceContext->Unmap(mPerObjectBuffer, 0);
 

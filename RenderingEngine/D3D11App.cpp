@@ -318,7 +318,7 @@ void D3D11App::Start()
 	mAmbientLight->Ambient = XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f);
 
 	mDirLight = new DirectionalLight();
-	mDirLight->Ambient = XMFLOAT4(0.0f, 0.0f, 0.0f, 0.0f);
+	mDirLight->Ambient = XMFLOAT4(0.01f, 0.01f, 0.1f, 0.01f);
 	mDirLight->Diffuse = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
 	mDirLight->Specular = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
 	mDirLight->Direction = XMFLOAT3(1.0f, -1.0f, 1.0f);
@@ -383,7 +383,7 @@ void D3D11App::Draw(const GameTimer &gt)
 
 	XMMATRIX world;
 	mCube->GetWorldMatrix(world);
-	world *= XMMatrixRotationAxis(upV, gt.DeltaTime());
+	world *= XMMatrixRotationAxis(diagV, gt.DeltaTime());
 	mCube->SetWorldMatrix(world);
 
 	// set mWorld to the cube's world matrix
@@ -395,14 +395,18 @@ void D3D11App::Draw(const GameTimer &gt)
 
 	// Combine the world, view and projection
 	// we send this to the VS's constant buffer
-	//mWorldViewProj = mWorld * mView * mProjection;
+	mWorldViewProj = mWorld * mView * mProjection;
+	mWorldInvTrans = XMMatrixInverse(NULL, mWorld);
+	mWorldInvTrans = XMMatrixTranspose(mWorldInvTrans);
 
 	// Add the cube's verts and indices to the
 	// context
 	mCube->Render(md3dImmediateContext);
 
 	// Render the scene on the back buffer
-	mLitColorShader->Render(md3dImmediateContext, mCube->GetIndexCount(), mWorld, mView, mProjection, *mAmbientLight, *mDirLight);
+	mLitColorShader->Render(md3dImmediateContext, mCube->GetIndexCount(),
+		mWorld, mWorldViewProj, mWorldInvTrans,
+		*mAmbientLight, *mDirLight, mView);
 
 	// present the back buffer
 	mSwapChain->Present(0, 0);

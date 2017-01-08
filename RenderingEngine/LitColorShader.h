@@ -18,8 +18,8 @@ class LitColorShader
 	struct PerObjectBuffer
 	{
 		XMMATRIX world;
-		XMMATRIX view;
-		XMMATRIX projection;
+		XMMATRIX worldInvTrans;
+		XMMATRIX worldViewProj;
 		AmbientLight Abmient;
 		DirectionalLight Directional;
 		XMFLOAT3 EyePos;
@@ -34,7 +34,7 @@ public:
 	~LitColorShader();
 
 	bool Init(ID3D11Device *device);
-	void XM_CALLCONV Render(ID3D11DeviceContext *deviceContext, int , XMMATRIX, XMMATRIX, XMMATRIX, AmbientLight, DirectionalLight);
+	void XM_CALLCONV Render(ID3D11DeviceContext *deviceContext, int , XMMATRIX, XMMATRIX, XMMATRIX, AmbientLight, DirectionalLight, XMMATRIX);
 	//void XM_CALLCONV Frame(ID3D11DeviceContext*, AmbientLight, DirectionalLight);
 
 private:

@@ -46,7 +46,7 @@ class D3D11App : IRenderFramework
 	float triRotY = 0.0f;
 
 	// Matrices we use when rendering
-	XMMATRIX mWorld, mView, mProjection, mWorldViewProj;
+	XMMATRIX mWorld, mView, mProjection, mWorldViewProj, mWorldInvTrans;
 
 	// Rasterizer state i'm using to debug stuff
 	ID3D11RasterizerState *mRS;

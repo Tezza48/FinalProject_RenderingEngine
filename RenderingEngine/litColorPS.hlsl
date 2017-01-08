@@ -3,8 +3,8 @@
 cbuffer cbPerObject
 {
 	float4x4 gWorld;
-	float4x4 gView;
-	float4x4 gProj;
+	float4x4 gWorldInvTrans;
+	float4x4 gWorldViewProj;
 	AmbientLight gAmbientLight;
 	DirectionalLight gDirLight;
 	float3 gEyePosW;
@@ -40,7 +40,7 @@ void ComputeLightDirectional(DirectionalLight light, float4 inColor, float3 pos,
 
 	ambient = inColor * light.Ambient;
 
-	float diffuseFactor = dot(lightVec, nrm);
+	float diffuseFactor = dot(lightVec, nrm);// dot means angle between
 
 	[flatten] // i dont understand what dynamic branching is
 	if (diffuseFactor > 0.0f)
