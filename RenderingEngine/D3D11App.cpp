@@ -251,6 +251,11 @@ void D3D11App::OnResize(bool isRunning)
 	vp.MaxDepth = 1.0f;
 
 	md3dImmediateContext->RSSetViewports(1, &vp);
+
+	if (isRunning)
+	{
+		mMainCamera->ResizeAspectRatio(AspectRatio());
+	}
 }
 
 bool D3D11App::InitPipeline()
@@ -444,7 +449,7 @@ LRESULT CALLBACK D3D11App::WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lP
 		{
 			mClientWidth = LOWORD(lParam);
 			mClientHeight = HIWORD(lParam);
-			OnResize();
+			OnResize(true);
 		}
 		return 0;
 	}
