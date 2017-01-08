@@ -39,6 +39,9 @@ class D3D11App : IRenderFramework
 	// Class with vertex color VS and PS
 	LitColorShader *mLitColorShader;
 
+	AmbientLight *mAmbientLight;
+	DirectionalLight *mDirLight;
+
 	// we're rotating mCube for the demonstration
 	float triRotY = 0.0f;
 

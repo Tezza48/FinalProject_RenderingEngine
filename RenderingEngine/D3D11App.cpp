@@ -11,6 +11,9 @@ D3D11App::D3D11App()
 	mCube = nullptr;
 	mLitColorShader = nullptr;
 
+	mAmbientLight = nullptr;
+	mDirLight = nullptr;
+
 	mWorld = XMMatrixIdentity();
 	mView = XMMatrixIdentity();
 	mProjection = XMMatrixIdentity();
@@ -41,8 +44,16 @@ D3D11App::~D3D11App()
 	mRS->Release();
 	
 	delete mLitColorShader;
+	mLitColorShader = nullptr;
 	delete mCube;
+	mCube = nullptr;
 	delete mMainCamera;
+	mMainCamera = nullptr;
+
+	delete mAmbientLight;
+	mAmbientLight = nullptr;
+	delete mDirLight;
+	mDirLight = nullptr;
 
 	mApp = nullptr;
 }
@@ -267,7 +278,7 @@ bool D3D11App::InitPipeline()
 	// Initialize the basic shader we're using
 	if (!mLitColorShader->Init(md3dDevice))
 	{
-		MessageBox(mMainWindow, L"Could not initialize the Basic Shader object", L"ERROR", MB_OK);
+		MessageBox(mMainWindow, L"Could not initialize the Lit Color Shader object", L"ERROR", MB_OK);
 		return false;
 	}
 
@@ -302,6 +313,15 @@ void D3D11App::Start()
 
 		mCube->SetWorldMatrix(XMMatrixIdentity());
 	}
+	
+	mAmbientLight = new AmbientLight();
+	mAmbientLight->Ambient = XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f);
+
+	mDirLight = new DirectionalLight();
+	mDirLight->Ambient = XMFLOAT4(0.0f, 0.0f, 0.0f, 0.0f);
+	mDirLight->Diffuse = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
+	mDirLight->Specular = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
+	mDirLight->Direction = XMFLOAT3(1.0f, -1.0f, 1.0f);
 
 }
 
@@ -349,16 +369,21 @@ void D3D11App::Draw(const GameTimer &gt)
 	// our settings
 	md3dImmediateContext->RSSetState(mRS);
 
-	mLitColorShader->Frame(md3dImmediateContext, mLitColorShader->defaultAmbient, DirectionalLight());
+	//mLitColorShader->Frame(md3dImmediateContext, mLitColorShader->defaultAmbient, DirectionalLight());
 
-	// Rotate the cube in y by the deltatime
+	// Rotate the cube diagonally by the deltatime
 	XMFLOAT3 diag = XMFLOAT3(0.5773f, 0.5773f, 0.5773f);
 	XMVECTOR diagV;
 	diagV = XMLoadFloat3(&diag);
 
+	// Rotate the cube in y by the deltatime
+	XMFLOAT3 up = XMFLOAT3(0.0f, 1.0f, 0.0f);
+	XMVECTOR upV;
+	upV = XMLoadFloat3(&up);
+
 	XMMATRIX world;
 	mCube->GetWorldMatrix(world);
-	world *= XMMatrixRotationAxis(diagV, gt.DeltaTime());
+	world *= XMMatrixRotationAxis(upV, gt.DeltaTime());
 	mCube->SetWorldMatrix(world);
 
 	// set mWorld to the cube's world matrix
@@ -377,7 +402,7 @@ void D3D11App::Draw(const GameTimer &gt)
 	mCube->Render(md3dImmediateContext);
 
 	// Render the scene on the back buffer
-	mLitColorShader->Render(md3dImmediateContext, mCube->GetIndexCount(), mWorld, mView, mProjection);
+	mLitColorShader->Render(md3dImmediateContext, mCube->GetIndexCount(), mWorld, mView, mProjection, *mAmbientLight, *mDirLight);
 
 	// present the back buffer
 	mSwapChain->Present(0, 0);

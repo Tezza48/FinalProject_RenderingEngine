@@ -170,6 +170,7 @@
   <ItemGroup>
     <None Include="colorPS.hlsl" />
     <None Include="colorVS.hlsl" />
+    <None Include="LightsHelper.hlsli" />
     <None Include="shaders.shader" />
   </ItemGroup>
   <ItemGroup>

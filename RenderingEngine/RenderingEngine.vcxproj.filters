@@ -102,6 +102,9 @@
     <None Include="colorVS.hlsl">
       <Filter>Resources\Vertex Shaders</Filter>
     </None>
+    <None Include="LightsHelper.hlsli">
+      <Filter>Resources</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="basicPS.hlsl">

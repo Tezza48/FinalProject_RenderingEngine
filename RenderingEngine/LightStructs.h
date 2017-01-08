@@ -20,5 +20,6 @@ struct DirectionalLight
 	XMFLOAT4 Diffuse;
 	XMFLOAT4 Specular;
 	XMFLOAT3 Direction;
+private:
 	float pad;
 };
