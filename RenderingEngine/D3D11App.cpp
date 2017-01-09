@@ -317,16 +317,21 @@ void D3D11App::Start()
 		mCube->Init(md3dDevice, Mesh::MESH_CUBE);
 
 		mCube->SetWorldMatrix(XMMatrixIdentity());
+
+		mColorMaterial = new ColorMaterial(
+			XMFLOAT4(0.0f, 0.0f, 0.0f, 0.0f),
+			XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f),
+			XMFLOAT4(1.0f, 1.0f, 1.0f, 0.5f));
 	}
 	
 	mAmbientLight = new AmbientLight();
 	mAmbientLight->Ambient = XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f);
 
 	mDirLight = new DirectionalLight();
-	mDirLight->Ambient = XMFLOAT4(0.01f, 0.01f, 0.1f, 0.01f);
-	mDirLight->Diffuse = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
-	mDirLight->Specular = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
-	mDirLight->Direction = XMFLOAT3(1.0f, -1.0f, 1.0f);
+	mDirLight->Ambient = XMFLOAT4(0.01f, 0.01f, 0.01f, 1.0f);
+	mDirLight->Diffuse = XMFLOAT4(0.8f, 0.8f, 0.8f, 1.0f);
+	mDirLight->Specular = XMFLOAT4(0.8f, 0.8f, 0.8f, 1.0f);
+	mDirLight->Direction =  XMFLOAT3(1.0f, -1.0f, 1.0f);
 
 }
 
@@ -365,7 +370,7 @@ void D3D11App::Draw(const GameTimer &gt)
 {
 	// Clear the RTV and DSV in preparation for drawing
 	md3dImmediateContext->ClearRenderTargetView(mRenderTargetView,
-		D3DXCOLOR(0.0f, 0.0f, 0.0f, 1.0f));
+		D3DXCOLOR(0.05f, 0.05f, 0.05f, 1.0f));
 
 	md3dImmediateContext->ClearDepthStencilView(mDepthStencilView,
 		D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0.0f);
@@ -388,7 +393,7 @@ void D3D11App::Draw(const GameTimer &gt)
 
 	XMMATRIX world;
 	mCube->GetWorldMatrix(world);
-	world *= XMMatrixRotationAxis(diagV, gt.DeltaTime());
+	world *= XMMatrixRotationAxis(upV, gt.DeltaTime());
 	mCube->SetWorldMatrix(world);
 
 	// set mWorld to the cube's world matrix
@@ -411,7 +416,7 @@ void D3D11App::Draw(const GameTimer &gt)
 	// Render the scene on the back buffer
 	mLitColorShader->Render(md3dImmediateContext, mCube->GetIndexCount(),
 		mWorld, mWorldViewProj, mWorldInvTrans,
-		*mAmbientLight, *mDirLight, mView);
+		*mAmbientLight, *mDirLight, mView, *mColorMaterial);
 
 	// present the back buffer
 	mSwapChain->Present(0, 0);

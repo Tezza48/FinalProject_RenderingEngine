@@ -4,6 +4,7 @@ Mesh::Mesh()
 {
 	mVertexBuffer = nullptr;
 	mIndexBuffer = nullptr;
+	//mMaterial = nullptr;
 }
 
 Mesh::Mesh(const Mesh &)
@@ -12,6 +13,14 @@ Mesh::Mesh(const Mesh &)
 
 Mesh::~Mesh()
 {
+	mVertexBuffer->Release();
+	mVertexBuffer = nullptr;
+
+	mIndexBuffer->Release();
+	mIndexBuffer = nullptr;
+
+	//delete mMaterial;
+	//mMaterial = nullptr;
 }
 
 // Model will be a green triangle
@@ -254,11 +263,6 @@ bool Mesh::Init(ID3D11Device *device,
 	return InitBuffers(device, vertices, numVertices, indices, numIndices);
 }
 
-void Mesh::Shutdown()
-{
-	ShutdownBuffers();
-}
-
 void Mesh::Render(ID3D11DeviceContext *deviceContext)
 {
 	RenderBuffers(deviceContext);
@@ -280,6 +284,16 @@ void XM_CALLCONV Mesh::SetWorldMatrix(XMMATRIX world)
 {
 	mWorld = world;
 }
+
+void Mesh::SetMaterial(ColorMaterial * material)
+{
+	//mMaterial = material;
+}
+
+//ColorMaterial * Mesh::GetMaterial()
+//{
+//	//return mMaterial;
+//}
 
 bool Mesh::InitBuffers(ID3D11Device *device)
 {
@@ -408,20 +422,6 @@ bool Mesh::InitBuffers(ID3D11Device *device,
 	}
 
 	return true;
-}
-
-void Mesh::ShutdownBuffers()
-{
-	if (mIndexBuffer)
-	{
-		mIndexBuffer->Release();
-		mIndexBuffer = nullptr;
-	}
-	if (mVertexBuffer)
-	{
-		mVertexBuffer->Release();
-		mVertexBuffer = nullptr;
-	}
 }
 
 void Mesh::RenderBuffers(ID3D11DeviceContext *deviceContext)

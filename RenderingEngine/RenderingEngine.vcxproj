@@ -147,10 +147,12 @@
     <ClCompile Include="BasicShader.cpp" />
     <ClCompile Include="Camera.cpp" />
     <ClCompile Include="ColorShaderClass.cpp" />
+    <ClCompile Include="ColorMaterial.cpp" />
     <ClCompile Include="D3D11App.cpp" />
     <ClCompile Include="GameTimer.cpp" />
     <ClCompile Include="IRenderFramework.cpp" />
     <ClCompile Include="LitColorShader.cpp" />
+    <ClCompile Include="Material.cpp" />
     <ClCompile Include="Mesh.cpp" />
     <ClCompile Include="Source.cpp" />
     <ClCompile Include="utils.cpp" />
@@ -159,18 +161,22 @@
     <ClInclude Include="BasicShader.h" />
     <ClInclude Include="Camera.h" />
     <ClInclude Include="ColorShaderClass.h" />
+    <ClInclude Include="ColorMaterial.h" />
     <ClInclude Include="D3D11App.h" />
     <ClInclude Include="GameTimer.h" />
     <ClInclude Include="LightStructs.h" />
     <ClInclude Include="IRenderFramework.h" />
     <ClInclude Include="LitColorShader.h" />
+    <ClInclude Include="Material.h" />
     <ClInclude Include="Mesh.h" />
+    <ClInclude Include="resource.h" />
     <ClInclude Include="utils.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="colorPS.hlsl" />
     <None Include="colorVS.hlsl" />
     <None Include="LightsHelper.hlsli" />
+    <None Include="LitColor.hlsli" />
     <None Include="shaders.shader" />
   </ItemGroup>
   <ItemGroup>
@@ -198,6 +204,9 @@
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Vertex</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Vertex</ShaderType>
     </FxCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="RenderingEngine.rc" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

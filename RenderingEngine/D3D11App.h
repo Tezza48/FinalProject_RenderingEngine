@@ -14,6 +14,7 @@
 #include "Mesh.h"
 #include "Camera.h"
 #include "LitColorShader.h"
+#include "ColorMaterial.h"
 
 #pragma comment(lib, "d3d11.lib")
 #pragma comment(lib, "d3dx11.lib")
@@ -38,6 +39,7 @@ class D3D11App : IRenderFramework
 	Mesh *mCube;
 	// Class with vertex color VS and PS
 	LitColorShader *mLitColorShader;
+	ColorMaterial * mColorMaterial;
 
 	AmbientLight *mAmbientLight;
 	DirectionalLight *mDirLight;

@@ -1,3 +1,4 @@
+#include "litColor.hlsli"
 #include "LightsHelper.hlsli"
 
 cbuffer cbPerObject
@@ -8,28 +9,21 @@ cbuffer cbPerObject
 	AmbientLight gAmbientLight;
 	DirectionalLight gDirLight;
 	float3 gEyePosW;
+	Material gMat;
 };
 
 //cbuffer cbPerFrame
 //{
 //};
 
-struct PixelInputType
-{
-	float4 positionH : SV_POSITION;
-	float3 positionW : POSITION;
-	float3 normalW : NORMAL;
-	float4 color : COLOR;
-};
-
-void ComputeLightAmbient(AmbientLight light, float4 matColor, out float4 ambient)
+void ComputeLightAmbient(AmbientLight light, Material mat, out float4 ambient)
 {
 	ambient = float4(0.0f, 0.0f, 0.0f, 0.0f);
 
-	ambient = matColor * light.Ambient;
+	ambient = mat.Ambient * light.Ambient;
 }
 
-void ComputeLightDirectional(DirectionalLight light, float4 inColor, float3 pos, float3 nrm, float3 toEye,
+void ComputeLightDirectional(DirectionalLight light, Material mat, float3 pos, float3 nrm, float3 toEye,
 	out float4 ambient, out float4 diffuse, out float4 specular)
 {
 	ambient = float4(0.0f, 0.0f, 0.0f, 0.0f);
@@ -38,7 +32,7 @@ void ComputeLightDirectional(DirectionalLight light, float4 inColor, float3 pos,
 
 	float3 lightVec = -light.Direction;
 
-	ambient = inColor * light.Ambient;
+	ambient = mat.Ambient * light.Ambient;
 
 	float diffuseFactor = dot(lightVec, nrm);// dot means angle between
 
@@ -46,10 +40,10 @@ void ComputeLightDirectional(DirectionalLight light, float4 inColor, float3 pos,
 	if (diffuseFactor > 0.0f)
 	{
 		float3 v = reflect(-lightVec, nrm);
-		//float specFactor = pow(max(dot(v, toEye), 0.0f), mat.Speculat.W);
+		float specFactor = pow(max(dot(v, toEye), 0.0f), mat.Specular.w);
 
-		diffuse = diffuseFactor * inColor * light.Diffuse;
-		//specular = specFactor * mat.Specular * light.Specular;
+		diffuse = diffuseFactor * mat.Diffuse * light.Diffuse;
+		specular = specFactor * mat.Specular * light.Specular;
 	}
 }
 
@@ -65,13 +59,13 @@ float4 main(PixelInputType input) : SV_TARGET
 	float4 a, d, s; //ambient, diffuse, specular components
 
 	// ambient
-	ComputeLightAmbient(gAmbientLight, input.color, a);
+	ComputeLightAmbient(gAmbientLight, gMat, a);
 	ambient += a;
 
-	ComputeLightDirectional(gDirLight, input.color, input.positionW, input.normalW, toEye, a, d, s);
+	ComputeLightDirectional(gDirLight, gMat, input.positionW, input.normalW, toEye, a, d, s);
 	ambient += a;
 	diffuse += d;
-	//specular += s;
+	specular += s;
 
 	float4 litColor = ambient + diffuse + specular;
 

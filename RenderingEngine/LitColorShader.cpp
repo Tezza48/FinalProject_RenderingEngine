@@ -1,7 +1,5 @@
 #include "LitColorShader.h"
 
-
-
 LitColorShader::LitColorShader()
 {
 	//defaultAmbient.Ambient = XMFLOAT4(0.05f, 0.05f, 0.05f, 1.0f);
@@ -137,7 +135,7 @@ bool LitColorShader::Init(ID3D11Device *device)
 
 void XM_CALLCONV LitColorShader::Render(ID3D11DeviceContext *deviceContext, int indexCount,
 	XMMATRIX world, XMMATRIX worldViewProj, XMMATRIX worldInvTrans,
-	AmbientLight ambient, DirectionalLight directional, XMMATRIX view)
+	AmbientLight ambient, DirectionalLight directional, XMMATRIX view, ColorMaterial mat)
 {
 	HRESULT hr;
 	D3D11_MAPPED_SUBRESOURCE mappedResource;
@@ -166,12 +164,15 @@ void XM_CALLCONV LitColorShader::Render(ID3D11DeviceContext *deviceContext, int 
 	XMStoreFloat3(&eyePos, eyePosVec);
 
 	dataPtrPerObj = (PerObjectBuffer*)mappedResource.pData;
-	dataPtrPerObj->world = world;
-	dataPtrPerObj->worldViewProj = worldViewProj;
-	dataPtrPerObj->worldInvTrans = worldInvTrans;
+	dataPtrPerObj->World = world;
+	dataPtrPerObj->WorldViewProj = worldViewProj;
+	dataPtrPerObj->WorldInvTrans = worldInvTrans;
 	dataPtrPerObj->Abmient = ambient;
 	dataPtrPerObj->Directional = directional;
 	dataPtrPerObj->EyePos = eyePos;
+	dataPtrPerObj->Mat = Mat{ XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f),
+		XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f),
+		XMFLOAT4(0.5f, 0.5f, 0.5f, 0.1f) };
 
 	deviceContext->Unmap(mPerObjectBuffer, 0);
 

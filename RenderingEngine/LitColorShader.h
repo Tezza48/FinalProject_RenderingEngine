@@ -7,6 +7,7 @@
 #include <fstream>
 #include "utils.h"
 #include "LightStructs.h"
+#include "ColorMaterial.h"
 
 using namespace DirectX;
 
@@ -15,14 +16,22 @@ using namespace DirectX;
 class LitColorShader
 {
 
+	struct Mat
+	{
+		XMFLOAT4 Ambient;
+		XMFLOAT4 Diffuse;
+		XMFLOAT4 Specular;
+	};
+
 	struct PerObjectBuffer
 	{
-		XMMATRIX world;
-		XMMATRIX worldInvTrans;
-		XMMATRIX worldViewProj;
+		XMMATRIX World;
+		XMMATRIX WorldInvTrans;
+		XMMATRIX WorldViewProj;
 		AmbientLight Abmient;
 		DirectionalLight Directional;
 		XMFLOAT3 EyePos;
+		Mat Mat;
 	};
 
 	//struct PerFrameBuffer
@@ -34,7 +43,7 @@ public:
 	~LitColorShader();
 
 	bool Init(ID3D11Device *device);
-	void XM_CALLCONV Render(ID3D11DeviceContext *deviceContext, int , XMMATRIX, XMMATRIX, XMMATRIX, AmbientLight, DirectionalLight, XMMATRIX);
+	void XM_CALLCONV Render(ID3D11DeviceContext *deviceContext, int , XMMATRIX, XMMATRIX, XMMATRIX, AmbientLight, DirectionalLight, XMMATRIX, ColorMaterial);
 	//void XM_CALLCONV Frame(ID3D11DeviceContext*, AmbientLight, DirectionalLight);
 
 private:
