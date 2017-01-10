@@ -235,14 +235,112 @@ bool Mesh::Init(ID3D11Device *device, PrimativeShape shape)
 
 		for (size_t i = 0; i < numVertices; i++)
 		{
-			vertices[i].uv = XMFLOAT2(0.0f, 0.0f);
-			vertices[i + 1].uv = XMFLOAT2(0.0f, 1.0f);
-			vertices[i + 2].uv = XMFLOAT2(1.0f, 1.0f);
-			vertices[i + 3].uv = XMFLOAT2(1.0f, 0.0f);
+			vertices[i].tex = XMFLOAT2(0.0f, 0.0f);
+			vertices[i + 1].tex = XMFLOAT2(0.0f, 1.0f);
+			vertices[i + 2].tex = XMFLOAT2(1.0f, 1.0f);
+			vertices[i + 3].tex = XMFLOAT2(1.0f, 0.0f);
 		}
 
 	}
 		break;
+	case Mesh::MESH_SOFTCUBE:
+		numVertices = 8;
+		numIndices = 36;
+
+		vertices = new Vertex[numVertices];
+		indices = new unsigned long[numIndices];
+
+		// Front
+		vertices[0].position = XMFLOAT3(-0.5f, -0.5f, -0.5f);
+		vertices[0].normal = XMFLOAT3(-0.57735f, -0.57735f, -0.57735f);
+		vertices[0].tex = XMFLOAT2(0.0f, 0.0f);
+
+		vertices[1].position = XMFLOAT3(-0.5f, 0.5f, -0.5f);
+		vertices[1].normal = XMFLOAT3(-0.57735f, 0.57735f, -0.57735f);
+		vertices[1].tex = XMFLOAT2(0.0f, 1.0f);
+
+		vertices[2].position = XMFLOAT3(0.5f, 0.5f, -0.5f);
+		vertices[2].normal = XMFLOAT3(0.57735f, 0.57735f, -0.57735f);
+		vertices[2].tex = XMFLOAT2(1.0f, 1.0f);
+
+		vertices[3].position = XMFLOAT3(0.5f, -0.5f, -0.5f);
+		vertices[3].normal = XMFLOAT3(0.57735f, -0.57735f, -0.57735f);
+		vertices[3].tex = XMFLOAT2(1.0f, 0.0f);
+
+		// Back
+		vertices[4].position = XMFLOAT3(0.5f, -0.5f, 0.5f);
+		vertices[4].normal = XMFLOAT3(0.57735f, -0.57735f, 0.57735f);
+		vertices[4].tex = XMFLOAT2(0.0f, 0.0f);
+
+		vertices[5].position = XMFLOAT3(0.5f, 0.5f, 0.5f);
+		vertices[5].normal = XMFLOAT3(0.57735f, 0.57735f, 0.57735f);
+		vertices[5].tex = XMFLOAT2(0.0f, 1.0f);
+
+		vertices[6].position = XMFLOAT3(-0.5f, 0.5f, 0.5f);
+		vertices[6].normal = XMFLOAT3(-0.57735f, 0.57735f, 0.57735f);
+		vertices[6].tex = XMFLOAT2(1.0f, 1.0f);
+
+		vertices[7].position = XMFLOAT3(-0.5f, -0.5f, 0.5f);
+		vertices[7].normal = XMFLOAT3(-0.57735f, -0.57735f, 0.57735f);
+		vertices[7].tex = XMFLOAT2(1.0f, 0.0f);
+
+
+		//F
+		indices[0] = 0;
+		indices[1] = 1;
+		indices[2] = 2;
+
+		indices[3] = 0;
+		indices[4] = 2;
+		indices[5] = 3;
+
+		//R
+		indices[6] = 3;
+		indices[7] = 2;
+		indices[8] = 5;
+
+		indices[9] = 3;
+		indices[10] = 5;
+		indices[11] = 4;
+
+		//Ba
+		indices[12] = 4;
+		indices[13] = 5;
+		indices[14] = 6;
+
+		indices[15] = 4;
+		indices[16] = 6;
+		indices[17] = 7;
+
+		//L
+		indices[18] = 7;
+		indices[19] = 6;
+		indices[20] = 1;
+
+		indices[21] = 7;
+		indices[22] = 1;
+		indices[23] = 0;
+
+		//T
+		indices[24] = 1;
+		indices[25] = 6;
+		indices[26] = 5;
+
+		indices[27] = 1; 
+		indices[28] = 5; 
+		indices[29] = 2;
+
+		//Bo
+		indices[30] = 7;
+		indices[31] = 0;
+		indices[32] = 3;
+
+		indices[33] = 7;
+		indices[34] = 3;
+		indices[35] = 4;
+
+		break;
+
 	//case Mesh::MESH_NONE:
 	//	break;
 	//default:

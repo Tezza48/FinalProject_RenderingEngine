@@ -25,7 +25,8 @@ PixelInputType main(VertexInputType input)
 	output.positionW = mul(float4(input.positionL, 1.0f), gWorld).xyz;
 
 	output.normalW = mul(input.normalL, (float3x3)gWorldInvTrans);
-	output.color = input.color;
+	output.normalW = normalize(output.normalW);
+	//output.color = input.color;
 
 	return output;
 }

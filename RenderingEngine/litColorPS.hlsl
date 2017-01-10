@@ -65,7 +65,7 @@ float4 main(PixelInputType input) : SV_TARGET
 	ComputeLightDirectional(gDirLight, gMat, input.positionW, input.normalW, toEye, a, d, s);
 	ambient += a;
 	diffuse += d;
-	specular += s;
+	//specular += s;
 
 	float4 litColor = ambient + diffuse + specular;
 

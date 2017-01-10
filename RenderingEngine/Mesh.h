@@ -16,7 +16,7 @@ public:
 	{
 		XMFLOAT3 position;
 		XMFLOAT3 normal;
-		XMFLOAT2 uv;// Texture UV co-ord
+		XMFLOAT2 tex;// Texture UV co-ord
 	};
 
 	enum PrimativeShape
@@ -24,6 +24,7 @@ public:
 		MESH_TRIANGLE,
 		//MESH_SQUARE,
 		MESH_CUBE,
+		MESH_SOFTCUBE,
 		//MESH_NONE
 	};
 

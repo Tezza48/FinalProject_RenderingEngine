@@ -77,7 +77,7 @@ bool LitColorShader::Init(ID3D11Device *device)
 	polygonLayout[1].InputSlotClass = D3D11_INPUT_PER_VERTEX_DATA;
 	polygonLayout[1].InstanceDataStepRate = 0;
 
-	polygonLayout[2].SemanticName = "COLOR";
+	polygonLayout[2].SemanticName = "TEXCOORD";
 	polygonLayout[2].SemanticIndex = 0;
 	polygonLayout[2].Format = DXGI_FORMAT_R32G32B32A32_FLOAT;
 	polygonLayout[2].InputSlot = 0;
@@ -170,9 +170,10 @@ void XM_CALLCONV LitColorShader::Render(ID3D11DeviceContext *deviceContext, int 
 	dataPtrPerObj->Abmient = ambient;
 	dataPtrPerObj->Directional = directional;
 	dataPtrPerObj->EyePos = eyePos;
-	dataPtrPerObj->Mat = Mat{ XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f),
-		XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f),
-		XMFLOAT4(0.5f, 0.5f, 0.5f, 0.1f) };
+	dataPtrPerObj->Mat = Mat{
+		XMFLOAT4(0.8f, 0.8f, 0.8f, 1.0f),
+		XMFLOAT4(0.8f, 0.8f, 0.8f, 1.0f),
+		XMFLOAT4(0.3f, 0.3f, 0.3f, 10.0f) };
 
 	deviceContext->Unmap(mPerObjectBuffer, 0);
 
