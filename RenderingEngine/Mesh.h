@@ -16,7 +16,7 @@ public:
 	{
 		XMFLOAT3 position;
 		XMFLOAT3 normal;
-		XMFLOAT4 color;
+		XMFLOAT2 uv;// Texture UV co-ord
 	};
 
 	enum PrimativeShape
@@ -32,7 +32,7 @@ public:
 	Mesh(const Mesh&);
 	~Mesh();
 
-	bool Init(ID3D11Device*);
+	//bool Init(ID3D11Device*);
 	bool Init(ID3D11Device*, PrimativeShape);
 	bool Init(ID3D11Device*, Vertex*, unsigned long, unsigned long*, unsigned long);
 	void Render(ID3D11DeviceContext*);
@@ -41,10 +41,10 @@ public:
 	void XM_CALLCONV GetWorldMatrix(XMMATRIX&);
 	void XM_CALLCONV SetWorldMatrix(XMMATRIX);
 	void SetMaterial(ColorMaterial *material);
-	ColorMaterial *GetMaterial();
+	//ColorMaterial *GetMaterial();
 
 private:
-	bool InitBuffers(ID3D11Device*);
+	//bool InitBuffers(ID3D11Device*);
 	bool InitBuffers(ID3D11Device*, Vertex*, unsigned long, unsigned long*, unsigned long);
 	void RenderBuffers(ID3D11DeviceContext*);
 
