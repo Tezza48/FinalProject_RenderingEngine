@@ -9,6 +9,7 @@ D3D11App::D3D11App()
 
 	mMainCamera = nullptr;
 	mCube = nullptr;
+	mSoftCube = nullptr;
 	mLitColorShader = nullptr;
 
 	mAmbientLight = nullptr;
@@ -45,13 +46,19 @@ D3D11App::~D3D11App()
 	
 	delete mLitColorShader;
 	mLitColorShader = nullptr;
+
 	delete mCube;
 	mCube = nullptr;
+
+	delete mSoftCube;
+	mSoftCube = nullptr;
+
 	delete mMainCamera;
 	mMainCamera = nullptr;
 
 	delete mAmbientLight;
 	mAmbientLight = nullptr;
+
 	delete mDirLight;
 	mDirLight = nullptr;
 
@@ -277,7 +284,6 @@ bool D3D11App::InitPipeline()
 	rd.AntialiasedLineEnable = false;
 	
 	md3dDevice->CreateRasterizerState(&rd, &mRS);
-
 	mLitColorShader = new LitColorShader();
 
 	// Initialize the basic shader we're using
@@ -303,9 +309,9 @@ void D3D11App::Start()
 
 	// Place the camera at 0, 1, -2,
 	// looking at the origin
-	XMVECTOR pos = XMVectorSet(0.0f, 1.0f, -2.0f, 1.0f);
+	XMVECTOR pos = XMVectorSet(0.0f, 1.5f, -3.0f, 1.0f);
 	XMVECTOR target = XMVectorZero();
-	XMVECTOR up = XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f);
+	XMVECTOR up = XMVectorSet(0.0f, 1.0f, 0.0f, 1.0f);
 
 	XMMATRIX  V = XMMatrixLookAtLH(pos, target, up);
 	mMainCamera->SetViewMatrix(V);
@@ -314,13 +320,19 @@ void D3D11App::Start()
 	{
 		mCube = new Mesh();
 
-		mCube->Init(md3dDevice, Mesh::MESH_SOFTCUBE);
+		mCube->Init(md3dDevice, Mesh::MESH_CUBE);
 
-		mCube->SetWorldMatrix(XMMatrixIdentity());
+		mCube->SetWorldMatrix(XMMatrixTranslation(-1.0f, 0.0f, 0.0f));
+
+		mSoftCube = new Mesh();
+
+		mSoftCube->Init(md3dDevice, Mesh::MESH_SOFTCUBE);
+
+		mSoftCube->SetWorldMatrix(XMMatrixTranslation(1.0f, 0.0f, 0.0f));
 
 		mColorMaterial = new ColorMaterial(
 			XMFLOAT4(0.1f, 0.1f, 0.1f, 0.0f),
-			XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f),
+			XMFLOAT4(1.0f, 0.0f, 1.0f, 1.0f),
 			XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f));
 	}
 	
@@ -364,22 +376,7 @@ void D3D11App::Update(const GameTimer &gt)
 	title = mClientTitle + L". FPS: " + std::to_wstring(fps);
 
 	SetWindowText(mMainWindow, title.c_str());
-}
 
-void D3D11App::Draw(const GameTimer &gt)
-{
-	// Clear the RTV and DSV in preparation for drawing
-	md3dImmediateContext->ClearRenderTargetView(mRenderTargetView,
-		D3DXCOLOR(0.0f, 0.0f, 0.0f, 1.0f));
-
-	md3dImmediateContext->ClearDepthStencilView(mDepthStencilView,
-		D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0.0f);
-
-	// Set the rasterizer state to
-	// our settings
-	md3dImmediateContext->RSSetState(mRS);
-
-	//mLitColorShader->Frame(md3dImmediateContext, mLitColorShader->defaultAmbient, DirectionalLight());
 
 	// Rotate the cube diagonally by the deltatime
 	XMFLOAT3 diag = XMFLOAT3(0.5773f, 0.5773f, 0.5773f);
@@ -393,18 +390,40 @@ void D3D11App::Draw(const GameTimer &gt)
 
 	XMMATRIX world;
 	mCube->GetWorldMatrix(world);
-	world *= XMMatrixRotationAxis(upV, gt.DeltaTime());
-	//mCube->SetWorldMatrix(world);
+	world = XMMatrixRotationAxis(upV, gt.DeltaTime()) * world;
+	mCube->SetWorldMatrix(world);
 
-	// set mWorld to the cube's world matrix
-	mCube->GetWorldMatrix(mWorld);
+	mSoftCube->GetWorldMatrix(world);
+	world = XMMatrixRotationAxis(upV, gt.DeltaTime()) * world;
+	mSoftCube->SetWorldMatrix(world);
 
+}
+
+void D3D11App::Draw(const GameTimer &gt)
+{
+	// Clear the RTV and DSV in preparation for drawing
+	md3dImmediateContext->ClearRenderTargetView(mRenderTargetView,
+		D3DXCOLOR(0.0f, 0.0f, 0.0f, 1.0f));
+
+	md3dImmediateContext->ClearDepthStencilView(mDepthStencilView,
+		D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0.0f);
+
+	// Set the rasterizer state to our settings
+	md3dImmediateContext->RSSetState(mRS);
+
+	mLitColorShader->UpdateFrame(md3dImmediateContext, mAmbientLight, mDirLight,
+		mColorMaterial->GetMaterial(), mMainCamera->GetWorldPosition());
+
+	// Set mWorld to the cube's world matrix and
 	// set our view matrix and projection fo rendering
+	mCube->GetWorldMatrix(mWorld);
 	mMainCamera->GetViewMatrix(mView);
 	mMainCamera->GetProjectionMatrix(mProjection);
 
 	// Combine the world, view and projection
-	// we send this to the VS's constant buffer
+	// and create inverse transpose for VS
+	// This could be cone inside the shader,
+	// and would make more sense there
 	mWorldViewProj = mWorld * mView * mProjection;
 	mWorldInvTrans = XMMatrixInverse(NULL, mWorld);
 	mWorldInvTrans = XMMatrixTranspose(mWorldInvTrans);
@@ -415,8 +434,26 @@ void D3D11App::Draw(const GameTimer &gt)
 
 	// Render the scene on the back buffer
 	mLitColorShader->Render(md3dImmediateContext, mCube->GetIndexCount(),
-		mWorld, mWorldViewProj, mWorldInvTrans,
-		*mAmbientLight, *mDirLight, mView, *mColorMaterial);
+		mWorld, mWorldViewProj, mWorldInvTrans);
+
+	mSoftCube->Render(md3dImmediateContext);
+
+	// Set mWorld to the cube's world matrix and
+	// set our view matrix and projection fo rendering
+	mSoftCube->GetWorldMatrix(mWorld);
+	mMainCamera->GetViewMatrix(mView);
+	mMainCamera->GetProjectionMatrix(mProjection);
+
+	// Combine the world, view and projection
+	// and create inverse transpose for VS
+	// This could be cone inside the shader,
+	// and would make more sense there
+	mWorldViewProj = mWorld * mView * mProjection;
+	mWorldInvTrans = XMMatrixInverse(NULL, mWorld);
+	mWorldInvTrans = XMMatrixTranspose(mWorldInvTrans);
+
+	mLitColorShader->Render(md3dImmediateContext, mSoftCube->GetIndexCount(),
+		mWorld, mWorldViewProj, mWorldInvTrans);
 
 	// present the back buffer
 	mSwapChain->Present(0, 0);

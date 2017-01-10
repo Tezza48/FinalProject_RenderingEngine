@@ -1,15 +1,19 @@
 #include "litColor.hlsli"
 #include "LightsHelper.hlsli"
 
-cbuffer cbPerObject
+cbuffer cbPerObject : register(b0)
 {
 	float4x4 gWorld;
 	float4x4 gWorldInvTrans;
 	float4x4 gWorldViewProj;
+};
+
+cbuffer cbPerFrame : register(b1)
+{
 	AmbientLight gAmbientLight;
 	DirectionalLight gDirLight;
-	float3 gEyePosW;
 	Material gMat;
+	float3 gEyePosW;
 };
 
 //cbuffer cbPerFrame
@@ -51,6 +55,7 @@ void ComputeLightDirectional(DirectionalLight light, Material mat, float3 pos, f
 float4 main(PixelInputType input) : SV_TARGET
 {
 	float3 toEye = normalize(gEyePosW - input.positionW);
+	toEye.z = -toEye.z;
 
 	float4 ambient = float4(0.0f, 0.0f, 0.0f, 0.0f);
 	float4 diffuse = float4(0.0f, 0.0f, 0.0f, 0.0f);
@@ -65,7 +70,7 @@ float4 main(PixelInputType input) : SV_TARGET
 	ComputeLightDirectional(gDirLight, gMat, input.positionW, input.normalW, toEye, a, d, s);
 	ambient += a;
 	diffuse += d;
-	//specular += s;
+	specular += s;
 
 	float4 litColor = ambient + diffuse + specular;
 

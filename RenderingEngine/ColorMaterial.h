@@ -6,6 +6,14 @@
 
 using namespace DirectX;
 
+struct Mat
+{
+	Mat(XMFLOAT4 a, XMFLOAT4 d, XMFLOAT4 s) { Ambient = a; Diffuse = d; Specular = s; }
+	XMFLOAT4 Ambient;
+	XMFLOAT4 Diffuse;
+	XMFLOAT4 Specular;
+};
+
 class ColorMaterial :
 	public Material
 {
@@ -21,9 +29,7 @@ public:
 	ColorMaterial(XMFLOAT4 ambient, XMFLOAT4 diffuse, XMFLOAT4 specular);
 	~ColorMaterial();
 
-	XMFLOAT4 GetAmbient() { return Ambient; }
-	XMFLOAT4 GetDiffuse() { return Diffuse; }
-	XMFLOAT4 GetSpecular() { return Specular; }
+	Mat GetMaterial() { return Mat(Ambient, Diffuse, Specular); }
 
 private:
 

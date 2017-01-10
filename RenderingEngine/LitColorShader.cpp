@@ -2,7 +2,15 @@
 
 LitColorShader::LitColorShader()
 {
-	//defaultAmbient.Ambient = XMFLOAT4(0.05f, 0.05f, 0.05f, 1.0f);
+	mVertexShader = nullptr;
+
+	mPixelShader = nullptr;
+
+	mInputLayout = nullptr;
+
+	mPerObjectBuffer = nullptr;
+
+	mPerFrameBuffer = nullptr;
 }
 
 
@@ -20,44 +28,51 @@ LitColorShader::~LitColorShader()
 	mPerObjectBuffer->Release();
 	mPerObjectBuffer = nullptr;
 
-	//mPerFrameBuffer->Release();
-	//mPerFrameBuffer = nullptr;
+//	mPerFrameBuffer->Release();
+	mPerFrameBuffer = nullptr;
 }
 
 bool LitColorShader::Init(ID3D11Device *device)
 {
-	HRESULT hr;
-
 	ID3D10Blob *vertexShaderBuffer;
 	ID3D10Blob *pixelShaderBuffer;
 	UINT numElements;
 
 #if DEBUG || _DEBUG
 
-	hr = D3DX11CompileFromFile(L"litColorVS.hlsl", NULL, NULL, "main", "vs_5_0", D3DCOMPILE_DEBUG | D3D10_SHADER_ENABLE_STRICTNESS, 0, NULL, &vertexShaderBuffer, nullptr, NULL);
-	if (FAILED(hr))
-		return false;
-	hr = D3DX11CompileFromFile(L"litColorPS.hlsl", NULL, NULL, "main", "ps_5_0", D3DCOMPILE_DEBUG | D3D10_SHADER_ENABLE_STRICTNESS, 0, NULL, &pixelShaderBuffer, nullptr, NULL);
-	if (FAILED(hr))
-		return false;
+	DX::ThrowIfFailed(D3DX11CompileFromFile(
+		L"litColorVS.hlsl", NULL, NULL, "main", "vs_5_0",
+		D3DCOMPILE_DEBUG | D3D10_SHADER_ENABLE_STRICTNESS,
+		0, NULL, &vertexShaderBuffer, nullptr, NULL));
+
+	DX::ThrowIfFailed(D3DX11CompileFromFile(
+		L"litColorPS.hlsl", NULL, NULL, "main", "ps_5_0",
+		D3DCOMPILE_DEBUG | D3D10_SHADER_ENABLE_STRICTNESS,
+		0, NULL, &pixelShaderBuffer, nullptr, NULL));
 
 #else
 
-	hr = D3DX11CompileFromFile(L"litColorVS.hlsl", NULL, NULL, "main", "vs_5_0", D3D10_SHADER_ENABLE_STRICTNESS, 0, NULL, &vertexShaderBuffer, nullptr, NULL);
-	if (FAILED(hr))
-		return false;
-	hr = D3DX11CompileFromFile(L"litColorPS.hlsl", NULL, NULL, "main", "ps_5_0", D3D10_SHADER_ENABLE_STRICTNESS, 0, NULL, &pixelShaderBuffer, nullptr, NULL);
-	if (FAILED(hr))
-		return false;
+	DX::ThrowIfFailed(D3DX11CompileFromFile(
+		L"litColorVS.hlsl", NULL, NULL, "main", "vs_5_0", 
+		D3D10_SHADER_ENABLE_STRICTNESS, 
+		0, NULL, &vertexShaderBuffer, nullptr, NULL));
 
+	DX::ThrowIfFailed(D3DX11CompileFromFile(
+		L"litColorPS.hlsl", NULL, NULL, "main", "ps_5_0", 
+		D3D10_SHADER_ENABLE_STRICTNESS, 
+		0, NULL, &pixelShaderBuffer, nullptr, NULL));
+	
 #endif // DEBUG || _DEBUG
 
-	hr = device->CreateVertexShader(vertexShaderBuffer->GetBufferPointer(), vertexShaderBuffer->GetBufferSize(), NULL, &mVertexShader);
-	if (FAILED(hr))
-		return false;
-	hr = device->CreatePixelShader(pixelShaderBuffer->GetBufferPointer(), pixelShaderBuffer->GetBufferSize(), NULL, &mPixelShader);
-	if (FAILED(hr))
-		return false;
+	DX::ThrowIfFailed(device->CreateVertexShader(
+		vertexShaderBuffer->GetBufferPointer(),
+		vertexShaderBuffer->GetBufferSize(),
+		NULL, &mVertexShader));
+
+	DX::ThrowIfFailed(device->CreatePixelShader(
+		pixelShaderBuffer->GetBufferPointer(),
+		pixelShaderBuffer->GetBufferSize(),
+		NULL, &mPixelShader));
 
 	D3D11_INPUT_ELEMENT_DESC polygonLayout[3];
 
@@ -88,14 +103,11 @@ bool LitColorShader::Init(ID3D11Device *device)
 	numElements = sizeof(polygonLayout) / sizeof(polygonLayout[0]);
 
 	// Create the input layout
-	hr = device->CreateInputLayout(polygonLayout,
+	DX::ThrowIfFailed(device->CreateInputLayout(polygonLayout,
 		numElements,
 		vertexShaderBuffer->GetBufferPointer(),
 		vertexShaderBuffer->GetBufferSize(),
-		&mInputLayout);
-
-	if (FAILED(hr))
-		return false;
+		&mInputLayout));
 
 	// Release the helper buffers we no longer need
 	vertexShaderBuffer->Release();
@@ -104,7 +116,7 @@ bool LitColorShader::Init(ID3D11Device *device)
 	pixelShaderBuffer->Release();
 	pixelShaderBuffer = nullptr;
 
-	// Describe per object constant buffer buffer
+	// Describe per object constant buffers
 	D3D11_BUFFER_DESC perObjectBufferDesc;
 	perObjectBufferDesc.Usage = D3D11_USAGE_DYNAMIC;
 	perObjectBufferDesc.ByteWidth = sizeof(PerObjectBuffer);
@@ -113,42 +125,37 @@ bool LitColorShader::Init(ID3D11Device *device)
 	perObjectBufferDesc.MiscFlags = 0;
 	perObjectBufferDesc.StructureByteStride = 0;
 
-	//D3D11_BUFFER_DESC perFrameBufferDesc;
-	//perFrameBufferDesc.Usage = D3D11_USAGE_DYNAMIC;
-	//perFrameBufferDesc.ByteWidth = sizeof(PerFrameBuffer);
-	//perFrameBufferDesc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
-	//perFrameBufferDesc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
-	//perFrameBufferDesc.MiscFlags = 0;
-	//perFrameBufferDesc.StructureByteStride = 0;
+	// Possible solution, making it a multiple of 16 bytes
+	D3D11_BUFFER_DESC perFrameBufferDesc;
+	perFrameBufferDesc.Usage = D3D11_USAGE_DYNAMIC;
+	perFrameBufferDesc.ByteWidth = sizeof(PerFrameBuffer);
+	perFrameBufferDesc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
+	perFrameBufferDesc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
+	perFrameBufferDesc.MiscFlags = 0;
+	perFrameBufferDesc.StructureByteStride = 0;
 
-	// Create that buffer
-	hr = device->CreateBuffer(&perObjectBufferDesc, NULL, &mPerObjectBuffer);
-	if (FAILED(hr))
-		return false;
+	// Create the buffers
+	DX::ThrowIfFailed(
+		device->CreateBuffer(&perObjectBufferDesc, NULL, &mPerObjectBuffer));
 
-	//hr = device->CreateBuffer(&perFrameBufferDesc, NULL, &mPerFrameBuffer);
-	//if (FAILED(hr))
-	//	return false;
+	DX::ThrowIfFailed(
+		device->CreateBuffer(&perFrameBufferDesc, NULL, &mPerFrameBuffer));
 
 	return true;
 }
 
-void XM_CALLCONV LitColorShader::Render(ID3D11DeviceContext *deviceContext, int indexCount,
-	XMMATRIX world, XMMATRIX worldViewProj, XMMATRIX worldInvTrans,
-	AmbientLight ambient, DirectionalLight directional, XMMATRIX view, ColorMaterial mat)
+void XM_CALLCONV LitColorShader::Render(ID3D11DeviceContext *deviceContext, int indexCount/*, unsigned int offset, int baseVertLocation*/,
+	XMMATRIX world, XMMATRIX worldViewProj, XMMATRIX worldInvTrans/*,
+	AmbientLight ambient, DirectionalLight directional, XMMATRIX view, ColorMaterial mat*/)
 {
 	HRESULT hr;
 	D3D11_MAPPED_SUBRESOURCE mappedResource;
-	PerObjectBuffer *dataPtrPerObj;
+	PerObjectBuffer *pObjectBuffer;
 	//PerFrameBuffer *dataPtrPerFrame;
 	unsigned int bufferNumber;
 
-	//{
-	//	world = world * view * projection;
-	//}
-
 	// DX requires we transpose the matrices we
-	// send to our shaders
+	// send to our shaders (it sends it as 4 float4s and basically transposes it as it's sent.
 	world = XMMatrixTranspose(world);
 	worldViewProj = XMMatrixTranspose(worldViewProj);
 	worldInvTrans = XMMatrixTranspose(worldInvTrans);
@@ -157,23 +164,17 @@ void XM_CALLCONV LitColorShader::Render(ID3D11DeviceContext *deviceContext, int 
 	hr = deviceContext->Map(mPerObjectBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
 	DX::ThrowIfFailed(hr);
 
-	XMVECTOR nullVector;
-	XMVECTOR eyePosVec;
-	XMFLOAT3 eyePos;
-	XMMatrixDecompose(&nullVector, &nullVector, &eyePosVec, view);
-	XMStoreFloat3(&eyePos, eyePosVec);
-
-	dataPtrPerObj = (PerObjectBuffer*)mappedResource.pData;
-	dataPtrPerObj->World = world;
-	dataPtrPerObj->WorldViewProj = worldViewProj;
-	dataPtrPerObj->WorldInvTrans = worldInvTrans;
-	dataPtrPerObj->Abmient = ambient;
-	dataPtrPerObj->Directional = directional;
-	dataPtrPerObj->EyePos = eyePos;
-	dataPtrPerObj->Mat = Mat{
-		XMFLOAT4(0.8f, 0.8f, 0.8f, 1.0f),
-		XMFLOAT4(0.8f, 0.8f, 0.8f, 1.0f),
-		XMFLOAT4(0.3f, 0.3f, 0.3f, 10.0f) };
+	pObjectBuffer = (PerObjectBuffer*)mappedResource.pData;
+	pObjectBuffer->World = world;
+	pObjectBuffer->WorldViewProj = worldViewProj;
+	pObjectBuffer->WorldInvTrans = worldInvTrans;
+	//dataPtrPerObj->Abmient = ambient;
+	//dataPtrPerObj->Directional = directional;
+	//dataPtrPerObj->EyePos = eyePos;
+	//dataPtrPerObj->Mat = Mat{
+	//	XMFLOAT4(0.8f, 0.8f, 0.8f, 1.0f),
+	//	XMFLOAT4(0.8f, 0.8f, 0.8f, 1.0f),
+	//	XMFLOAT4(0.3f, 0.3f, 0.3f, 10.0f) };
 
 	deviceContext->Unmap(mPerObjectBuffer, 0);
 
@@ -191,7 +192,6 @@ void XM_CALLCONV LitColorShader::Render(ID3D11DeviceContext *deviceContext, int 
 	deviceContext->VSSetConstantBuffers(0, 1, &mPerObjectBuffer);
 	
 	deviceContext->PSSetConstantBuffers(0, 1, &mPerObjectBuffer);
-	//deviceContext->PSSetConstantBuffers(1, 1, &mPerFrameBuffer);
 
 	deviceContext->IASetInputLayout(mInputLayout);
 
@@ -202,23 +202,24 @@ void XM_CALLCONV LitColorShader::Render(ID3D11DeviceContext *deviceContext, int 
 	deviceContext->DrawIndexed(indexCount, 0, 0);
 }
 
-//void XM_CALLCONV LitColorShader::Frame(ID3D11DeviceContext *deviceContext, AmbientLight ambient, DirectionalLight directional)
-//{
-//	HRESULT hr;
-//	D3D11_MAPPED_SUBRESOURCE mappedSubresource;
-//	PerFrameBuffer *dataPtr;
-//	unsigned int bufferNumber;
-//
-//	hr = deviceContext->Map(mPerFrameBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedSubresource);
-//	DX::ThrowIfFailed(hr);
-//
-//	dataPtr = (PerFrameBuffer*)mappedSubresource.pData;
-//	dataPtr->Abmient = ambient;
-//	dataPtr->Directional = directional;
-//	deviceContext->Unmap(mPerFrameBuffer, 0);
-//
-//	bufferNumber = 1;
-//
-//	deviceContext->PSSetConstantBuffers(bufferNumber, 1, &mPerFrameBuffer);
-//
-//}
+void XM_CALLCONV LitColorShader::UpdateFrame(ID3D11DeviceContext *deviceContext, AmbientLight *ambient, DirectionalLight *directional, Mat material, XMFLOAT4 eyePos)
+{
+	HRESULT hr;
+	D3D11_MAPPED_SUBRESOURCE mappedResource;
+	PerFrameBuffer *pFrameBuffer;
+	unsigned int bufferNumber;
+
+	hr = deviceContext->Map(mPerFrameBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
+	DX::ThrowIfFailed(hr);
+
+	pFrameBuffer = (PerFrameBuffer*)mappedResource.pData;
+	pFrameBuffer->Abmient = *ambient;
+	pFrameBuffer->Directional = *directional;
+	pFrameBuffer->Mat = material;
+	pFrameBuffer->EyePos = eyePos;
+	deviceContext->Unmap(mPerFrameBuffer, 0);
+
+	bufferNumber = 1;
+
+	deviceContext->PSSetConstantBuffers(bufferNumber, 1, &mPerFrameBuffer);
+}

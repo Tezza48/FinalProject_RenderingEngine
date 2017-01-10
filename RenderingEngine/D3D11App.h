@@ -37,6 +37,7 @@ class D3D11App : IRenderFramework
 	Camera *mMainCamera;
 	// Cube Mesh we're rendering
 	Mesh *mCube;
+	Mesh *mSoftCube;
 	// Class with vertex color VS and PS
 	LitColorShader *mLitColorShader;
 	ColorMaterial * mColorMaterial;

@@ -20,6 +20,16 @@ void XM_CALLCONV Camera::GetViewMatrix(XMMATRIX &other)
 	other = mView;
 }
 
+XMFLOAT4 Camera::GetWorldPosition()
+{
+	XMVECTOR nullVector;
+	XMVECTOR eyePosVec;
+	XMFLOAT4 eyePos;
+	XMMatrixDecompose(&nullVector, &nullVector, &eyePosVec, mView);
+	XMStoreFloat4(&eyePos, eyePosVec);
+	return eyePos;
+}
+
 void XM_CALLCONV Camera::GetProjectionMatrix(XMMATRIX &other)
 {
 	other = mProjection;

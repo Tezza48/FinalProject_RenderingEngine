@@ -1,10 +1,10 @@
 #pragma once
 
-#include <d3d11.h>
+#include <D3D11.h>
 #include <D3DX11.h>
 #include <DirectXMath.h>
 #include <D3Dcompiler.h>
-#include <fstream>
+//#include <fstream>
 #include "utils.h"
 #include "LightStructs.h"
 #include "ColorMaterial.h"
@@ -15,36 +15,28 @@ using namespace DirectX;
 // with ambient, direct, point and spotlights
 class LitColorShader
 {
-
-	struct Mat
-	{
-		XMFLOAT4 Ambient;
-		XMFLOAT4 Diffuse;
-		XMFLOAT4 Specular;
-	};
-
 	struct PerObjectBuffer
 	{
 		XMMATRIX World;
 		XMMATRIX WorldInvTrans;
 		XMMATRIX WorldViewProj;
-		AmbientLight Abmient;
-		DirectionalLight Directional;
-		XMFLOAT3 EyePos;
-		Mat Mat;
 	};
 
-	//struct PerFrameBuffer
-	//{
-	//};
+	struct PerFrameBuffer
+	{
+		AmbientLight Abmient;// Ambient Light
+		DirectionalLight Directional;// Directional Light
+		Mat Mat;// Object Material
+		XMFLOAT4 EyePos; // The eye's current world position
+	};
 
 public:
 	LitColorShader();
 	~LitColorShader();
 
 	bool Init(ID3D11Device *device);
-	void XM_CALLCONV Render(ID3D11DeviceContext *deviceContext, int , XMMATRIX, XMMATRIX, XMMATRIX, AmbientLight, DirectionalLight, XMMATRIX, ColorMaterial);
-	//void XM_CALLCONV Frame(ID3D11DeviceContext*, AmbientLight, DirectionalLight);
+	void XM_CALLCONV Render(ID3D11DeviceContext *deviceContext, int/*, unsigned int, int baseVertLocation*/, XMMATRIX, XMMATRIX, XMMATRIX/*, AmbientLight, DirectionalLight, XMMATRIX, ColorMaterial*/);
+	void XM_CALLCONV UpdateFrame(ID3D11DeviceContext *deviceContext, AmbientLight *ambient, DirectionalLight *directional, Mat material, XMFLOAT4 eyePos);
 
 private:
 	ID3D11VertexShader *mVertexShader;
@@ -53,7 +45,7 @@ private:
 
 	// constant buffers
 	ID3D11Buffer *mPerObjectBuffer;
-	//ID3D11Buffer *mPerFrameBuffer;
+	ID3D11Buffer *mPerFrameBuffer;
 
 public:
 	AmbientLight defaultAmbient;

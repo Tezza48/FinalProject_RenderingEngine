@@ -1,15 +1,11 @@
 #include "litColor.hlsli"
 #include "LightsHelper.hlsli"
 
-cbuffer cbPerObject
+cbuffer cbPerObject : register(b0)
 {
 	float4x4 gWorld;
 	float4x4 gWorldInvTrans;
 	float4x4 gWorldViewProj;
-	AmbientLight gAmbientLight;
-	DirectionalLight gDirLight;
-	float3 gEyePosW;
-	Material gMat;
 };
 
 PixelInputType main(VertexInputType input)
