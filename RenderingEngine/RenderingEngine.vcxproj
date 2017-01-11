@@ -166,7 +166,7 @@
     <ClInclude Include="ColorMaterial.h" />
     <ClInclude Include="D3D11App.h" />
     <ClInclude Include="GameTimer.h" />
-    <ClInclude Include="LightStructs.h" />
+    <ClInclude Include="LightHelper.h" />
     <ClInclude Include="IRenderFramework.h" />
     <ClInclude Include="LitColorShader.h" />
     <ClInclude Include="Material.h" />
@@ -177,7 +177,7 @@
   <ItemGroup>
     <None Include="colorPS.hlsl" />
     <None Include="colorVS.hlsl" />
-    <None Include="LightsHelper.hlsli" />
+    <None Include="LightHelper.hlsli" />
     <None Include="LitColor.hlsli" />
     <None Include="shaders.shader" />
   </ItemGroup>

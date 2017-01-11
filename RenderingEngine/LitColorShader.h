@@ -6,7 +6,7 @@
 #include <D3Dcompiler.h>
 //#include <fstream>
 #include "utils.h"
-#include "LightStructs.h"
+#include "LightHelper.h"
 #include "ColorMaterial.h"
 
 using namespace DirectX;
@@ -26,6 +26,8 @@ class LitColorShader
 	{
 		AmbientLight Abmient;// Ambient Light
 		DirectionalLight Directional;// Directional Light
+		PointLight Point;
+		SpotLight Spot;
 		Mat Mat;// Object Material
 		XMFLOAT4 EyePos; // The eye's current world position
 	};
@@ -36,7 +38,10 @@ public:
 
 	bool Init(ID3D11Device *device);
 	void XM_CALLCONV Render(ID3D11DeviceContext *deviceContext, int/*, unsigned int, int baseVertLocation*/, XMMATRIX, XMMATRIX, XMMATRIX/*, AmbientLight, DirectionalLight, XMMATRIX, ColorMaterial*/);
-	void XM_CALLCONV UpdateFrame(ID3D11DeviceContext *deviceContext, AmbientLight *ambient, DirectionalLight *directional, Mat material, XMFLOAT4 eyePos);
+	void XM_CALLCONV UpdateFrame(ID3D11DeviceContext *deviceContext, 
+		AmbientLight *ambient, DirectionalLight *directional, 
+		PointLight *point, SpotLight *spot, 
+		Mat material, XMFLOAT4 eyePos);
 
 private:
 	ID3D11VertexShader *mVertexShader;

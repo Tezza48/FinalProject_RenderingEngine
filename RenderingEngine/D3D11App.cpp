@@ -8,12 +8,16 @@ D3D11App::D3D11App()
 	mIsRunning = false;
 
 	mMainCamera = nullptr;
+
+	mFloor = nullptr;
 	mCube = nullptr;
 	mSoftCube = nullptr;
 	mLitColorShader = nullptr;
 
 	mAmbientLight = nullptr;
 	mDirLight = nullptr;
+	mPointLight = nullptr;
+	mSpotLight = nullptr;
 
 	mWorld = XMMatrixIdentity();
 	mView = XMMatrixIdentity();
@@ -47,6 +51,9 @@ D3D11App::~D3D11App()
 	delete mLitColorShader;
 	mLitColorShader = nullptr;
 
+	delete mFloor;
+	mFloor = nullptr;
+
 	delete mCube;
 	mCube = nullptr;
 
@@ -61,6 +68,12 @@ D3D11App::~D3D11App()
 
 	delete mDirLight;
 	mDirLight = nullptr;
+
+	delete mPointLight;
+	mPointLight = nullptr;
+
+	delete mSpotLight;
+	mSpotLight = nullptr;
 
 	mApp = nullptr;
 }
@@ -316,34 +329,85 @@ void D3D11App::Start()
 	XMMATRIX  V = XMMatrixLookAtLH(pos, target, up);
 	mMainCamera->SetViewMatrix(V);
 
-	// Manually Set the cube's verts and indices
-	{
-		mCube = new Mesh();
 
-		mCube->Init(md3dDevice, Mesh::MESH_CUBE);
+	mFloor = new Mesh();
 
-		mCube->SetWorldMatrix(XMMatrixTranslation(-1.0f, 0.0f, 0.0f));
+	int numVertices = 4;
+	int numIndices = 6;
 
-		mSoftCube = new Mesh();
+	Mesh::Vertex *floorVerts = new Mesh::Vertex[numVertices];
+	unsigned long *floorIndices;
 
-		mSoftCube->Init(md3dDevice, Mesh::MESH_SOFTCUBE);
+	floorVerts[0].position = XMFLOAT3(-5.0f, -0.5f, -5.0f);
+	floorVerts[0].normal = XMFLOAT3(0.0f, 1.0f, 0.0f);
 
-		mSoftCube->SetWorldMatrix(XMMatrixTranslation(1.0f, 0.0f, 0.0f));
+	floorVerts[1].position = XMFLOAT3(-5.0f, -0.5f, 5.0f);
+	floorVerts[1].normal = floorVerts[0].normal;
 
-		mColorMaterial = new ColorMaterial(
-			XMFLOAT4(0.1f, 0.1f, 0.1f, 0.0f),
-			XMFLOAT4(1.0f, 0.0f, 1.0f, 1.0f),
-			XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f));
-	}
+	floorVerts[2].position = XMFLOAT3(5.0f, -0.5f, 5.0f);
+	floorVerts[2].normal = floorVerts[0].normal;
+
+	floorVerts[3].position = XMFLOAT3(5.0f, -0.5f, -5.0f);
+	floorVerts[3].normal = floorVerts[0].normal;
+
+	floorIndices = new unsigned long[numIndices] {
+		0, 1, 2,
+		0, 2, 3
+	};
+
+	mFloor->Init(md3dDevice, floorVerts, numVertices, floorIndices, numIndices);
+	
+	mFloor->SetWorldMatrix(XMMatrixIdentity());
+
+	delete[] floorVerts;
+	floorVerts = nullptr;
+
+	delete[] floorIndices;
+	floorIndices = nullptr;
+
+	mCube = new Mesh();
+
+	mCube->Init(md3dDevice, Mesh::MESH_CUBE);
+
+	mCube->SetWorldMatrix(XMMatrixTranslation(-1.0f, 0.0f, 0.0f));
+
+	mSoftCube = new Mesh();
+
+	mSoftCube->Init(md3dDevice, Mesh::MESH_SOFTCUBE);
+
+	mSoftCube->SetWorldMatrix(XMMatrixTranslation(1.0f, 0.0f, 0.0f));
+
+	mColorMaterial = new ColorMaterial(
+		XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f),
+		XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f),
+		XMFLOAT4(1.0f, 1.0f, 1.0f, 10.0f));
 	
 	mAmbientLight = new AmbientLight();
 	mAmbientLight->Ambient = XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f);
 
 	mDirLight = new DirectionalLight();
-	mDirLight->Ambient = XMFLOAT4(0.1f, 0.1f, 0.1f, 1.0f);
-	mDirLight->Diffuse = XMFLOAT4(0.8f, 0.8f, 0.8f, 1.0f);
-	mDirLight->Specular = XMFLOAT4(0.8f, 0.8f, 0.8f, 1.0f);
+	mDirLight->Ambient = XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f);
+	mDirLight->Diffuse = XMFLOAT4(0.5f, 0.5f, 0.5f, 1.0f);
+	mDirLight->Specular = XMFLOAT4(0.5f, 0.5f, 0.5f, 1.0f);
 	mDirLight->Direction =  XMFLOAT3(0.57735f, -0.57735f, 0.57735f);
+
+	mPointLight = new PointLight();
+	mPointLight->Ambient = XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f);
+	mPointLight->Diffuse = XMFLOAT4(0.0f, 0.0f, 0.5f, 1.0f);
+	mPointLight->Specular = XMFLOAT4(0.0f, 0.0f, 0.5f, 1.0f);
+	mPointLight->Position = XMFLOAT3(-0.2f, 0.0f, -1.0f);
+	mPointLight->Range = 1.0f;
+	mPointLight->Attenuation = XMFLOAT3(0.0f, 0.0f, 0.5f);
+
+	mSpotLight = new SpotLight();
+	mSpotLight->Ambient = XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f);
+	mSpotLight->Diffuse = XMFLOAT4(1.0f, 1.0f, 0.0f, 1.0f);
+	mSpotLight->Specular = XMFLOAT4(1.0f, 1.0f, 0.0f, 1.0f);
+	mSpotLight->Position = XMFLOAT3(1.0f, 2.0f, 0.0f);
+	mSpotLight->Range = 3.0f;
+	mSpotLight->Direction = XMFLOAT3(0.0f, -1.0f, 0.0f);// {-0.666667, -0.666667, -0.333333}
+	mSpotLight->Spot = 1.0f;
+	mSpotLight->Attenuation = XMFLOAT3(0.0f, 1.0f, 1.0f);
 
 }
 
@@ -411,7 +475,7 @@ void D3D11App::Draw(const GameTimer &gt)
 	// Set the rasterizer state to our settings
 	md3dImmediateContext->RSSetState(mRS);
 
-	mLitColorShader->UpdateFrame(md3dImmediateContext, mAmbientLight, mDirLight,
+	mLitColorShader->UpdateFrame(md3dImmediateContext, mAmbientLight, mDirLight, mPointLight, mSpotLight,
 		mColorMaterial->GetMaterial(), mMainCamera->GetWorldPosition());
 
 	// Set mWorld to the cube's world matrix and
@@ -441,18 +505,23 @@ void D3D11App::Draw(const GameTimer &gt)
 	// Set mWorld to the cube's world matrix and
 	// set our view matrix and projection fo rendering
 	mSoftCube->GetWorldMatrix(mWorld);
-	mMainCamera->GetViewMatrix(mView);
-	mMainCamera->GetProjectionMatrix(mProjection);
 
-	// Combine the world, view and projection
-	// and create inverse transpose for VS
-	// This could be cone inside the shader,
-	// and would make more sense there
 	mWorldViewProj = mWorld * mView * mProjection;
 	mWorldInvTrans = XMMatrixInverse(NULL, mWorld);
 	mWorldInvTrans = XMMatrixTranspose(mWorldInvTrans);
 
 	mLitColorShader->Render(md3dImmediateContext, mSoftCube->GetIndexCount(),
+		mWorld, mWorldViewProj, mWorldInvTrans);
+
+	mFloor->Render(md3dImmediateContext);
+
+	mFloor->GetWorldMatrix(mWorld);
+
+	mWorldViewProj = mWorld * mView * mProjection;
+	mWorldInvTrans = XMMatrixInverse(NULL, mWorld);
+	mWorldInvTrans = XMMatrixTranspose(mWorldInvTrans);
+
+	mLitColorShader->Render(md3dImmediateContext, mFloor->GetIndexCount(),
 		mWorld, mWorldViewProj, mWorldInvTrans);
 
 	// present the back buffer

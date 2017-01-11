@@ -1,5 +1,5 @@
 #include "litColor.hlsli"
-#include "LightsHelper.hlsli"
+#include "LightHelper.hlsli"
 
 cbuffer cbPerObject : register(b0)
 {

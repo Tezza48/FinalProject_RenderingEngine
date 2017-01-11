@@ -202,7 +202,10 @@ void XM_CALLCONV LitColorShader::Render(ID3D11DeviceContext *deviceContext, int 
 	deviceContext->DrawIndexed(indexCount, 0, 0);
 }
 
-void XM_CALLCONV LitColorShader::UpdateFrame(ID3D11DeviceContext *deviceContext, AmbientLight *ambient, DirectionalLight *directional, Mat material, XMFLOAT4 eyePos)
+void XM_CALLCONV LitColorShader::UpdateFrame(ID3D11DeviceContext *deviceContext, 
+	AmbientLight *ambient, DirectionalLight *directional, 
+	PointLight *point, SpotLight *spot, 
+	Mat material, XMFLOAT4 eyePos)
 {
 	HRESULT hr;
 	D3D11_MAPPED_SUBRESOURCE mappedResource;
@@ -215,6 +218,8 @@ void XM_CALLCONV LitColorShader::UpdateFrame(ID3D11DeviceContext *deviceContext,
 	pFrameBuffer = (PerFrameBuffer*)mappedResource.pData;
 	pFrameBuffer->Abmient = *ambient;
 	pFrameBuffer->Directional = *directional;
+	pFrameBuffer->Point = *point;
+	pFrameBuffer->Spot = *spot;
 	pFrameBuffer->Mat = material;
 	pFrameBuffer->EyePos = eyePos;
 	deviceContext->Unmap(mPerFrameBuffer, 0);

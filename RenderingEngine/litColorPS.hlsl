@@ -1,5 +1,5 @@
 #include "litColor.hlsli"
-#include "LightsHelper.hlsli"
+#include "LightHelper.hlsli"
 
 cbuffer cbPerObject : register(b0)
 {
@@ -12,6 +12,8 @@ cbuffer cbPerFrame : register(b1)
 {
 	AmbientLight gAmbientLight;
 	DirectionalLight gDirLight;
+	PointLight gPointLight;
+	SpotLight gSpotLight;
 	Material gMat;
 	float3 gEyePosW;
 };
@@ -51,6 +53,81 @@ void ComputeLightDirectional(DirectionalLight light, Material mat, float3 pos, f
 	}
 }
 
+void ComputeLightPoint(PointLight light, Material mat, float3 pos, float3 nrm, float3 toEye,
+	out float4 ambient, out float4 diffuse, out float4 specular)
+{
+	ambient = float4(0.0f, 0.0f, 0.0f, 0.0f);
+	diffuse = float4(0.0f, 0.0f, 0.0f, 0.0f);
+	specular = float4(0.0f, 0.0f, 0.0f, 0.0f);
+
+	float3 lightVec = light.Position - pos;
+
+	float d = length(lightVec);
+
+	if (d > light.Range)
+		return;
+
+	lightVec /= d;
+
+	ambient = mat.Ambient * light.Ambient;
+
+	float diffuseFactor = dot(lightVec, nrm);
+
+	[flatten]
+	if (diffuseFactor > 0.0f)
+	{
+		float3 v = reflect(-lightVec, nrm);
+		float specFactor = pow(max(dot(v, toEye), 0.0f), mat.Specular.w);
+
+		diffuse = diffuseFactor * mat.Diffuse * light.Diffuse;
+		specular = specFactor * mat.Specular * light.Specular;
+	}
+
+	float att = 1.0f / dot(light.Attenuation, float3(1.0f, d, d*d));
+
+	diffuse *= att;
+	specular *= att;
+
+}
+
+void ComputeLightSpot(SpotLight light, Material mat, float3 pos, float3 nrm, float3 toEye,
+	out float4 ambient, out float4 diffuse, out float4 specular)
+{
+	ambient = float4(0.0f, 0.0f, 0.0f, 0.0f);
+	diffuse = float4(0.0f, 0.0f, 0.0f, 0.0f);
+	specular = float4(0.0f, 0.0f, 0.0f, 0.0f);
+
+	float3 lightVec = light.Position - pos;
+
+	float d = length(lightVec);
+
+	if (d > light.Range)
+		return;
+
+	lightVec /= d;
+
+	ambient = mat.Ambient * light.Ambient;
+
+	float diffuseFactor = dot(lightVec, nrm);
+
+	[flatten]
+	if (diffuseFactor > 0.0f)
+	{
+		float3 v = reflect(-lightVec, nrm);
+		float specFactor = pow(max(dot(v, toEye), 0.0f), mat.Specular.w);
+
+		diffuse = diffuseFactor * mat.Diffuse * light.Diffuse;
+		specular = specFactor * mat.Specular * light.Specular;
+	}
+
+	float spot = pow(max(dot(-lightVec, light.Direction), 0.0f), light.Spot);
+
+	float att = spot / dot(light.Attenuation, float3(1.0f, d, d*d));
+
+	ambient *= spot;
+	diffuse *= att;
+	specular *= att;
+}
 
 float4 main(PixelInputType input) : SV_TARGET
 {
@@ -68,6 +145,16 @@ float4 main(PixelInputType input) : SV_TARGET
 	ambient += a;
 
 	ComputeLightDirectional(gDirLight, gMat, input.positionW, input.normalW, toEye, a, d, s);
+	ambient += a;
+	diffuse += d;
+	specular += s;
+
+	ComputeLightPoint(gPointLight, gMat, input.positionW, input.normalW, toEye, a, d, s);
+	ambient += a;
+	diffuse += d;
+	specular += s;
+
+	ComputeLightSpot(gSpotLight, gMat, input.positionW, input.normalW, toEye, a, d, s);
 	ambient += a;
 	diffuse += d;
 	specular += s;

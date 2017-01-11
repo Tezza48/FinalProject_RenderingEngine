@@ -505,11 +505,7 @@ bool Mesh::InitBuffers(ID3D11Device *device,
 	vertexData.SysMemPitch = 0;
 	vertexData.SysMemSlicePitch = 0;
 
-	hr = device->CreateBuffer(&vertexBufferDesc, &vertexData, &mVertexBuffer);
-	if (FAILED(hr))
-	{
-		return false;
-	}
+	DX::ThrowIfFailed(device->CreateBuffer(&vertexBufferDesc, &vertexData, &mVertexBuffer));
 
 	indexBufferDesc.Usage = D3D11_USAGE_DEFAULT;
 	indexBufferDesc.ByteWidth = sizeof(unsigned long) * mIndexCount;
@@ -522,11 +518,7 @@ bool Mesh::InitBuffers(ID3D11Device *device,
 	indexData.SysMemPitch = 0;
 	indexData.SysMemSlicePitch = 0;
 
-	hr = device->CreateBuffer(&indexBufferDesc, &indexData, &mIndexBuffer);
-	if (FAILED(hr))
-	{
-		return false;
-	}
+	DX::ThrowIfFailed(device->CreateBuffer(&indexBufferDesc, &indexData, &mIndexBuffer));
 
 	return true;
 }

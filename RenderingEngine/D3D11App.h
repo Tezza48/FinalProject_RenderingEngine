@@ -36,6 +36,7 @@ class D3D11App : IRenderFramework
 	// Main Camera (only camera)
 	Camera *mMainCamera;
 	// Cube Mesh we're rendering
+	Mesh *mFloor;
 	Mesh *mCube;
 	Mesh *mSoftCube;
 	// Class with vertex color VS and PS
@@ -44,6 +45,8 @@ class D3D11App : IRenderFramework
 
 	AmbientLight *mAmbientLight;
 	DirectionalLight *mDirLight;
+	PointLight *mPointLight;
+	SpotLight *mSpotLight;
 
 	// we're rotating mCube for the demonstration
 	float triRotY = 0.0f;

@@ -6,6 +6,7 @@
 #include <DirectXMath.h>
 //#include "Material.h"
 #include "ColorMaterial.h"
+#include "utils.h"
 
 using namespace DirectX;
 

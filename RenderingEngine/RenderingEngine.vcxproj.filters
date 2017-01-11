@@ -63,9 +63,6 @@
     <ClInclude Include="Camera.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="LightStructs.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="LitColorShader.h">
       <Filter>Header Files\ShaderClasses</Filter>
     </ClInclude>
@@ -76,6 +73,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="resource.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="LightHelper.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -125,11 +125,11 @@
     <None Include="colorVS.hlsl">
       <Filter>Resources\Color</Filter>
     </None>
-    <None Include="LightsHelper.hlsli">
-      <Filter>Resources</Filter>
-    </None>
     <None Include="LitColor.hlsli">
       <Filter>Resources\LitColor</Filter>
+    </None>
+    <None Include="LightHelper.hlsli">
+      <Filter>Resources</Filter>
     </None>
   </ItemGroup>
   <ItemGroup>
