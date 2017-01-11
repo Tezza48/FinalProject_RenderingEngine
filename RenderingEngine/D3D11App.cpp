@@ -393,11 +393,11 @@ void D3D11App::Start()
 
 	mPointLight = new PointLight();
 	mPointLight->Ambient = XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f);
-	mPointLight->Diffuse = XMFLOAT4(0.0f, 0.0f, 0.5f, 1.0f);
-	mPointLight->Specular = XMFLOAT4(0.0f, 0.0f, 0.5f, 1.0f);
-	mPointLight->Position = XMFLOAT3(-0.2f, 0.0f, -1.0f);
-	mPointLight->Range = 1.0f;
-	mPointLight->Attenuation = XMFLOAT3(0.0f, 0.0f, 0.5f);
+	mPointLight->Diffuse = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
+	mPointLight->Specular = XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f);
+	mPointLight->Position = XMFLOAT3(-0.0f, 0.5f, -1.0f);
+	mPointLight->Range = 1.5f;
+	mPointLight->Attenuation = XMFLOAT3(0.0f, 0.0f, 1.0f);
 
 	mSpotLight = new SpotLight();
 	mSpotLight->Ambient = XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f);
@@ -458,7 +458,7 @@ void D3D11App::Update(const GameTimer &gt)
 	mCube->SetWorldMatrix(world);
 
 	mSoftCube->GetWorldMatrix(world);
-	world = XMMatrixRotationAxis(upV, gt.DeltaTime()) * world;
+	world = XMMatrixRotationAxis(upV, -gt.DeltaTime()) * world;
 	mSoftCube->SetWorldMatrix(world);
 
 }
