@@ -1,34 +1,28 @@
-struct AmbientLight
-{
-	float4 Ambient;
-};
+#include "litColor.hlsli"
+#include "LightHelper.hlsli"
 
-cbuffer cbPerObject
+cbuffer cbPerObject : register(b0)
 {
+	float4x4 gWorld;
+	float4x4 gWorldInvTrans;
 	float4x4 gWorldViewProj;
-	AmbientLight gAmbientLight;
-};
-
-struct VertexInputType
-{
-	float4 position : POSITION;
-	float4 color : COLOR;
-};
-
-struct PixelInputType
-{
-	float4 position : SV_POSITION;
-	float4 color : COLOR;
 };
 
 PixelInputType main(VertexInputType input)
 {
 	PixelInputType output;
 
-	input.position.w = 1.0f;
+	float4x4 worldInverseTranspose = transpose(gWorld);
 
-	output.position = mul(input.position, gWorldViewProj);
-	output.color = input.color;
+	//output.positionH = float4(input.positionL, 1.0f);
+
+	output.positionH = mul(float4(input.positionL, 1.0f), gWorldViewProj);
+
+	output.positionW = mul(float4(input.positionL, 1.0f), gWorld).xyz;
+
+	output.normalW = mul(input.normalL, (float3x3)gWorldInvTrans);
+	output.normalW = normalize(output.normalW);
+	//output.color = input.color;
 
 	return output;
 }

@@ -11,7 +11,8 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR pCmdLine, 
 	try
 	{
 		D3D11App thisApp;
-		thisApp.Init(hInstance, nShowCmd);
+		if (!thisApp.Init(hInstance, nShowCmd))
+			throw std::exception();
 
 		return thisApp.Run();
 	}

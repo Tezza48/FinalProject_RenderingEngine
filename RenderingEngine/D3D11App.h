@@ -14,6 +14,7 @@
 #include "Mesh.h"
 #include "Camera.h"
 #include "LitColorShader.h"
+#include "ColorMaterial.h"
 
 #pragma comment(lib, "d3d11.lib")
 #pragma comment(lib, "d3dx11.lib")
@@ -35,15 +36,23 @@ class D3D11App : IRenderFramework
 	// Main Camera (only camera)
 	Camera *mMainCamera;
 	// Cube Mesh we're rendering
+	Mesh *mFloor;
 	Mesh *mCube;
+	Mesh *mSoftCube;
 	// Class with vertex color VS and PS
 	LitColorShader *mLitColorShader;
+	ColorMaterial * mColorMaterial;
+
+	AmbientLight *mAmbientLight;
+	DirectionalLight *mDirLight;
+	PointLight *mPointLight;
+	SpotLight *mSpotLight;
 
 	// we're rotating mCube for the demonstration
 	float triRotY = 0.0f;
 
 	// Matrices we use when rendering
-	XMMATRIX mWorld, mView, mProjection, mWorldViewProj;
+	XMMATRIX mWorld, mView, mProjection, mWorldViewProj, mWorldInvTrans;
 
 	// Rasterizer state i'm using to debug stuff
 	ID3D11RasterizerState *mRS;
