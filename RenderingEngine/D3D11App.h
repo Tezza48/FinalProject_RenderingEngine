@@ -9,6 +9,7 @@
 #include <D3DX10.h>
 #include <DirectXMath.h>
 #include <DirectXColors.h>
+#include <fbxsdk.h>
 #include "IRenderFramework.h"
 #include "utils.h"
 #include "Mesh.h"
@@ -30,7 +31,6 @@ LRESULT CALLBACK MainWndProc(HWND, UINT, WPARAM, LPARAM);
 
 class D3D11App : IRenderFramework
 {
-
 	bool mIsRunning;
 
 	// Main Camera (only camera)
