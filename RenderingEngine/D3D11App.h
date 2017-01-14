@@ -1,21 +1,21 @@
 #pragma once
 
-#include <Windows.h>
+#include <WINDOWS.h>
 #include <WRL.h>
-#include <assert.h>
-#include <string>
-#include <d3d11.h>
+#include <ASSERT.h>
+#include <STRING>
+#include <D3D11.h>
 #include <D3DX11.h>
 #include <D3DX10.h>
 #include <DirectXMath.h>
 #include <DirectXColors.h>
-#include <fbxsdk.h>
 #include "IRenderFramework.h"
-#include "utils.h"
+#include "ContentManager.h"
 #include "Mesh.h"
 #include "Camera.h"
 #include "LitColorShader.h"
 #include "ColorMaterial.h"
+#include "utils.h"
 
 #pragma comment(lib, "d3d11.lib")
 #pragma comment(lib, "d3dx11.lib")
@@ -33,12 +33,14 @@ class D3D11App : IRenderFramework
 {
 	bool mIsRunning;
 
+	ContentManager *mContent;
+
+	size_t mNumMeshes;
+	Mesh *mMeshes; // an array of meshes;
+
 	// Main Camera (only camera)
 	Camera *mMainCamera;
-	// Cube Mesh we're rendering
-	Mesh *mFloor;
-	Mesh *mCube;
-	Mesh *mSoftCube;
+
 	// Class with vertex color VS and PS
 	LitColorShader *mLitColorShader;
 	ColorMaterial * mColorMaterial;

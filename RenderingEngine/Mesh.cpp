@@ -7,27 +7,23 @@ Mesh::Mesh()
 	//mMaterial = nullptr;
 }
 
-Mesh::Mesh(const Mesh &)
-{
-}
-
 Mesh::~Mesh()
 {
-	mVertexBuffer->Release();
-	mVertexBuffer = nullptr;
+	if (mVertexBuffer)
+	{
+		mVertexBuffer->Release();
+		mVertexBuffer = nullptr;
+	}
 
-	mIndexBuffer->Release();
-	mIndexBuffer = nullptr;
+	if (mIndexBuffer)
+	{
+		mIndexBuffer->Release();
+		mIndexBuffer = nullptr;
+	}
 
 	//delete mMaterial;
 	//mMaterial = nullptr;
 }
-
-// Model will be a green triangle
-//bool Mesh::Init(ID3D11Device *device)
-//{
-//	return InitBuffers(device);
-//}
 
 bool Mesh::Init(ID3D11Device *device, PrimativeShape shape)
 {
@@ -402,87 +398,6 @@ void Mesh::SetMaterial(ColorMaterial * material)
 //	//return mMaterial;
 //}
 
-/*bool Mesh::InitBuffers(ID3D11Device *device)
-{
-	HRESULT hr;
-	Vertex *vertices;
-	unsigned long *indices;
-	D3D11_BUFFER_DESC vertexBufferDesc, indexBufferDesc;
-	D3D11_SUBRESOURCE_DATA vertexData, indexData;
-
-	mVertexCount = 3;
-	mIndexCount = 3;
-
-	vertices = new Vertex[mVertexCount];
-	if (!vertices)
-	{
-		return false;
-	}
-
-	indices = new unsigned long[mIndexCount];
-	if (!indices)
-	{
-		return false;
-	}
-
-	//this change this to a proper mesh loading thingy later
-
-	vertices[0].position = XMFLOAT3(-1.0f, -1.0f, 0.0f);
-	vertices[0].uv = XMFLOAT2(0.0f, 0.0f);
-
-	vertices[1].position = XMFLOAT3(0.0f, 1.0f, 0.0f);
-	vertices[1].uv = XMFLOAT2(0.5f, 1.0f);
-
-	vertices[2].position = XMFLOAT3(1.0f, -1.0f, 0.0f);
-	vertices[2].uv = XMFLOAT2(1.0f, 0.0f);
-
-	indices[0] = 0;
-	indices[1] = 1;
-	indices[2] = 2;
-
-	vertexBufferDesc.Usage = D3D11_USAGE_DEFAULT;
-	vertexBufferDesc.ByteWidth = sizeof(Vertex) * mVertexCount;
-	vertexBufferDesc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
-	vertexBufferDesc.CPUAccessFlags = 0;
-	vertexBufferDesc.MiscFlags = 0;
-	vertexBufferDesc.StructureByteStride = 0;
-
-	vertexData.pSysMem = vertices;
-	vertexData.SysMemPitch = 0;
-	vertexData.SysMemSlicePitch = 0;
-
-	hr = device->CreateBuffer(&vertexBufferDesc, &vertexData, &mVertexBuffer);
-	if (FAILED(hr))
-	{
-		return false;
-	}
-
-	indexBufferDesc.Usage = D3D11_USAGE_DEFAULT;
-	indexBufferDesc.ByteWidth = sizeof(unsigned long) * mIndexCount;
-	indexBufferDesc.BindFlags = D3D11_BIND_INDEX_BUFFER;
-	indexBufferDesc.CPUAccessFlags = 0;
-	indexBufferDesc.MiscFlags = 0;
-	indexBufferDesc.StructureByteStride = 0;
-
-	indexData.pSysMem = indices;
-	indexData.SysMemPitch = 0;
-	indexData.SysMemSlicePitch = 0;
-
-	hr = device->CreateBuffer(&indexBufferDesc, &indexData, &mIndexBuffer);
-	if (FAILED(hr))
-	{
-		return false;
-	}
-
-	delete []vertices;
-	vertices = nullptr;
-
-	delete[]indices;
-	indices = nullptr;
-
-	return true;
-}*/
-
 bool Mesh::InitBuffers(ID3D11Device *device, 
 	Vertex *vertices, unsigned long numVertices, 
 	unsigned long *indices, unsigned long numIndices)
@@ -490,6 +405,8 @@ bool Mesh::InitBuffers(ID3D11Device *device,
 	HRESULT hr;
 	D3D11_BUFFER_DESC vertexBufferDesc, indexBufferDesc;
 	D3D11_SUBRESOURCE_DATA vertexData, indexData;
+
+	mWorld = XMMatrixIdentity();
 
 	mVertexCount = numVertices;
 	mIndexCount = numIndices;
