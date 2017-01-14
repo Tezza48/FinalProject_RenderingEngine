@@ -340,7 +340,7 @@ void D3D11App::Start()
 	mAmbientLight->Ambient = XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f);
 
 	mDirLight = new DirectionalLight();
-	mDirLight->Ambient = XMFLOAT4(0.1f, 0.1f, 0.1f, 1.0f);
+	mDirLight->Ambient = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
 	mDirLight->Diffuse = XMFLOAT4(0.5f, 0.5f, 0.5f, 1.0f);
 	mDirLight->Specular = XMFLOAT4(0.5f, 0.5f, 0.5f, 1.0f);
 	mDirLight->Direction =  XMFLOAT3(0.57735f, -0.57735f, 0.57735f);

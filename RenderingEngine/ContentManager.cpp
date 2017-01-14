@@ -77,7 +77,7 @@ Mesh *ContentManager::LoadFBX(ID3D11Device *device, const char * pFilename, size
 
 			for (size_t vi = 0; vi < numVertices; vi++)// vi == vertex index
 			{
-				vertices[vi].position = XMFLOAT3((float)meshes[i]->GetControlPointAt(vi)[0]/100, (float)meshes[i]->GetControlPointAt(vi)[1]/100, (float)meshes[i]->GetControlPointAt(vi)[2]/100);
+				vertices[vi].position = XMFLOAT3((float)meshes[i]->GetControlPointAt(vi)[0], (float)meshes[i]->GetControlPointAt(vi)[1], (float)meshes[i]->GetControlPointAt(vi)[2]);
 				XMVECTOR normal = XMLoadFloat3(&vertices[vi].position);
 				normal = -XMVector4Normalize(normal);
 				XMStoreFloat3(&vertices[vi].normal, normal);
