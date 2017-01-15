@@ -37,7 +37,7 @@ public:
 	~LitColorShader();
 
 	bool Init(ID3D11Device *device);
-	void XM_CALLCONV Render(ID3D11DeviceContext *deviceContext, int/*, unsigned int, int baseVertLocation*/, XMMATRIX, XMMATRIX, XMMATRIX/*, AmbientLight, DirectionalLight, XMMATRIX, ColorMaterial*/);
+	void XM_CALLCONV Render(ID3D11DeviceContext *deviceContext, int, XMMATRIX world, XMMATRIX worldViewProj, XMMATRIX worldInvTrans);
 	void XM_CALLCONV UpdateFrame(ID3D11DeviceContext *deviceContext, 
 		AmbientLight *ambient, DirectionalLight *directional, 
 		PointLight *point, SpotLight *spot, 

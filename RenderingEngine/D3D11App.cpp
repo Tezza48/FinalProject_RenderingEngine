@@ -283,8 +283,8 @@ bool D3D11App::InitPipeline()
 	// May possibly add multiple so
 	// i can draw some objects differently
 	D3D11_RASTERIZER_DESC rd;
-	rd.FillMode = D3D11_FILL_SOLID;
-	rd.CullMode = D3D11_CULL_NONE;
+	rd.FillMode = D3D11_FILL_WIREFRAME;
+	rd.CullMode = D3D11_CULL_BACK;
 	rd.FrontCounterClockwise = false;
 	rd.DepthBias = 0;
 	rd.DepthBiasClamp = 0.0f;
@@ -344,7 +344,7 @@ void D3D11App::Start()
 	mAmbientLight->Ambient = XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f);
 
 	mDirLight = new DirectionalLight();
-	mDirLight->Ambient = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
+	mDirLight->Ambient = XMFLOAT4(0.2f, 0.2f, 0.2f, 1.0f);
 	mDirLight->Diffuse = XMFLOAT4(0.5f, 0.5f, 0.5f, 1.0f);
 	mDirLight->Specular = XMFLOAT4(0.5f, 0.5f, 0.5f, 1.0f);
 	mDirLight->Direction =  XMFLOAT3(0.57735f, -0.57735f, 0.57735f);
@@ -398,6 +398,21 @@ void D3D11App::Update(const GameTimer &gt)
 	title = mClientTitle + L". FPS: " + std::to_wstring(fps);
 
 	SetWindowText(mMainWindow, title.c_str());
+
+	// Make the thing spin
+	XMFLOAT3 diag = XMFLOAT3(0.5773f, 0.5773f, 0.5773f);
+	XMVECTOR diagV;
+	diagV = XMLoadFloat3(&diag);
+
+	// Rotate the cube in y by the deltatime
+	XMFLOAT3 up = XMFLOAT3(0.0f, 1.0f, 0.0f);
+	XMVECTOR upV;
+	upV = XMLoadFloat3(&up);
+
+	XMMATRIX world;
+	mMeshes[0].GetWorldMatrix(world);
+	world = XMMatrixRotationAxis(upV, gt.DeltaTime()) * world;
+	mMeshes[0].SetWorldMatrix(world);
 }
 
 void D3D11App::Draw(const GameTimer &gt)
@@ -407,7 +422,7 @@ void D3D11App::Draw(const GameTimer &gt)
 		D3DXCOLOR(0.0f, 0.0f, 0.0f, 1.0f));
 
 	md3dImmediateContext->ClearDepthStencilView(mDepthStencilView,
-		D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
+		D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0.0f);
 
 	// Set the rasterizer state to our settings
 	md3dImmediateContext->RSSetState(mRS);
@@ -423,7 +438,12 @@ void D3D11App::Draw(const GameTimer &gt)
 		mMeshes[i].Render(md3dImmediateContext);
 		mMeshes[i].GetWorldMatrix(mWorld);
 
-		mLitColorShader->Render(md3dImmediateContext, mMeshes[i].GetIndexCount(), mWorld, mView, mProjection);
+		// DONT FORGET TO DO THIS! YOU MORON
+		mWorldViewProj = mWorld * mView * mProjection;
+		mWorldInvTrans = XMMatrixInverse(NULL, mWorld);
+		mWorldInvTrans = XMMatrixTranspose(mWorldInvTrans);
+
+		mLitColorShader->Render(md3dImmediateContext, mMeshes[i].GetIndexCount(), mWorld, mWorldViewProj, mWorldInvTrans);
 	}
 
 	// present the back buffer
