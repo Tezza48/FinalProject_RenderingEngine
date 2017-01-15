@@ -283,8 +283,8 @@ bool D3D11App::InitPipeline()
 	// May possibly add multiple so
 	// i can draw some objects differently
 	D3D11_RASTERIZER_DESC rd;
-	rd.FillMode = D3D11_FILL_WIREFRAME;
-	rd.CullMode = D3D11_CULL_BACK;
+	rd.FillMode = D3D11_FILL_SOLID;
+	rd.CullMode = D3D11_CULL_NONE;
 	rd.FrontCounterClockwise = false;
 	rd.DepthBias = 0;
 	rd.DepthBiasClamp = 0.0f;
@@ -315,21 +315,17 @@ void D3D11App::Start()
 	mTimer = GameTimer();
 	mTimer.Reset();
 
-	mMeshes = mContent->LoadFBX(md3dDevice, "/res/fbx/cube.fbx", mNumMeshes);
-	//mMeshes = new Mesh[2]{mMeshes[0], Mesh()};
-	//mNumMeshes = 2;
-
-	mMeshes[1].Init(md3dDevice, Mesh::PrimativeShape::MESH_CUBE);
+	mMeshes = mContent->LoadFBX(md3dDevice, "/res/fbx/teapot.fbx", mNumMeshes);
 
 	mMainCamera = new Camera();
 
 	// Set up the camera's projection
 	mMainCamera->CreateProjection(XM_PI / 4.0f, AspectRatio(), 1.0f, 100.0f);
 
-	// Place the camera at 0, 1, -2,
-	// looking at the origin
-	XMVECTOR pos = XMVectorSet(0.0f, 1.5f, -3.0f, 1.0f);
-	XMVECTOR target = XMVectorZero();
+	XMFLOAT4 targetXMFloat = XMFLOAT4(0.0f, 0.5f, 0.0f, 1.0f);
+
+	XMVECTOR pos = XMVectorSet(0.0f, 1.0f, -4.0f, 1.0f);
+	XMVECTOR target = XMLoadFloat4(&targetXMFloat);
 	XMVECTOR up = XMVectorSet(0.0f, 1.0f, 0.0f, 1.0f);
 
 	XMMATRIX  V = XMMatrixLookAtLH(pos, target, up);
@@ -338,23 +334,23 @@ void D3D11App::Start()
 	mColorMaterial = new ColorMaterial(
 		XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f),
 		XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f),
-		XMFLOAT4(1.0f, 1.0f, 1.0f, 10.0f));
+		XMFLOAT4(1.0f, 1.0f, 1.0f, 100.0f));
 	
 	mAmbientLight = new AmbientLight();
 	mAmbientLight->Ambient = XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f);
 
 	mDirLight = new DirectionalLight();
-	mDirLight->Ambient = XMFLOAT4(0.2f, 0.2f, 0.2f, 1.0f);
-	mDirLight->Diffuse = XMFLOAT4(0.5f, 0.5f, 0.5f, 1.0f);
-	mDirLight->Specular = XMFLOAT4(0.5f, 0.5f, 0.5f, 1.0f);
+	mDirLight->Ambient = XMFLOAT4(0.1f, 0.1f, 0.1f, 1.0f);
+	mDirLight->Diffuse = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
+	mDirLight->Specular = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
 	mDirLight->Direction =  XMFLOAT3(0.57735f, -0.57735f, 0.57735f);
 
 	mPointLight = new PointLight();
 	mPointLight->Ambient = XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f);
-	mPointLight->Diffuse = XMFLOAT4(0.0f, 0.0f, 0.0f, 0.0f);
-	mPointLight->Specular = XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f);
-	mPointLight->Position = XMFLOAT3(-0.0f, 0.5f, -1.0f);
-	mPointLight->Range = 1.5f;
+	mPointLight->Diffuse = XMFLOAT4(0.5f, 0.0f, 0.0f, 1.0f);
+	mPointLight->Specular = XMFLOAT4(0.5f, 0.0f, 0.0f, 1.0f);
+	mPointLight->Position = XMFLOAT3(1.0f, 1.0f, -2.0f);
+	mPointLight->Range = 2.5f;
 	mPointLight->Attenuation = XMFLOAT3(0.0f, 0.0f, 1.0f);
 
 	mSpotLight = new SpotLight();
@@ -405,7 +401,7 @@ void D3D11App::Update(const GameTimer &gt)
 	diagV = XMLoadFloat3(&diag);
 
 	// Rotate the cube in y by the deltatime
-	XMFLOAT3 up = XMFLOAT3(0.0f, 1.0f, 0.0f);
+	XMFLOAT3 up = XMFLOAT3(0.0f, 0.0f, 1.0f);
 	XMVECTOR upV;
 	upV = XMLoadFloat3(&up);
 

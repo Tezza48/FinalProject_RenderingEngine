@@ -38,6 +38,6 @@ public:
 	Mesh *LoadFBX(ID3D11Device *device, const std::string filename, size_t &numMeshes);
 
 private:
-	FbxArray<FbxMesh*> GetAllMeshes(FbxNode *node);
+	FbxArray<FbxMesh*> GetAllMeshesReccursive(FbxNode *node);
 };
 

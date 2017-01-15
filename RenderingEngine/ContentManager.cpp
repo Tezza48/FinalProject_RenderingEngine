@@ -40,7 +40,7 @@ Mesh *ContentManager::LoadFBX(ID3D11Device *device, std::string pFilename, size_
 
 	fbxImporter->Import(scene);
 
-	FbxArray<FbxMesh*> meshes = GetAllMeshes(scene->GetRootNode());
+	FbxArray<FbxMesh*> meshes = GetAllMeshesReccursive(scene->GetRootNode());
 
 	numMeshes = meshes.GetCount();
 	Mesh *output;
@@ -48,13 +48,16 @@ Mesh *ContentManager::LoadFBX(ID3D11Device *device, std::string pFilename, size_
 	Mesh::Vertex *vertices;
 
 	FbxVector4 *controlPoints;// vertex positions. dont need to know how many because polygon vertices does (kinda)
-	size_t numPolyVerts;//number of polygon vertices (the indices that point to control points)
-	int *polygonVertices;// control point indices for each vertex
-	FbxArray<FbxVector4> polyVertNrms;//polygon vertex normals
+	size_t numControlPoints;//number of polygon vertices (the indices that point to control points)
+	int polygonCount;// control point indices for each vertex
+	//FbxArray<FbxVector4> polyVertNrms;//polygon vertex normals
 
 	//Control points are all the vertex positions (they are most likely used multiple times)
 	//Polygon vertices are the indices for each vertex's position (control point)
 	//Polygon Vertex Normals are the the float4 normals for each polygon vertex
+	
+	XMMATRIX xmPivot;
+	FbxAMatrix fbxPivot;// current mesh's pivot matrix
 
 	if (numMeshes > 0)
 	{
@@ -64,32 +67,64 @@ Mesh *ContentManager::LoadFBX(ID3D11Device *device, std::string pFilename, size_
 		{
 			output[i] = Mesh();
 
-			//fill controlPoints
 			controlPoints = meshes[i]->GetControlPoints();
-			
-			//fill polygonVertices
-			numPolyVerts = meshes[i]->GetPolygonVertexCount();
-			polygonVertices = meshes[i]->GetPolygonVertices();
+			numControlPoints = meshes[i]->GetControlPointsCount();
+			polygonCount = meshes[i]->GetPolygonCount();
 
-			//fill polyVertNrm
-			meshes[i]->GetPolygonVertexNormals(polyVertNrms);
+			vertices = new Mesh::Vertex[polygonCount * 3];
 
-			//TODO: fill polygon vertex UVs
-
-			vertices = new Mesh::Vertex[numPolyVerts];
-			FbxVector4 currentVec;//temporary variable for any FbxVector4s we need
-			//Create the Vertex*, dont need to do indices as polygonVertices is already here.
-			for (size_t j = 0; j < numPolyVerts; j++)
+			for (size_t currentPolygon = 0; currentPolygon < polygonCount; currentPolygon++)
 			{
-				currentVec = controlPoints[polygonVertices[j]];
-				vertices[j].position = XMFLOAT3((float)currentVec[0], (float)currentVec[1], (float)currentVec[2]);
-				currentVec = polyVertNrms[j];
-				vertices[j].normal = XMFLOAT3((float)currentVec[0], (float)currentVec[1], (float)currentVec[2]);
-				//TODO: UVs
+				int offset = currentPolygon * 3;
+				FbxVector4 currentNormal;
+				vertices[offset].position.x = controlPoints[meshes[i]->GetPolygonVertex(currentPolygon, 0)][0];
+				vertices[offset].position.y = controlPoints[meshes[i]->GetPolygonVertex(currentPolygon, 0)][1];
+				vertices[offset].position.z = controlPoints[meshes[i]->GetPolygonVertex(currentPolygon, 0)][2];
+				
+				meshes[i]->GetPolygonVertexNormal(currentPolygon, 0, currentNormal);
+				vertices[offset].normal.x = currentNormal[0];
+				vertices[offset].normal.y = currentNormal[1];
+				vertices[offset].normal.z = currentNormal[2];
+
+				offset++;
+
+				vertices[offset].position.x = controlPoints[meshes[i]->GetPolygonVertex(currentPolygon, 1)][0];
+				vertices[offset].position.y = controlPoints[meshes[i]->GetPolygonVertex(currentPolygon, 1)][1];
+				vertices[offset].position.z = controlPoints[meshes[i]->GetPolygonVertex(currentPolygon, 1)][2];
+
+				meshes[i]->GetPolygonVertexNormal(currentPolygon, 1, currentNormal);
+				vertices[offset].normal.x = currentNormal[0];
+				vertices[offset].normal.y = currentNormal[1];
+				vertices[offset].normal.z = currentNormal[2];
+
+				offset++;
+
+				vertices[offset].position.x = controlPoints[meshes[i]->GetPolygonVertex(currentPolygon, 2)][0];
+				vertices[offset].position.y = controlPoints[meshes[i]->GetPolygonVertex(currentPolygon, 2)][1];
+				vertices[offset].position.z = controlPoints[meshes[i]->GetPolygonVertex(currentPolygon, 2)][2];
+
+				meshes[i]->GetPolygonVertexNormal(currentPolygon, 2, currentNormal);
+				vertices[offset].normal.x = currentNormal[0];
+				vertices[offset].normal.y = currentNormal[1];
+				vertices[offset].normal.z = currentNormal[2];
+			}
+
+			unsigned long *indices = new unsigned long[polygonCount * 3];
+
+			for (size_t j = 0; j < polygonCount * 3; j++)
+			{
+				indices[j] = j;
 			}
 
 			//Initialize the new mesh
-			output[i].Init(device, vertices, (unsigned long)numPolyVerts, (unsigned long*)polygonVertices, (unsigned long)numPolyVerts);
+			output[i].Init(device, vertices, (unsigned long)polygonCount * 3, (unsigned long*)indices, (unsigned long)polygonCount * 3);
+
+			output->GetWorldMatrix(xmPivot);
+
+			xmPivot *= XMMatrixRotationRollPitchYaw(-90.0f, 0.0f, 0.0f);//rotate it so that y is up (because changing the export settings in max dosn't do anything
+
+			output->SetWorldMatrix(xmPivot);
+
 		}
 
 	}
@@ -98,14 +133,14 @@ Mesh *ContentManager::LoadFBX(ID3D11Device *device, std::string pFilename, size_
 	//meshArray = nullptr;
 	//well that was pretty stupid
 
-	delete[] polygonVertices;
-	polygonVertices = nullptr;
+	//delete[] polygonVertices;
+	//polygonVertices = nullptr;
 
-	delete controlPoints;
-	controlPoints = nullptr;
+	//delete controlPoints;
+	//controlPoints = nullptr;
 
-	delete[] vertices;
-	vertices = nullptr;
+	//delete[] vertices;
+	//vertices = nullptr;
 
 	//scene->Destroy(true);
 	//scene = nullptr;
@@ -116,7 +151,7 @@ Mesh *ContentManager::LoadFBX(ID3D11Device *device, std::string pFilename, size_
 	return output;
 }
 
-FbxArray<FbxMesh*> ContentManager::GetAllMeshes(FbxNode *node)
+FbxArray<FbxMesh*> ContentManager::GetAllMeshesReccursive(FbxNode *node)
 {
 	size_t i;
 	FbxArray<FbxMesh*> meshes = FbxArray<FbxMesh*>();
@@ -135,7 +170,7 @@ FbxArray<FbxMesh*> ContentManager::GetAllMeshes(FbxNode *node)
 	{
 		for (i = 0; i < count; i++)
 		{
-			meshes.AddArray(GetAllMeshes(node->GetChild(i)));
+			meshes.AddArray(GetAllMeshesReccursive(node->GetChild(i)));
 		}
 	}
 

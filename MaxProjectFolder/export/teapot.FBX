@@ -10,11 +10,11 @@ FBXHeaderExtension:  {
 		Version: 1000
 		Year: 2017
 		Month: 1
-		Day: 14
-		Hour: 2
-		Minute: 38
-		Second: 39
-		Millisecond: 590
+		Day: 15
+		Hour: 21
+		Minute: 15
+		Second: 26
+		Millisecond: 689
 	}
 	Creator: "FBX SDK/FBX Plugins version 2015.1"
 	SceneInfo: "SceneInfo::GlobalInfo", "UserData" {
@@ -36,13 +36,13 @@ FBXHeaderExtension:  {
 			P: "Original|ApplicationVendor", "KString", "", "", "Autodesk"
 			P: "Original|ApplicationName", "KString", "", "", "3ds Max"
 			P: "Original|ApplicationVersion", "KString", "", "", "2014"
-			P: "Original|DateTime_GMT", "DateTime", "", "", "14/01/2017 02:38:39.590"
+			P: "Original|DateTime_GMT", "DateTime", "", "", "15/01/2017 21:15:26.688"
 			P: "Original|FileName", "KString", "", "", "D:\tezza\Documents\University\Uni Year 3\Final Project\FinalProject_RenderingEngine\MaxProjectFolder\export\teapot.FBX"
 			P: "LastSaved", "Compound", "", ""
 			P: "LastSaved|ApplicationVendor", "KString", "", "", "Autodesk"
 			P: "LastSaved|ApplicationName", "KString", "", "", "3ds Max"
 			P: "LastSaved|ApplicationVersion", "KString", "", "", "2014"
-			P: "LastSaved|DateTime_GMT", "DateTime", "", "", "14/01/2017 02:38:39.590"
+			P: "LastSaved|DateTime_GMT", "DateTime", "", "", "15/01/2017 21:15:26.688"
 		}
 	}
 }
@@ -77,7 +77,7 @@ GlobalSettings:  {
 
 Documents:  {
 	Count: 1
-	Document: 2164976384, "", "Scene" {
+	Document: 1699396144, "", "Scene" {
 		Properties70:  {
 			P: "SourceObject", "object", "", ""
 			P: "ActiveAnimStackName", "KString", "", "", ""
@@ -237,9 +237,9 @@ Definitions:  {
 ;------------------------------------------------------------------
 
 Objects:  {
-	Geometry: 2175538912, "Geometry::", "Mesh" {
+	Geometry: 2077673552, "Geometry::", "Mesh" {
 		Properties70:  {
-			P: "Color", "ColorRGB", "Color", "",0.529411764705882,0.231372549019608,0.0313725490196078
+			P: "Color", "ColorRGB", "Color", "",0,0,0
 		}
 		Vertices: *1590 {
 			a: 0.699999928474426,0,1.19999992847443,0.690234303474426,0,1.23691391944885,0.701562404632568,0,1.24921858310699,0.72460925579071,0,1.23691403865814,0.74999988079071,0,1.19999992847443,0.645749807357788,-0.274749934673309,1.19999992847443,0.636741101741791,-0.270916938781738,1.23691391944885,0.647191226482391,-0.275363236665726,1.24921858310699,0.668452084064484,-0.28440910577774,1.23691403865814,0.691874861717224,-0.294374942779541,1.19999992847443,0.496999889612198,-0.49699991941452,1.19999992847443,0.490066289901733,-0.490066289901733,1.23691391944885,0.49810928106308,-0.49810928106308,1.24921858310699,0.514472544193268,-0.514472544193268,1.23691403865814,0.532499969005585,-0.532499969005585,1.19999992847443,0.274749934673309,-0.645749866962433,1.19999992847443,0.270916938781738,-0.636741101741791,1.23691391944885,0.275363236665726,-0.647191286087036,1.24921858310699,0.28440910577774,-0.668452084064484,1.23691403865814,0.294374942779541,-0.691874861717224,1.19999992847443,0,-0.699999928474426,1.19999992847443,0,-0.690234303474426,1.23691391944885,0,-0.701562404632568,1.24921858310699,0,-0.72460925579071,1.23691403865814,0,-0.74999988079071,1.19999992847443,-0.293734341859818,-0.645749807357788,1.19999992847443,-0.278925955295563,-0.636741101741791,1.23691391944885,-0.277736306190491,-0.647191226482391,1.24921858310699,-0.284705758094788,-0.668452084064484,1.23691403865814,-0.294374942779541,-0.691874861717224,1.19999992847443,-0.51387482881546,-0.496999889612198,1.19999992847443,-0.497185349464417,-0.490066289901733,1.23691391944885,-0.500218629837036,-0.49810928106308,1.24921858310699,-0.514736294746399,-0.514472544193268,1.23691403865814,-0.532499969005585,-0.532499969005585,1.19999992847443,-0.652078092098236,-0.274749934673309,1.19999992847443,-0.639410793781281,-0.270916938781738,1.23691391944885,-0.64798229932785,-0.275363236665726,1.24921858310699,-0.668550848960876,-0.28440910577774,1.23691403865814,-0.691874861717224,-0.294374942779541,1.19999992847443,-0.699999928474426,0,1.19999992847443,
@@ -401,36 +401,61 @@ Objects:  {
 			}
 		}
 	}
-	Model: 1351184112, "Model::Teapot001", "Mesh" {
+	Model: 2082867584, "Model::Teapot001", "Mesh" {
 		Version: 232
 		Properties70:  {
 			P: "PreRotation", "Vector3D", "Vector", "",-90,-0,0
 			P: "RotationActive", "bool", "", "",1
 			P: "InheritType", "enum", "", "",1
 			P: "ScalingMax", "Vector3D", "Vector", "",0,0,0
+			P: "GeometricTranslation", "Vector3D", "Vector", "",-6.70552253723145e-008,-0.625195205211639,4.67849048391145e-009
+			P: "GeometricRotation", "Vector3D", "Vector", "",-90,2.50447851612989e-006,-2.50447806138254e-006
 			P: "DefaultAttributeIndex", "int", "Integer", "",0
+			P: "Lcl Translation", "Lcl Translation", "", "A",6.70552253723145e-008,0,2.26496617017347e-008
+			P: "Lcl Rotation", "Lcl Rotation", "", "A+",90.0000025044781,-0,0
 			P: "UDP3DSMAX", "KString", "", "U", "MapChannel:1 = UVChannel_1&cr;&lf;"
 			P: "MaxHandle", "int", "Integer", "UH",1
 		}
 		Shading: T
 		Culling: "CullingOff"
 	}
-	AnimationStack: 1130429552, "AnimStack::Take 001", "" {
+	AnimationStack: 1694032992, "AnimStack::Take 001", "" {
 		Properties70:  {
 			P: "LocalStop", "KTime", "Time", "",153953860000
 			P: "ReferenceStop", "KTime", "Time", "",153953860000
 		}
 	}
-	AnimationLayer: 1262162656, "AnimLayer::BaseLayer", "" {
+	AnimationLayer: 1241242144, "AnimLayer::BaseLayer", "" {
 	}
-	AnimationCurveNode: 1130422480, "AnimCurveNode::R", "" {
+	AnimationCurveNode: 1694033408, "AnimCurveNode::R", "" {
 		Properties70:  {
-			P: "d|X", "Number", "", "A",0
-			P: "d|Y", "Number", "", "A",0
+			P: "d|X", "Number", "", "A",90.0000025044781
+			P: "d|Y", "Number", "", "A",-0
 			P: "d|Z", "Number", "", "A",0
 		}
 	}
-	AnimationCurve: 908438016, "AnimCurve::", "" {
+	AnimationCurve: 1695420608, "AnimCurve::", "" {
+		Default: 0
+		KeyVer: 4008
+		KeyTime: *1 {
+			a: 0
+		} 
+		KeyValueFloat: *1 {
+			a: 90
+		} 
+		;KeyAttrFlags: Cubic|TangeantUser|WeightedRight
+		KeyAttrFlags: *1 {
+			a: 16778248
+		} 
+		;KeyAttrDataFloat: RightSlope:0, NextLeftSlope:0, RightWeight:0.333233, NextLeftWeight:0.333333, RightVelocity:0, NextLeftVelocity:0
+		KeyAttrDataFloat: *4 {
+			a: 0,0,218434820,0
+		} 
+		KeyAttrRefCount: *1 {
+			a: 1
+		} 
+	}
+	AnimationCurve: 1695424128, "AnimCurve::", "" {
 		Default: 0
 		KeyVer: 4008
 		KeyTime: *1 {
@@ -451,28 +476,7 @@ Objects:  {
 			a: 1
 		} 
 	}
-	AnimationCurve: 908438336, "AnimCurve::", "" {
-		Default: 0
-		KeyVer: 4008
-		KeyTime: *1 {
-			a: 0
-		} 
-		KeyValueFloat: *1 {
-			a: 0
-		} 
-		;KeyAttrFlags: Cubic|TangeantUser|WeightedRight
-		KeyAttrFlags: *1 {
-			a: 16778248
-		} 
-		;KeyAttrDataFloat: RightSlope:0, NextLeftSlope:0, RightWeight:0.333233, NextLeftWeight:0.333333, RightVelocity:0, NextLeftVelocity:0
-		KeyAttrDataFloat: *4 {
-			a: 0,0,218434820,0
-		} 
-		KeyAttrRefCount: *1 {
-			a: 1
-		} 
-	}
-	AnimationCurve: 908435776, "AnimCurve::", "" {
+	AnimationCurve: 1695424288, "AnimCurve::", "" {
 		Default: 0
 		KeyVer: 4008
 		KeyTime: *1 {
@@ -501,28 +505,28 @@ Objects:  {
 Connections:  {
 	
 	;Model::Teapot001, Model::RootNode
-	C: "OO",1351184112,0
+	C: "OO",2082867584,0
 	
 	;AnimLayer::BaseLayer, AnimStack::Take 001
-	C: "OO",1262162656,1130429552
+	C: "OO",1241242144,1694032992
 	
 	;AnimCurveNode::R, AnimLayer::BaseLayer
-	C: "OO",1130422480,1262162656
+	C: "OO",1694033408,1241242144
 	
 	;Geometry::, Model::Teapot001
-	C: "OO",2175538912,1351184112
+	C: "OO",2077673552,2082867584
 	
 	;AnimCurveNode::R, Model::Teapot001
-	C: "OP",1130422480,1351184112, "Lcl Rotation"
+	C: "OP",1694033408,2082867584, "Lcl Rotation"
 	
 	;AnimCurve::, AnimCurveNode::R
-	C: "OP",908438016,1130422480, "d|X"
+	C: "OP",1695420608,1694033408, "d|X"
 	
 	;AnimCurve::, AnimCurveNode::R
-	C: "OP",908438336,1130422480, "d|Y"
+	C: "OP",1695424128,1694033408, "d|Y"
 	
 	;AnimCurve::, AnimCurveNode::R
-	C: "OP",908435776,1130422480, "d|Z"
+	C: "OP",1695424288,1694033408, "d|Z"
 }
 ;Takes section
 ;----------------------------------------------------
