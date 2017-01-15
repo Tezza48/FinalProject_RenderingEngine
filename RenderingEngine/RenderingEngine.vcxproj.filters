@@ -38,7 +38,7 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="ContentManager.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Source Files\Framework</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

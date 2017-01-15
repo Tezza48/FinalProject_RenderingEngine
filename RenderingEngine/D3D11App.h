@@ -24,7 +24,6 @@
 
 using namespace DirectX;
 using namespace DX;
-using namespace Microsoft::WRL;
 
 // Global Message procedure, redirects to the class's message proc
 LRESULT CALLBACK MainWndProc(HWND, UINT, WPARAM, LPARAM);

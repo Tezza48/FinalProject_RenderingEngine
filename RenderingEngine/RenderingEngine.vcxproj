@@ -72,7 +72,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
     <IncludePath>C:\Program Files (x86)\Microsoft DirectX SDK (June 2010)\Include;$(IncludePath);C:\Program Files\Autodesk\FBX\FBX SDK\2017.1\include</IncludePath>
-    <LibraryPath>C:\Program Files (x86)\Microsoft DirectX SDK (June 2010)\Lib\x86;D:\tezza\Documents\University\Uni Year 3\Final Project\FinalProject_RenderingEngine\RenderingEngine\lib;$(LibraryPath)</LibraryPath>
+    <LibraryPath>C:\Program Files (x86)\Microsoft DirectX SDK (June 2010)\Lib\x86;C:\Program Files\Autodesk\FBX\FBX SDK\2017.1\lib\vs2015\x86\debug;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
@@ -104,7 +104,8 @@
       </Message>
     </PreBuildEvent>
     <PostBuildEvent>
-      <Command>
+      <Command>xcopy /Y /E "$(ProjectDir)res" "$(OutDir)res"
+xcopy /Y /E "$(ProjectDir)dll\*" "$(OutDir)"
 </Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>

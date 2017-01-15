@@ -315,7 +315,11 @@ void D3D11App::Start()
 	mTimer = GameTimer();
 	mTimer.Reset();
 
-	mMeshes = mContent->LoadFBX(md3dDevice, "/res/fbx/teapot.fbx", mNumMeshes);
+	mMeshes = mContent->LoadFBX(md3dDevice, "/res/fbx/cube.fbx", mNumMeshes);
+	//mMeshes = new Mesh[2]{mMeshes[0], Mesh()};
+	//mNumMeshes = 2;
+
+	mMeshes[1].Init(md3dDevice, Mesh::PrimativeShape::MESH_CUBE);
 
 	mMainCamera = new Camera();
 
@@ -413,8 +417,6 @@ void D3D11App::Draw(const GameTimer &gt)
 
 	mMainCamera->GetViewMatrix(mView);
 	mMainCamera->GetProjectionMatrix(mProjection);
-
-	mNumMeshes;
 
 	for (size_t i = 0; i < mNumMeshes; i++)
 	{

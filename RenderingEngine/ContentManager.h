@@ -1,6 +1,7 @@
 #pragma once
 
 //#include <list>
+#include <string>
 #include <D3D11.h>
 #include <fbxsdk.h>
 #include <fbxsdk/fileio/fbxiosettings.h>
@@ -34,7 +35,7 @@ public:
 	ContentManager();
 	~ContentManager();
 
-	Mesh *LoadFBX(ID3D11Device *device, const char *pFilename, size_t &numMeshes);
+	Mesh *LoadFBX(ID3D11Device *device, const std::string filename, size_t &numMeshes);
 
 private:
 	FbxArray<FbxMesh*> GetAllMeshes(FbxNode *node);

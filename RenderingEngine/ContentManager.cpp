@@ -21,14 +21,14 @@ ContentManager::~ContentManager()
 {
 	mFbxIOS->Destroy();
 
-	mFbxManager->Destroy();
+	//mFbxManager->Destroy();
 }
 
-Mesh *ContentManager::LoadFBX(ID3D11Device *device, const char * pFilename, size_t &numMeshes)
+Mesh *ContentManager::LoadFBX(ID3D11Device *device, std::string pFilename, size_t &numMeshes)
 {
 	FbxImporter *fbxImporter = FbxImporter::Create(mFbxManager, "");
 
-	bool importStatus = fbxImporter->Initialize(pFilename, -1, mFbxManager->GetIOSettings());
+	bool importStatus = fbxImporter->Initialize(pFilename.c_str(), -1, mFbxManager->GetIOSettings());
 	if (!importStatus)
 	{
 		printf("Call to FbxImporter::Initialize() failed.\n");
@@ -42,65 +42,78 @@ Mesh *ContentManager::LoadFBX(ID3D11Device *device, const char * pFilename, size
 
 	FbxArray<FbxMesh*> meshes = GetAllMeshes(scene->GetRootNode());
 
-	Mesh *meshArray;
-
 	numMeshes = meshes.GetCount();
+	Mesh *output;
+
+	Mesh::Vertex *vertices;
+
+	FbxVector4 *controlPoints;// vertex positions. dont need to know how many because polygon vertices does (kinda)
+	size_t numPolyVerts;//number of polygon vertices (the indices that point to control points)
+	int *polygonVertices;// control point indices for each vertex
+	FbxArray<FbxVector4> polyVertNrms;//polygon vertex normals
+
+	//Control points are all the vertex positions (they are most likely used multiple times)
+	//Polygon vertices are the indices for each vertex's position (control point)
+	//Polygon Vertex Normals are the the float4 normals for each polygon vertex
+
 	if (numMeshes > 0)
 	{
-		meshArray = new Mesh[numMeshes];
-
-		// create meshes from the data in the fbx meshes
-		unsigned long numVertices = NULL;
-		unsigned long numIndices = NULL;
-
-		Mesh::Vertex *vertices = nullptr;
-		unsigned long *indices = nullptr;
-
-		FbxArray<FbxVector4> *normals;
+		output = new Mesh[numMeshes];
 
 		for (size_t i = 0; i < numMeshes; i++)
 		{
-			meshArray[i] = Mesh();
+			output[i] = Mesh();
 
-			/*
-				control point is a vertex synonym
-				polygon vertex is an index to a control point on a polygon
-				
-			*/
+			//fill controlPoints
+			controlPoints = meshes[i]->GetControlPoints();
+			
+			//fill polygonVertices
+			numPolyVerts = meshes[i]->GetPolygonVertexCount();
+			polygonVertices = meshes[i]->GetPolygonVertices();
 
-			numVertices = meshes[i]->GetControlPointsCount();// checks out
-			numIndices = meshes[i]->GetPolygonVertexCount();// = number of polys * 3
+			//fill polyVertNrm
+			meshes[i]->GetPolygonVertexNormals(polyVertNrms);
 
-			vertices = new Mesh::Vertex[numVertices];
+			//TODO: fill polygon vertex UVs
 
-			indices = new unsigned long[numIndices];
-
-			for (size_t vi = 0; vi < numVertices; vi++)// vi == vertex index
+			vertices = new Mesh::Vertex[numPolyVerts];
+			FbxVector4 currentVec;//temporary variable for any FbxVector4s we need
+			//Create the Vertex*, dont need to do indices as polygonVertices is already here.
+			for (size_t j = 0; j < numPolyVerts; j++)
 			{
-				vertices[vi].position = XMFLOAT3((float)meshes[i]->GetControlPointAt(vi)[0], (float)meshes[i]->GetControlPointAt(vi)[1], (float)meshes[i]->GetControlPointAt(vi)[2]);
-				XMVECTOR normal = XMLoadFloat3(&vertices[vi].position);
-				normal = -XMVector4Normalize(normal);
-				XMStoreFloat3(&vertices[vi].normal, normal);
+				currentVec = controlPoints[polygonVertices[j]];
+				vertices[j].position = XMFLOAT3((float)currentVec[0], (float)currentVec[1], (float)currentVec[2]);
+				currentVec = polyVertNrms[j];
+				vertices[j].normal = XMFLOAT3((float)currentVec[0], (float)currentVec[1], (float)currentVec[2]);
+				//TODO: UVs
 			}
 
-			for (size_t ii = 0; ii < numIndices; ii++)// ii == index index? good job, me.
-			{
-				indices[ii] = meshes[i]->GetPolygonVertices()[ii];
-			}
-			meshArray[i].Init(device, vertices, numVertices, indices, numIndices);
+			//Initialize the new mesh
+			output[i].Init(device, vertices, (unsigned long)numPolyVerts, (unsigned long*)polygonVertices, (unsigned long)numPolyVerts);
 		}
 
-		delete[] vertices;
-		vertices = nullptr;
-		delete[] indices;
-		indices = nullptr;
 	}
+	
+	//delete[] meshArray;
+	//meshArray = nullptr;
+	//well that was pretty stupid
 
-	fbxImporter->Destroy();
+	delete[] polygonVertices;
+	polygonVertices = nullptr;
 
-	scene->Destroy();
+	delete controlPoints;
+	controlPoints = nullptr;
 
-	return meshArray;
+	delete[] vertices;
+	vertices = nullptr;
+
+	//scene->Destroy(true);
+	//scene = nullptr;
+	
+	fbxImporter->Destroy(true);
+	fbxImporter = nullptr;
+
+	return output;
 }
 
 FbxArray<FbxMesh*> ContentManager::GetAllMeshes(FbxNode *node)

@@ -5,6 +5,8 @@ Mesh::Mesh()
 	mVertexBuffer = nullptr;
 	mIndexBuffer = nullptr;
 	//mMaterial = nullptr;
+
+	mWorld = XMMatrixIdentity();
 }
 
 Mesh::~Mesh()
@@ -405,8 +407,6 @@ bool Mesh::InitBuffers(ID3D11Device *device,
 	HRESULT hr;
 	D3D11_BUFFER_DESC vertexBufferDesc, indexBufferDesc;
 	D3D11_SUBRESOURCE_DATA vertexData, indexData;
-
-	mWorld = XMMatrixIdentity();
 
 	mVertexCount = numVertices;
 	mIndexCount = numIndices;
