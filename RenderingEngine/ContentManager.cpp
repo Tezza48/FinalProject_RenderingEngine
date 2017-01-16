@@ -151,6 +151,42 @@ Mesh *ContentManager::LoadFBX(ID3D11Device *device, std::string pFilename, size_
 	return output;
 }
 
+Texture * ContentManager::LoadTGA(const std::string filename)
+{
+	// http://www.cplusplus.com/reference/istream/istream/
+	std::ifstream is;
+	is.open(filename, std::fstream::binary);
+
+	if (is)
+	{
+		is.seekg(0, is.end);
+		int length = is.tellg();
+		is.seekg(0, is.beg);
+
+		char *buffer = new char[length];
+
+		is.read(buffer, length);
+
+		TargaHeader header;
+
+		header.idLength = buffer[0];
+		header.colorMapType = buffer[1];
+		header.imageTypeCode = buffer[2];
+		header.colorMapOrigin = buffer[3] << 8 | buffer[4];
+		header.colorMapLength = buffer[5] << 8 | buffer[6];
+		header.colorMapEntrySize = buffer[7];
+		header.xOrigin = buffer[8] << 8 | buffer[9];
+		header.yOrigin = buffer[10] << 8 | buffer[11];
+		header.width = buffer[12] << 8 | buffer[13];
+		header.height = buffer[14] << 8 | buffer[15];
+		header.imagePixelSize = buffer[16];
+		header.imageDescriptorByte = buffer[17];
+
+	}
+
+	return nullptr;
+}
+
 FbxArray<FbxMesh*> ContentManager::GetAllMeshesReccursive(FbxNode *node)
 {
 	size_t i;

@@ -40,6 +40,9 @@
     <ClCompile Include="ContentManager.cpp">
       <Filter>Source Files\Framework</Filter>
     </ClCompile>
+    <ClCompile Include="Texture.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="BasicShader.h">
@@ -86,6 +89,9 @@
     </ClInclude>
     <ClInclude Include="GameTimer.h">
       <Filter>Header Files\Framework</Filter>
+    </ClInclude>
+    <ClInclude Include="Texture.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

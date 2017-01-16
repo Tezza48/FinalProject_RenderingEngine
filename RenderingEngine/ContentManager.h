@@ -2,11 +2,13 @@
 
 //#include <list>
 #include <string>
+#include <fstream>
 #include <D3D11.h>
 #include <fbxsdk.h>
 #include <fbxsdk/fileio/fbxiosettings.h>
 #include "FilePathMacros.h"
 #include "Mesh.h"
+#include "Texture.h"
 
 
 #pragma comment(lib, "libfbxsdk.lib")
@@ -25,6 +27,22 @@
 //		TGA
 class ContentManager
 {
+	struct TargaHeader
+	{
+		TargaHeader() { ZeroMemory(this, sizeof(this)); }
+		char idLength;
+		char colorMapType;
+		char imageTypeCode;
+		short colorMapOrigin;
+		short colorMapLength;
+		char colorMapEntrySize;//bit depth: 24bit / 32bit for the color map
+		short xOrigin;
+		short yOrigin;
+		short width;
+		short height;
+		char imagePixelSize;//24, 32, for the actual image
+		char imageDescriptorByte;//should be set to 0 says paul bourke
+	};
 private:
 	FbxManager *mFbxManager;
 
@@ -36,7 +54,7 @@ public:
 	~ContentManager();
 
 	Mesh *LoadFBX(ID3D11Device *device, const std::string filename, size_t &numMeshes);
-
+	Texture *LoadTGA(const std::string filename);
 private:
 	FbxArray<FbxMesh*> GetAllMeshesReccursive(FbxNode *node);
 };

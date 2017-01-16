@@ -315,7 +315,9 @@ void D3D11App::Start()
 	mTimer = GameTimer();
 	mTimer.Reset();
 
-	mMeshes = mContent->LoadFBX(md3dDevice, "/res/fbx/teapot.fbx", mNumMeshes);
+	mMeshes = mContent->LoadFBX(md3dDevice, "res/fbx/teapot.fbx", mNumMeshes);
+
+	Texture *t = mContent->LoadTGA("res/tga/crate1_diffuse.tga");
 
 	mMainCamera = new Camera();
 
