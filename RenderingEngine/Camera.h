@@ -5,6 +5,9 @@
 
 using namespace DirectX;
 
+// http://stackoverflow.com/questions/20104815/warning-c4316-object-allocated-on-the-heap-may-not-be-aligned-16 12/01/2017
+// solution to C4316 may not be alligned 16
+
 class Camera
 {
 private:

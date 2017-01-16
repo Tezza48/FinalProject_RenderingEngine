@@ -4,6 +4,8 @@
 #include <D3DX11.h>
 #include <DirectXColors.h>
 #include <DirectXMath.h>
+#include <fbxsdk.h>
+#include "FilePathMacros.h"
 //#include "Material.h"
 #include "ColorMaterial.h"
 #include "utils.h"
@@ -31,24 +33,23 @@ public:
 
 public:
 	Mesh();
-	Mesh(const Mesh&);
 	~Mesh();
 
 	//bool Init(ID3D11Device*);
-	bool Init(ID3D11Device*, PrimativeShape);
-	bool Init(ID3D11Device*, Vertex*, unsigned long, unsigned long*, unsigned long);
-	void Render(ID3D11DeviceContext*);
+	bool Init(ID3D11Device *device, PrimativeShape shape);
+	bool Init(ID3D11Device *device, Vertex *vertices, unsigned long numVertices, unsigned long *indices, unsigned long numIndices);
+	void Render(ID3D11DeviceContext *deviceContext);
 
 	int GetIndexCount();
-	void XM_CALLCONV GetWorldMatrix(XMMATRIX&);
-	void XM_CALLCONV SetWorldMatrix(XMMATRIX);
+	void XM_CALLCONV GetWorldMatrix(XMMATRIX &other);
+	void XM_CALLCONV SetWorldMatrix(XMMATRIX world);
 	void SetMaterial(ColorMaterial *material);
 	//ColorMaterial *GetMaterial();
 
 private:
 	//bool InitBuffers(ID3D11Device*);
-	bool InitBuffers(ID3D11Device*, Vertex*, unsigned long, unsigned long*, unsigned long);
-	void RenderBuffers(ID3D11DeviceContext*);
+	bool InitBuffers(ID3D11Device *device, Vertex *vertices, unsigned long numVertices, unsigned long *indices, unsigned long numIndices);
+	void RenderBuffers(ID3D11DeviceContext *deviceContext);
 
 private:
 	XMMATRIX mWorld;
