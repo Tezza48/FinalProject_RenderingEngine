@@ -54,7 +54,7 @@ public:
 	~ContentManager();
 
 	Mesh *LoadFBX(ID3D11Device *device, const std::string filename, size_t &numMeshes);
-	Texture *LoadTGA(const std::string filename);
+	Texture *LoadTGA(ID3D11Device *device, ID3D11DeviceContext *deviceContext, const std::string filename);
 private:
 	FbxArray<FbxMesh*> GetAllMeshesReccursive(FbxNode *node);
 };

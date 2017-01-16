@@ -8,6 +8,7 @@
 #include "utils.h"
 #include "LightHelper.h"
 #include "ColorMaterial.h"
+#include "Texture.h"
 
 using namespace DirectX;
 
@@ -38,6 +39,7 @@ public:
 
 	bool Init(ID3D11Device *device);
 	void XM_CALLCONV Render(ID3D11DeviceContext *deviceContext, int, XMMATRIX world, XMMATRIX worldViewProj, XMMATRIX worldInvTrans);
+	void XM_CALLCONV Render(ID3D11DeviceContext *deviceContext, int, XMMATRIX world, XMMATRIX worldViewProj, XMMATRIX worldInvTrans, ID3D11ShaderResourceView *texture);
 	void XM_CALLCONV UpdateFrame(ID3D11DeviceContext *deviceContext, 
 		AmbientLight *ambient, DirectionalLight *directional, 
 		PointLight *point, SpotLight *spot, 
@@ -47,6 +49,9 @@ private:
 	ID3D11VertexShader *mVertexShader;
 	ID3D11PixelShader *mPixelShader;
 	ID3D11InputLayout *mInputLayout;
+
+	// For the sake of lazyness i'm not making a new shader
+	ID3D11SamplerState *mSamplerState;
 
 	// constant buffers
 	ID3D11Buffer *mPerObjectBuffer;

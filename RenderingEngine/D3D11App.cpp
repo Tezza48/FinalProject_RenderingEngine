@@ -11,6 +11,8 @@ D3D11App::D3D11App()
 
 	mMeshes = nullptr;
 
+	mCrateTexture = nullptr;
+
 	mMainCamera = nullptr;
 
 	mLitColorShader = nullptr;
@@ -57,6 +59,9 @@ D3D11App::~D3D11App()
 
 	delete[] mMeshes;
 	mMeshes = nullptr;
+
+	delete mCrateTexture;
+	mCrateTexture = nullptr;
 
 	delete mMainCamera;
 	mMainCamera = nullptr;
@@ -315,18 +320,22 @@ void D3D11App::Start()
 	mTimer = GameTimer();
 	mTimer.Reset();
 
-	mMeshes = mContent->LoadFBX(md3dDevice, "res/fbx/teapot.fbx", mNumMeshes);
+	//mMeshes = mContent->LoadFBX(md3dDevice, "res/fbx/cube.fbx", mNumMeshes);
 
-	Texture *t = mContent->LoadTGA("res/tga/crate1_diffuse.tga");
+	mNumMeshes = 1;
+	mMeshes = new Mesh();
+	mMeshes->Init(md3dDevice, Mesh::MESH_CUBE);
+
+	mCrateTexture = mContent->LoadTGA(md3dDevice, md3dImmediateContext, "res/dds/crate1_diffuse.dds");
 
 	mMainCamera = new Camera();
 
 	// Set up the camera's projection
 	mMainCamera->CreateProjection(XM_PI / 4.0f, AspectRatio(), 1.0f, 100.0f);
 
-	XMFLOAT4 targetXMFloat = XMFLOAT4(0.0f, 0.5f, 0.0f, 1.0f);
+	XMFLOAT4 targetXMFloat = XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f);
 
-	XMVECTOR pos = XMVectorSet(0.0f, 1.0f, -4.0f, 1.0f);
+	XMVECTOR pos = XMVectorSet(0.0f, 1.0f, -2.0f, 1.0f);
 	XMVECTOR target = XMLoadFloat4(&targetXMFloat);
 	XMVECTOR up = XMVectorSet(0.0f, 1.0f, 0.0f, 1.0f);
 
@@ -403,7 +412,7 @@ void D3D11App::Update(const GameTimer &gt)
 	diagV = XMLoadFloat3(&diag);
 
 	// Rotate the cube in y by the deltatime
-	XMFLOAT3 up = XMFLOAT3(0.0f, 0.0f, 1.0f);
+	XMFLOAT3 up = XMFLOAT3(0.0f, 1.0f, 0.0f);
 	XMVECTOR upV;
 	upV = XMLoadFloat3(&up);
 
@@ -416,11 +425,10 @@ void D3D11App::Update(const GameTimer &gt)
 void D3D11App::Draw(const GameTimer &gt)
 {
 	// Clear the RTV and DSV in preparation for drawing
-	md3dImmediateContext->ClearRenderTargetView(mRenderTargetView,
-		D3DXCOLOR(0.0f, 0.0f, 0.0f, 1.0f));
+	md3dImmediateContext->ClearRenderTargetView(mRenderTargetView, DirectX::Colors::Black);
 
 	md3dImmediateContext->ClearDepthStencilView(mDepthStencilView,
-		D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0.0f);
+		D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f,(UINT8) 0.0f);
 
 	// Set the rasterizer state to our settings
 	md3dImmediateContext->RSSetState(mRS);
@@ -441,7 +449,7 @@ void D3D11App::Draw(const GameTimer &gt)
 		mWorldInvTrans = XMMatrixInverse(NULL, mWorld);
 		mWorldInvTrans = XMMatrixTranspose(mWorldInvTrans);
 
-		mLitColorShader->Render(md3dImmediateContext, mMeshes[i].GetIndexCount(), mWorld, mWorldViewProj, mWorldInvTrans);
+		mLitColorShader->Render(md3dImmediateContext, mMeshes[i].GetIndexCount(), mWorld, mWorldViewProj, mWorldInvTrans, mCrateTexture->GetSRV());
 	}
 
 	// present the back buffer

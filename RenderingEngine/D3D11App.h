@@ -6,7 +6,7 @@
 #include <STRING>
 #include <D3D11.h>
 #include <D3DX11.h>
-#include <D3DX10.h>
+//#include <D3DX10.h>
 #include <DirectXMath.h>
 #include <DirectXColors.h>
 #include "IRenderFramework.h"
@@ -19,7 +19,7 @@
 
 #pragma comment(lib, "d3d11.lib")
 #pragma comment(lib, "d3dx11.lib")
-#pragma comment(lib, "d3dx10.lib")
+//#pragma comment(lib, "d3dx10.lib")
 //#pragma comment(lib, "dxgi.lib")
 
 using namespace DirectX;
@@ -36,6 +36,8 @@ class D3D11App : IRenderFramework
 
 	size_t mNumMeshes;
 	Mesh *mMeshes; // an array of meshes;
+
+	Texture *mCrateTexture;
 
 	// Main Camera (only camera)
 	Camera *mMainCamera;

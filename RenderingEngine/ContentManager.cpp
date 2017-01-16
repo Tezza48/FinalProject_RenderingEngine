@@ -21,7 +21,7 @@ ContentManager::~ContentManager()
 {
 	mFbxIOS->Destroy();
 
-	//mFbxManager->Destroy();
+	mFbxManager->Destroy();
 }
 
 Mesh *ContentManager::LoadFBX(ID3D11Device *device, std::string pFilename, size_t &numMeshes)
@@ -49,7 +49,7 @@ Mesh *ContentManager::LoadFBX(ID3D11Device *device, std::string pFilename, size_
 
 	FbxVector4 *controlPoints;// vertex positions. dont need to know how many because polygon vertices does (kinda)
 	size_t numControlPoints;//number of polygon vertices (the indices that point to control points)
-	int polygonCount;// control point indices for each vertex
+	size_t polygonCount;// control point indices for each vertex
 	//FbxArray<FbxVector4> polyVertNrms;//polygon vertex normals
 
 	//Control points are all the vertex positions (they are most likely used multiple times)
@@ -77,36 +77,52 @@ Mesh *ContentManager::LoadFBX(ID3D11Device *device, std::string pFilename, size_
 			{
 				int offset = currentPolygon * 3;
 				FbxVector4 currentNormal;
-				vertices[offset].position.x = controlPoints[meshes[i]->GetPolygonVertex(currentPolygon, 0)][0];
-				vertices[offset].position.y = controlPoints[meshes[i]->GetPolygonVertex(currentPolygon, 0)][1];
-				vertices[offset].position.z = controlPoints[meshes[i]->GetPolygonVertex(currentPolygon, 0)][2];
+				FbxVector2 currentUV;
+				bool isMapped;
+
+				vertices[offset].position.x = (float)controlPoints[meshes[i]->GetPolygonVertex(currentPolygon, 0)][0];
+				vertices[offset].position.y = (float)controlPoints[meshes[i]->GetPolygonVertex(currentPolygon, 0)][1];
+				vertices[offset].position.z = (float)controlPoints[meshes[i]->GetPolygonVertex(currentPolygon, 0)][2];
 				
 				meshes[i]->GetPolygonVertexNormal(currentPolygon, 0, currentNormal);
-				vertices[offset].normal.x = currentNormal[0];
-				vertices[offset].normal.y = currentNormal[1];
-				vertices[offset].normal.z = currentNormal[2];
+				vertices[offset].normal.x = (float)currentNormal[0];
+				vertices[offset].normal.y = (float)currentNormal[1];
+				vertices[offset].normal.z = (float)currentNormal[2];
+
+				meshes[i]->GetPolygonVertexUV(offset, 0, "", currentUV, isMapped);
+				vertices[offset].tex.x = (float)currentUV[0];
+				vertices[offset].tex.y = (float)currentUV[1];
 
 				offset++;
 
-				vertices[offset].position.x = controlPoints[meshes[i]->GetPolygonVertex(currentPolygon, 1)][0];
-				vertices[offset].position.y = controlPoints[meshes[i]->GetPolygonVertex(currentPolygon, 1)][1];
-				vertices[offset].position.z = controlPoints[meshes[i]->GetPolygonVertex(currentPolygon, 1)][2];
+				vertices[offset].position.x = (float)controlPoints[meshes[i]->GetPolygonVertex(currentPolygon, 1)][0];
+				vertices[offset].position.y = (float)controlPoints[meshes[i]->GetPolygonVertex(currentPolygon, 1)][1];
+				vertices[offset].position.z = (float)controlPoints[meshes[i]->GetPolygonVertex(currentPolygon, 1)][2];
 
 				meshes[i]->GetPolygonVertexNormal(currentPolygon, 1, currentNormal);
-				vertices[offset].normal.x = currentNormal[0];
-				vertices[offset].normal.y = currentNormal[1];
-				vertices[offset].normal.z = currentNormal[2];
+				vertices[offset].normal.x = (float)currentNormal[0];
+				vertices[offset].normal.y = (float)currentNormal[1];
+				vertices[offset].normal.z = (float)currentNormal[2];
+
+				meshes[i]->GetPolygonVertexUV(offset, 0, "", currentUV, isMapped);
+				vertices[offset].tex.x = (float)currentUV[0];
+				vertices[offset].tex.y = (float)currentUV[1];
 
 				offset++;
 
-				vertices[offset].position.x = controlPoints[meshes[i]->GetPolygonVertex(currentPolygon, 2)][0];
-				vertices[offset].position.y = controlPoints[meshes[i]->GetPolygonVertex(currentPolygon, 2)][1];
-				vertices[offset].position.z = controlPoints[meshes[i]->GetPolygonVertex(currentPolygon, 2)][2];
+				vertices[offset].position.x = (float)controlPoints[meshes[i]->GetPolygonVertex(currentPolygon, 2)][0];
+				vertices[offset].position.y = (float)controlPoints[meshes[i]->GetPolygonVertex(currentPolygon, 2)][1];
+				vertices[offset].position.z = (float)controlPoints[meshes[i]->GetPolygonVertex(currentPolygon, 2)][2];
 
 				meshes[i]->GetPolygonVertexNormal(currentPolygon, 2, currentNormal);
-				vertices[offset].normal.x = currentNormal[0];
-				vertices[offset].normal.y = currentNormal[1];
-				vertices[offset].normal.z = currentNormal[2];
+				vertices[offset].normal.x = (float)currentNormal[0];
+				vertices[offset].normal.y = (float)currentNormal[1];
+				vertices[offset].normal.z = (float)currentNormal[2];
+
+				meshes[i]->GetPolygonVertexUV(offset, 0, "", currentUV, isMapped);
+				vertices[offset].tex.x = (float)currentUV[0];
+				vertices[offset].tex.y = (float)currentUV[1];
+				continue;
 			}
 
 			unsigned long *indices = new unsigned long[polygonCount * 3];
@@ -128,10 +144,6 @@ Mesh *ContentManager::LoadFBX(ID3D11Device *device, std::string pFilename, size_
 		}
 
 	}
-	
-	//delete[] meshArray;
-	//meshArray = nullptr;
-	//well that was pretty stupid
 
 	//delete[] polygonVertices;
 	//polygonVertices = nullptr;
@@ -151,40 +163,59 @@ Mesh *ContentManager::LoadFBX(ID3D11Device *device, std::string pFilename, size_
 	return output;
 }
 
-Texture * ContentManager::LoadTGA(const std::string filename)
+Texture * ContentManager::LoadTGA(ID3D11Device *device, ID3D11DeviceContext *deviceContext, const std::string filename)
 {
 	// http://www.cplusplus.com/reference/istream/istream/
+	Texture *output;
 	std::ifstream is;
-	is.open(filename, std::fstream::binary);
+	is.open(/*filename*/"res/tga/crate1_diffuse.tga", std::fstream::binary);
 
 	if (is)
 	{
 		is.seekg(0, is.end);
-		int length = is.tellg();
+		int length = (int)is.tellg();
 		is.seekg(0, is.beg);
 
 		char *buffer = new char[length];
 
 		is.read(buffer, length);
 
+		is.close();
+
 		TargaHeader header;
 
 		header.idLength = buffer[0];
 		header.colorMapType = buffer[1];
 		header.imageTypeCode = buffer[2];
-		header.colorMapOrigin = buffer[3] << 8 | buffer[4];
-		header.colorMapLength = buffer[5] << 8 | buffer[6];
+		header.colorMapOrigin = buffer[4] << 8 | buffer[3];
+		header.colorMapLength = buffer[6] << 8 | buffer[5];
 		header.colorMapEntrySize = buffer[7];
-		header.xOrigin = buffer[8] << 8 | buffer[9];
-		header.yOrigin = buffer[10] << 8 | buffer[11];
-		header.width = buffer[12] << 8 | buffer[13];
-		header.height = buffer[14] << 8 | buffer[15];
+		header.xOrigin = buffer[9] << 8 | buffer[8];
+		header.yOrigin = buffer[11] << 8 | buffer[10];
+		header.width = buffer[13] << 8 | buffer[12];
+		header.height = buffer[15] << 8 | buffer[14];
 		header.imagePixelSize = buffer[16];
 		header.imageDescriptorByte = buffer[17];
 
+		if (header.imagePixelSize != 32)
+		{
+			throw std::exception("Targa was not 32bit");
+		}
+
+		// init new texture
+
+		output = new Texture();
+
+		char *imageData = &buffer[18 + header.idLength + header.colorMapLength];
+
+		output->Init(device, deviceContext, imageData, header.width, header.height);
+
+		delete[] buffer;
+		buffer = nullptr;
+		imageData = nullptr;
 	}
 
-	return nullptr;
+	return output;
 }
 
 FbxArray<FbxMesh*> ContentManager::GetAllMeshesReccursive(FbxNode *node)
