@@ -326,7 +326,7 @@ void D3D11App::Start()
 	mMeshes = new Mesh();
 	mMeshes->Init(md3dDevice, Mesh::MESH_CUBE);
 
-	mCrateTexture = mContent->LoadTGA(md3dDevice, md3dImmediateContext, "res/dds/crate1_diffuse.dds");
+	mCrateTexture = mContent->LoadTGA(md3dDevice, md3dImmediateContext, "res/tga/crate1_diffuse.tga");
 
 	mMainCamera = new Camera();
 

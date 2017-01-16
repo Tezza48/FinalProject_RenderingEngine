@@ -168,7 +168,7 @@ Texture * ContentManager::LoadTGA(ID3D11Device *device, ID3D11DeviceContext *dev
 	// http://www.cplusplus.com/reference/istream/istream/
 	Texture *output;
 	std::ifstream is;
-	is.open(/*filename*/"res/tga/crate1_diffuse.tga", std::fstream::binary);
+	is.open(filename, std::fstream::binary);
 
 	if (is)
 	{
