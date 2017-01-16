@@ -323,8 +323,8 @@ void D3D11App::Start()
 	//mMeshes = mContent->LoadFBX(md3dDevice, "res/fbx/cube.fbx", mNumMeshes);
 
 	mNumMeshes = 1;
-	mMeshes = new Mesh();
-	mMeshes->Init(md3dDevice, Mesh::MESH_CUBE);
+	mMeshes = new Mesh[1];
+	mMeshes[0].Init(md3dDevice, Mesh::MESH_CUBE);
 
 	mCrateTexture = mContent->LoadTGA(md3dDevice, md3dImmediateContext, "res/tga/crate1_diffuse.tga");
 
