@@ -14,15 +14,14 @@ PixelInputType main(VertexInputType input)
 
 	float4x4 worldInverseTranspose = transpose(gWorld);
 
-	//output.positionH = float4(input.positionL, 1.0f);
-
 	output.positionH = mul(float4(input.positionL, 1.0f), gWorldViewProj);
 
 	output.positionW = mul(float4(input.positionL, 1.0f), gWorld).xyz;
 
 	output.normalW = mul(input.normalL, (float3x3)gWorldInvTrans);
 	output.normalW = normalize(output.normalW);
-	//output.color = input.color;
+	output.tex = input.tex;
+	output.color = float4(0.0f, 0.0f, 0.0f, 1.0f);
 
 	return output;
 }

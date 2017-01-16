@@ -43,18 +43,21 @@ bool Mesh::Init(ID3D11Device *device, PrimativeShape shape)
 		numIndices = 3;
 
 		vertices = new Vertex[numVertices];
-		indices = new unsigned long int[numIndices];
+		indices = new unsigned long[numIndices];
 
 		vertices[0].position = XMFLOAT3(-0.45f, 0.0f, -1.0f);
 		vertices[0].normal = XMFLOAT3(0.0f, 1.0f, 0.0f);
+		vertices[0].tex = XMFLOAT2(0.0f, 0.0f);
 		//vertices[0].color = XMFLOAT4(1.0f, 0.0f, 0.0f, 1.0f);
 
 		vertices[1].position = XMFLOAT3(0.0f, 0.0f, 1.0f);
 		vertices[1].normal = XMFLOAT3(0.0f, 1.0f, 0.0f);
+		vertices[1].tex = XMFLOAT2(0.5f, 1.0f);
 		//vertices[1].color = XMFLOAT4(0.0f, 1.0f, 0.0f, 1.0f);
 
 		vertices[2].position = XMFLOAT3(0.45f, 0.0f, -1.0f);
 		vertices[2].normal = XMFLOAT3(0.0f, 1.0f, 0.0f);
+		vertices[2].tex = XMFLOAT2(1.0f, 0.0f);
 		//vertices[2].color = XMFLOAT4(0.0f, 0.0f, 1.0f, 1.0f);
 
 
@@ -77,104 +80,110 @@ bool Mesh::Init(ID3D11Device *device, PrimativeShape shape)
 		//front
 		vertices[0].position = XMFLOAT3(-0.5f, -0.5f, -0.5f);
 		vertices[0].normal = XMFLOAT3(0.0f, 0.0f, -1.0f);
-		//vertices[0].color = XMFLOAT4(1.0f, 0.0f, 0.0f, 1.0f);
 
 		vertices[1].position = XMFLOAT3(-0.5f, 0.5f, -0.5f);
 		vertices[1].normal = vertices[0].normal;
-		//vertices[1].color = XMFLOAT4(1.0f, 0.0f, 0.0f, 1.0f);
 
 		vertices[2].position = XMFLOAT3(0.5f, 0.5f, -0.5f);
 		vertices[2].normal = vertices[0].normal;
-		//vertices[2].color = XMFLOAT4(1.0f, 0.0f, 0.0f, 1.0f);
 
 		vertices[3].position = XMFLOAT3(0.5f, -0.5f, -0.5f);
 		vertices[3].normal = vertices[0].normal;
-		//vertices[3].color = XMFLOAT4(1.0f, 0.0f, 0.0f, 1.0f);
+
+		vertices[0].tex = XMFLOAT2(0.0f, 0.0f);
+		vertices[1].tex = XMFLOAT2(0.0f, 1.0f);
+		vertices[2].tex = XMFLOAT2(1.0f, 1.0f);
+		vertices[3].tex = XMFLOAT2(1.0f, 0.0f);
 
 		//right
 		vertices[4].position = XMFLOAT3(0.5f, -0.5f, -0.5f);
 		vertices[4].normal = XMFLOAT3(1.0f, 0.0f, 0.0f);
-		//vertices[4].color = XMFLOAT4(1.0f, 1.0f, 0.0f, 1.0f);
-
+		
 		vertices[5].position = XMFLOAT3(0.5f, 0.5f, -0.5f);
 		vertices[5].normal = vertices[4].normal;
-		//vertices[5].color = XMFLOAT4(1.0f, 1.0f, 0.0f, 1.0f);
 
 		vertices[6].position = XMFLOAT3(0.5f, 0.5f, 0.5f);
 		vertices[6].normal = vertices[4].normal;
-		//vertices[6].color = XMFLOAT4(1.0f, 1.0f, 0.0f, 1.0f);
 
 		vertices[7].position = XMFLOAT3(0.5f, -0.5f, 0.5f);
 		vertices[7].normal = vertices[4].normal;
-		//vertices[7].color = XMFLOAT4(1.0f, 1.0f, 0.0f, 1.0f);
+
+		vertices[4].tex = XMFLOAT2(0.0f, 0.0f);
+		vertices[5].tex = XMFLOAT2(0.0f, 1.0f);
+		vertices[6].tex = XMFLOAT2(1.0f, 1.0f);
+		vertices[7].tex = XMFLOAT2(1.0f, 0.0f);
 
 		//back
 		vertices[8].position = XMFLOAT3(0.5f, -0.5f, 0.5f);
 		vertices[8].normal = XMFLOAT3(0.0f, 0.0f, 1.0f);
-		//vertices[8].color = XMFLOAT4(1.0f, 0.5f, 0.0f, 1.0f);
 
 		vertices[9].position = XMFLOAT3(0.5f, 0.5f, 0.5f);
 		vertices[9].normal = vertices[8].normal;
-		//vertices[9].color = XMFLOAT4(1.0f, 0.5f, 0.0f, 1.0f);
 
 		vertices[10].position = XMFLOAT3(-0.5f, 0.5f, 0.5f);
 		vertices[10].normal = vertices[8].normal;
-		//vertices[10].color = XMFLOAT4(1.0f, 0.5f, 0.0f, 1.0f);
 
 		vertices[11].position = XMFLOAT3(-0.5f, -0.5f, 0.5f);
 		vertices[11].normal = vertices[8].normal;
-		//vertices[11].color = XMFLOAT4(1.0f, 0.5f, 0.0f, 1.0f);
+
+		vertices[8].tex = XMFLOAT2(0.0f, 0.0f);
+		vertices[9].tex = XMFLOAT2(0.0f, 1.0f);
+		vertices[10].tex = XMFLOAT2(1.0f, 1.0f);
+		vertices[11].tex = XMFLOAT2(1.0f, 0.0f);
 
 		//left
 		vertices[12].position = XMFLOAT3(-0.5f, -0.5f, 0.5f);
 		vertices[12].normal = XMFLOAT3(-1.0f, 0.0f, 0.0f);
-		//vertices[12].color = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
 
 		vertices[13].position = XMFLOAT3(-0.5f, 0.5f, 0.5f);
 		vertices[13].normal = vertices[12].normal;
-		//vertices[13].color = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
 
 		vertices[14].position = XMFLOAT3(-0.5f, 0.5f, -0.5f);
 		vertices[14].normal = vertices[12].normal;
-		//vertices[14].color = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
 
 		vertices[15].position = XMFLOAT3(-0.5f, -0.5f, -0.5f);
 		vertices[15].normal = vertices[12].normal;
-		//vertices[15].color = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
+
+		vertices[12].tex = XMFLOAT2(0.0f, 0.0f);
+		vertices[13].tex = XMFLOAT2(0.0f, 1.0f);
+		vertices[14].tex = XMFLOAT2(1.0f, 1.0f);
+		vertices[15].tex = XMFLOAT2(1.0f, 0.0f);
 
 		//top
 		vertices[16].position = XMFLOAT3(0.5f, 0.5f, 0.5f);
 		vertices[16].normal = XMFLOAT3(0.0f, 1.0f, 0.0f);
-		//vertices[16].color = XMFLOAT4(0.0f, 0.0f, 1.0f, 1.0f);
 
 		vertices[17].position = XMFLOAT3(0.5f, 0.5f, -0.5f);
 		vertices[17].normal = vertices[16].normal;
-		//vertices[17].color = XMFLOAT4(0.0f, 0.0f, 1.0f, 1.0f);
 
 		vertices[18].position = XMFLOAT3(-0.5f, 0.5f, -0.5f);
 		vertices[18].normal = vertices[16].normal;
-		//vertices[18].color = XMFLOAT4(0.0f, 0.0f, 1.0f, 1.0f);
 
 		vertices[19].position = XMFLOAT3(-0.5f, 0.5f, 0.5f);
 		vertices[19].normal = vertices[16].normal;
-		//vertices[19].color = XMFLOAT4(0.0f, 0.0f, 1.0f, 1.0f);
+
+		vertices[16].tex = XMFLOAT2(0.0f, 0.0f);
+		vertices[17].tex = XMFLOAT2(0.0f, 1.0f);
+		vertices[18].tex = XMFLOAT2(1.0f, 1.0f);
+		vertices[19].tex = XMFLOAT2(1.0f, 0.0f);
 
 		//bottom
 		vertices[20].position = XMFLOAT3(0.5f, -0.5f, -0.5f);
 		vertices[20].normal = XMFLOAT3(0.0f, -0.1f, 0.0f);
-		//vertices[20].color = XMFLOAT4(0.0f, 1.0f, 0.0f, 1.0f);
 
 		vertices[21].position = XMFLOAT3(0.5f, -0.5f, 0.5f);
 		vertices[21].normal = vertices[20].normal;
-		//vertices[21].color = XMFLOAT4(0.0f, 1.0f, 0.0f, 1.0f);
 
 		vertices[22].position = XMFLOAT3(-0.5f, -0.5f, 0.5f);
 		vertices[22].normal = vertices[20].normal;
-		//vertices[22].color = XMFLOAT4(0.0f, 1.0f, 0.0f, 1.0f);
 
 		vertices[23].position = XMFLOAT3(-0.5f, -0.5f, -0.5f);
 		vertices[23].normal = vertices[20].normal;
-		//vertices[23].color = XMFLOAT4(0.0f, 1.0f, 0.0f, 1.0f);
+
+		vertices[20].tex = XMFLOAT2(0.0f, 0.0f);
+		vertices[21].tex = XMFLOAT2(0.0f, 1.0f);
+		vertices[22].tex = XMFLOAT2(1.0f, 1.0f);
+		vertices[23].tex = XMFLOAT2(1.0f, 0.0f);
 
 		//front
 		indices[0] = 0;
@@ -231,17 +240,10 @@ bool Mesh::Init(ID3D11Device *device, PrimativeShape shape)
 		indices[34] = 22;
 		indices[35] = 23;
 
-		for (size_t i = 0; i < numVertices; i++)
-		{
-			vertices[i].tex = XMFLOAT2(0.0f, 0.0f);
-			vertices[i + 1].tex = XMFLOAT2(0.0f, 1.0f);
-			vertices[i + 2].tex = XMFLOAT2(1.0f, 1.0f);
-			vertices[i + 3].tex = XMFLOAT2(1.0f, 0.0f);
-		}
-
 	}
 		break;
 	case Mesh::MESH_SOFTCUBE:
+	{
 		numVertices = 8;
 		numIndices = 36;
 
@@ -324,8 +326,8 @@ bool Mesh::Init(ID3D11Device *device, PrimativeShape shape)
 		indices[25] = 6;
 		indices[26] = 5;
 
-		indices[27] = 1; 
-		indices[28] = 5; 
+		indices[27] = 1;
+		indices[28] = 5;
 		indices[29] = 2;
 
 		//Bo
@@ -336,7 +338,7 @@ bool Mesh::Init(ID3D11Device *device, PrimativeShape shape)
 		indices[33] = 7;
 		indices[34] = 3;
 		indices[35] = 4;
-
+	}
 		break;
 
 	//case Mesh::MESH_NONE:

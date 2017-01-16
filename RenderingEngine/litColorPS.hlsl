@@ -1,6 +1,9 @@
 #include "litColor.hlsli"
 #include "LightHelper.hlsli"
 
+Texture2D gTexture;
+SamplerState gSampleType;
+
 cbuffer cbPerObject : register(b0)
 {
 	float4x4 gWorld;
@@ -134,6 +137,8 @@ float4 main(PixelInputType input) : SV_TARGET
 	float3 toEye = normalize(gEyePosW - input.positionW);
 	toEye.z = -toEye.z;
 
+	float4 diffuseTexture = gTexture.Sample(gSampleType, input.tex);
+
 	float4 ambient = float4(0.0f, 0.0f, 0.0f, 0.0f);
 	float4 diffuse = float4(0.0f, 0.0f, 0.0f, 0.0f);
 	float4 specular = float4(0.0f, 0.0f, 0.0f, 0.0f);
@@ -163,5 +168,5 @@ float4 main(PixelInputType input) : SV_TARGET
 
 	litColor.a = 1.0f;
 
-	return litColor;
+	return diffuseTexture * litColor;
 }

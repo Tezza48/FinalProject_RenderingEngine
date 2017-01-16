@@ -94,7 +94,7 @@ bool LitColorShader::Init(ID3D11Device *device)
 
 	polygonLayout[2].SemanticName = "TEXCOORD";
 	polygonLayout[2].SemanticIndex = 0;
-	polygonLayout[2].Format = DXGI_FORMAT_R32G32B32A32_FLOAT;
+	polygonLayout[2].Format = DXGI_FORMAT_R32G32_FLOAT;
 	polygonLayout[2].InputSlot = 0;
 	polygonLayout[2].AlignedByteOffset = 24;
 	polygonLayout[2].InputSlotClass = D3D11_INPUT_PER_VERTEX_DATA;
@@ -141,12 +141,28 @@ bool LitColorShader::Init(ID3D11Device *device)
 	DX::ThrowIfFailed(
 		device->CreateBuffer(&perFrameBufferDesc, NULL, &mPerFrameBuffer));
 
+	D3D11_SAMPLER_DESC samplerDesc;	
+	samplerDesc.Filter = D3D11_FILTER_MIN_MAG_MIP_LINEAR;
+	samplerDesc.AddressU = D3D11_TEXTURE_ADDRESS_WRAP;
+	samplerDesc.AddressV = D3D11_TEXTURE_ADDRESS_WRAP;
+	samplerDesc.AddressW = D3D11_TEXTURE_ADDRESS_WRAP;
+	samplerDesc.MipLODBias = 0.0f;
+	samplerDesc.MaxAnisotropy = 1;
+	samplerDesc.ComparisonFunc = D3D11_COMPARISON_ALWAYS;
+	samplerDesc.BorderColor[0] = 0;
+	samplerDesc.BorderColor[1] = 0;
+	samplerDesc.BorderColor[2] = 0;
+	samplerDesc.BorderColor[3] = 0;
+	samplerDesc.MinLOD = 0;
+	samplerDesc.MaxLOD = D3D11_FLOAT32_MAX;
+
+	DX::ThrowIfFailed(device->CreateSamplerState(&samplerDesc, &mSamplerState));
+
 	return true;
 }
 
-void XM_CALLCONV LitColorShader::Render(ID3D11DeviceContext *deviceContext, int indexCount/*, unsigned int offset, int baseVertLocation*/,
-	XMMATRIX world, XMMATRIX worldViewProj, XMMATRIX worldInvTrans/*,
-	AmbientLight ambient, DirectionalLight directional, XMMATRIX view, ColorMaterial mat*/)
+void XM_CALLCONV LitColorShader::Render(ID3D11DeviceContext *deviceContext, int indexCount,
+	XMMATRIX world, XMMATRIX worldViewProj, XMMATRIX worldInvTrans)
 {
 	HRESULT hr;
 	D3D11_MAPPED_SUBRESOURCE mappedResource;
@@ -197,6 +213,52 @@ void XM_CALLCONV LitColorShader::Render(ID3D11DeviceContext *deviceContext, int 
 
 	deviceContext->VSSetShader(mVertexShader, NULL, 0);
 	deviceContext->PSSetShader(mPixelShader, NULL, 0);
+
+	// Draw the buffers on the GPU memory
+	deviceContext->DrawIndexed(indexCount, 0, 0);
+}
+
+void XM_CALLCONV LitColorShader::Render(ID3D11DeviceContext *deviceContext, int indexCount,
+	XMMATRIX world, XMMATRIX worldViewProj, XMMATRIX worldInvTrans, ID3D11ShaderResourceView * texture)
+{
+	HRESULT hr;
+	D3D11_MAPPED_SUBRESOURCE mappedResource;
+	PerObjectBuffer *pObjectBuffer;
+	//PerFrameBuffer *dataPtrPerFrame;
+	unsigned int bufferNumber;
+
+	// DX requires we transpose the matrices we
+	// send to our shaders (it sends it as 4 float4s and basically transposes it as it's sent.
+	world = XMMatrixTranspose(world);
+	worldViewProj = XMMatrixTranspose(worldViewProj);
+	worldInvTrans = XMMatrixTranspose(worldInvTrans);
+
+	// map the matrix buffer to the GPU
+	hr = deviceContext->Map(mPerObjectBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
+	DX::ThrowIfFailed(hr);
+
+	pObjectBuffer = (PerObjectBuffer*)mappedResource.pData;
+	pObjectBuffer->World = world;
+	pObjectBuffer->WorldViewProj = worldViewProj;
+	pObjectBuffer->WorldInvTrans = worldInvTrans;
+
+	deviceContext->Unmap(mPerObjectBuffer, 0);
+
+	bufferNumber = 0;
+
+	// Actually set the shader constant buffers
+	deviceContext->VSSetConstantBuffers(0, 1, &mPerObjectBuffer);
+
+	deviceContext->PSSetConstantBuffers(0, 1, &mPerObjectBuffer);
+
+	deviceContext->PSSetShaderResources(0, 1, &texture);
+
+	deviceContext->IASetInputLayout(mInputLayout);
+
+	deviceContext->VSSetShader(mVertexShader, NULL, 0);
+	deviceContext->PSSetShader(mPixelShader, NULL, 0);
+
+	deviceContext->PSSetSamplers(0, 1, &mSamplerState);
 
 	// Draw the buffers on the GPU memory
 	deviceContext->DrawIndexed(indexCount, 0, 0);
