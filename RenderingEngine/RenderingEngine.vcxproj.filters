@@ -42,26 +42,11 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="D3D11App.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="GameTimer.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="utils.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="IRenderFramework.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="BasicShader.h">
       <Filter>Header Files\ShaderClasses</Filter>
     </ClInclude>
     <ClInclude Include="ColorShaderClass.h">
       <Filter>Header Files\ShaderClasses</Filter>
-    </ClInclude>
-    <ClInclude Include="Mesh.h">
-      <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Camera.h">
       <Filter>Header Files</Filter>
@@ -84,8 +69,23 @@
     <ClInclude Include="FilePathMacros.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="D3D11App.h">
+      <Filter>Header Files\Framework</Filter>
+    </ClInclude>
     <ClInclude Include="ContentManager.h">
-      <Filter>Header Files</Filter>
+      <Filter>Header Files\Framework</Filter>
+    </ClInclude>
+    <ClInclude Include="utils.h">
+      <Filter>Header Files\Framework</Filter>
+    </ClInclude>
+    <ClInclude Include="Mesh.h">
+      <Filter>Header Files\Framework</Filter>
+    </ClInclude>
+    <ClInclude Include="IRenderFramework.h">
+      <Filter>Header Files\Framework</Filter>
+    </ClInclude>
+    <ClInclude Include="GameTimer.h">
+      <Filter>Header Files\Framework</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -122,6 +122,9 @@
     </Filter>
     <Filter Include="Source Files\Framework">
       <UniqueIdentifier>{fd1173c9-5202-41f9-af3b-7ec9ff293b37}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Framework">
+      <UniqueIdentifier>{b2636297-07e8-450b-9f59-d57e0845d1e1}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
