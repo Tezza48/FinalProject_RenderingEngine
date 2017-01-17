@@ -193,6 +193,8 @@ bool D3D11App::InitD3D()
 // If it's running, also remake the camera's projection.
 void D3D11App::OnResize(bool isRunning)
 {
+	
+
 	// Describe the Swap Chain
 	DXGI_SWAP_CHAIN_DESC sd;
 	sd.BufferDesc.Width = mClientWidth;
@@ -221,8 +223,10 @@ void D3D11App::OnResize(bool isRunning)
 	IDXGIFactory *dxgiFactory = 0;
 	ThrowIfFailed(dxgiAdapter->GetParent(__uuidof(IDXGIFactory), (void**)&dxgiFactory));
 
+	
+
 	ThrowIfFailed(dxgiFactory->CreateSwapChain(md3dDevice, &sd, &mSwapChain));
-	dxgiFactory->MakeWindowAssociation(mMainWindow, DXGI_MWA_NO_ALT_ENTER);
+	dxgiFactory->MakeWindowAssociation(mMainWindow, /*DXGI_MWA_NO_ALT_ENTER*/0);
 
 	// release the helper objects
 	dxgiDevice->Release();
@@ -348,7 +352,7 @@ void D3D11App::Start()
 		XMFLOAT4(1.0f, 1.0f, 1.0f, 100.0f));
 	
 	mAmbientLight = new AmbientLight();
-	mAmbientLight->Ambient = XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f);
+	mAmbientLight->Ambient = XMFLOAT4(0.9f, 0.9f, 0.9f, 1.0f);
 
 	mDirLight = new DirectionalLight();
 	mDirLight->Ambient = XMFLOAT4(0.1f, 0.1f, 0.1f, 1.0f);
