@@ -57,5 +57,10 @@ public:
 	Texture *LoadTGA(ID3D11Device *device, ID3D11DeviceContext *deviceContext, const std::string filename);
 private:
 	FbxArray<FbxMesh*> GetAllMeshesReccursive(FbxNode *node);
+
+	//Helpers
+	XMFLOAT2 FbxToDxVec2(const FbxVector2 &other);// Convert an FbxVector2 to an XMFloat2
+	XMFLOAT3 FbxToDxVec3(const FbxVector4 &other);// Convert an FbxVector4 to an XMFloat3 using it's 0, 1 and 2 indices.
+	XMFLOAT4 FbxToDxVec4(const FbxVector4 &other);// Convert an FbxVector4 to an XMFloat4
 };
 

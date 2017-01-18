@@ -86,50 +86,15 @@ Mesh *ContentManager::LoadFBX(ID3D11Device *device, std::string pFilename, size_
 
 				for (size_t currentVertex = 0; currentVertex < 3; currentVertex++)
 				{
-					vertices[currentPolygon * 3 + currentVertex].position.x = (float)controlPoints[meshes[i]->GetPolygonVertex(currentPolygon, currentVertex)][0];
-					vertices[currentPolygon * 3 + currentVertex].position.y = (float)controlPoints[meshes[i]->GetPolygonVertex(currentPolygon, currentVertex)][1];
-					vertices[currentPolygon * 3 + currentVertex].position.z = (float)controlPoints[meshes[i]->GetPolygonVertex(currentPolygon, currentVertex)][2];
+					vertices[currentPolygon * 3 + currentVertex].position = FbxToDxVec3(controlPoints[meshes[i]->GetPolygonVertex(currentPolygon, currentVertex)]);
 				
 					meshes[i]->GetPolygonVertexNormal(currentPolygon, currentVertex, currentNormal);
-					vertices[currentPolygon * 3 + currentVertex].normal.x = (float)currentNormal[0];
-					vertices[currentPolygon * 3 + currentVertex].normal.y = (float)currentNormal[1];
-					vertices[currentPolygon * 3 + currentVertex].normal.z = (float)currentNormal[2];
+					vertices[currentPolygon * 3 + currentVertex].normal = FbxToDxVec3(currentNormal);
 
 					meshes[i]->GetPolygonVertexUV(currentPolygon, currentVertex, uvName, currentUV, isMapped);
-					vertices[currentPolygon * 3 + currentVertex].tex.x = (float)currentUV[0];
-					vertices[currentPolygon * 3 + currentVertex].tex.y = (float)currentUV[1];
+					vertices[currentPolygon * 3 + currentVertex].tex = FbxToDxVec2(currentUV);
 				}
 
-
-				//offset++;
-
-				//vertices[offset].position.x = (float)controlPoints[meshes[i]->GetPolygonVertex(currentPolygon, 1)][0];
-				//vertices[offset].position.y = (float)controlPoints[meshes[i]->GetPolygonVertex(currentPolygon, 1)][1];
-				//vertices[offset].position.z = (float)controlPoints[meshes[i]->GetPolygonVertex(currentPolygon, 1)][2];
-
-				//meshes[i]->GetPolygonVertexNormal(currentPolygon, 1, currentNormal);
-				//vertices[offset].normal.x = (float)currentNormal[0];
-				//vertices[offset].normal.y = (float)currentNormal[1];
-				//vertices[offset].normal.z = (float)currentNormal[2];
-
-				//meshes[i]->GetPolygonVertexUV(offset, 0, uvName, currentUV, isMapped);
-				//vertices[offset].tex.x = (float)currentUV[0];
-				//vertices[offset].tex.y = (float)currentUV[1];
-
-				//offset++;
-
-				//vertices[offset].position.x = (float)controlPoints[meshes[i]->GetPolygonVertex(currentPolygon, 2)][0];
-				//vertices[offset].position.y = (float)controlPoints[meshes[i]->GetPolygonVertex(currentPolygon, 2)][1];
-				//vertices[offset].position.z = (float)controlPoints[meshes[i]->GetPolygonVertex(currentPolygon, 2)][2];
-
-				//meshes[i]->GetPolygonVertexNormal(currentPolygon, 2, currentNormal);
-				//vertices[offset].normal.x = (float)currentNormal[0];
-				//vertices[offset].normal.y = (float)currentNormal[1];
-				//vertices[offset].normal.z = (float)currentNormal[2];
-
-				//meshes[i]->GetPolygonVertexUV(offset, 0, uvName, currentUV, isMapped);
-				//vertices[offset].tex.x = (float)currentUV[0];
-				//vertices[offset].tex.y = (float)currentUV[1];
 				continue;
 			}
 
@@ -200,8 +165,8 @@ Texture * ContentManager::LoadTGA(ID3D11Device *device, ID3D11DeviceContext *dev
 		header.colorMapEntrySize = buffer[7];
 		header.xOrigin = buffer[9] << 8 | buffer[8];
 		header.yOrigin = buffer[11] << 8 | buffer[10];
-		header.width = buffer[13] << 8 | buffer[12];
-		header.height = buffer[15] << 8 | buffer[14];
+		header.width = buffer[13] << 8 | -buffer[12];
+		header.height = buffer[15] << 8 | -buffer[14];
 		header.imagePixelSize = buffer[16];
 		header.imageDescriptorByte = buffer[17];
 
@@ -215,6 +180,19 @@ Texture * ContentManager::LoadTGA(ID3D11Device *device, ID3D11DeviceContext *dev
 		output = new Texture();
 
 		char *imageData = &buffer[18 + header.idLength + header.colorMapLength];
+
+		// convert from BGR to RGB
+		for (size_t texel = 0; texel < header.width * header.height * 4; texel+=4)
+		{
+			char r = imageData[texel + 2];
+			char g = imageData[texel + 1];
+			char b = imageData[texel + 0];
+			char a = imageData[texel + 3];
+			imageData[texel + 0] = r;
+			imageData[texel + 1] = g;
+			imageData[texel + 2] = b;
+			imageData[texel + 3] = a;
+		}
 
 		output->Init(device, deviceContext, imageData, header.width, header.height);
 
@@ -251,5 +229,21 @@ FbxArray<FbxMesh*> ContentManager::GetAllMeshesReccursive(FbxNode *node)
 
 	return meshes;
 }
+
+XMFLOAT2 ContentManager::FbxToDxVec2(const FbxVector2 & other)
+{
+	return XMFLOAT2((float)other[0], (float)other[1]);
+}
+
+XMFLOAT3 ContentManager::FbxToDxVec3(const FbxVector4 & other)
+{
+	return XMFLOAT3((float)other[0], (float)other[1], (float)other[2]);
+}
+
+XMFLOAT4 ContentManager::FbxToDxVec4(const FbxVector4 & other)
+{
+	return XMFLOAT4((float)other[0], (float)other[1], (float)other[2], (float)other[3]);
+}
+
 
 
