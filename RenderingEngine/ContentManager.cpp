@@ -75,53 +75,61 @@ Mesh *ContentManager::LoadFBX(ID3D11Device *device, std::string pFilename, size_
 
 			for (size_t currentPolygon = 0; currentPolygon < polygonCount; currentPolygon++)
 			{
-				int offset = currentPolygon * 3;
 				FbxVector4 currentNormal;
+
+				FbxStringList uvNames;
+				meshes[i]->GetUVSetNames(uvNames);
+				const char *uvName;
+				uvName = uvNames[0];
 				FbxVector2 currentUV;
 				bool isMapped;
 
-				vertices[offset].position.x = (float)controlPoints[meshes[i]->GetPolygonVertex(currentPolygon, 0)][0];
-				vertices[offset].position.y = (float)controlPoints[meshes[i]->GetPolygonVertex(currentPolygon, 0)][1];
-				vertices[offset].position.z = (float)controlPoints[meshes[i]->GetPolygonVertex(currentPolygon, 0)][2];
+				for (size_t currentVertex = 0; currentVertex < 3; currentVertex++)
+				{
+					vertices[currentPolygon * 3 + currentVertex].position.x = (float)controlPoints[meshes[i]->GetPolygonVertex(currentPolygon, currentVertex)][0];
+					vertices[currentPolygon * 3 + currentVertex].position.y = (float)controlPoints[meshes[i]->GetPolygonVertex(currentPolygon, currentVertex)][1];
+					vertices[currentPolygon * 3 + currentVertex].position.z = (float)controlPoints[meshes[i]->GetPolygonVertex(currentPolygon, currentVertex)][2];
 				
-				meshes[i]->GetPolygonVertexNormal(currentPolygon, 0, currentNormal);
-				vertices[offset].normal.x = (float)currentNormal[0];
-				vertices[offset].normal.y = (float)currentNormal[1];
-				vertices[offset].normal.z = (float)currentNormal[2];
+					meshes[i]->GetPolygonVertexNormal(currentPolygon, currentVertex, currentNormal);
+					vertices[currentPolygon * 3 + currentVertex].normal.x = (float)currentNormal[0];
+					vertices[currentPolygon * 3 + currentVertex].normal.y = (float)currentNormal[1];
+					vertices[currentPolygon * 3 + currentVertex].normal.z = (float)currentNormal[2];
 
-				meshes[i]->GetPolygonVertexUV(offset, 0, "", currentUV, isMapped);
-				vertices[offset].tex.x = (float)currentUV[0];
-				vertices[offset].tex.y = (float)currentUV[1];
+					meshes[i]->GetPolygonVertexUV(currentPolygon, currentVertex, uvName, currentUV, isMapped);
+					vertices[currentPolygon * 3 + currentVertex].tex.x = (float)currentUV[0];
+					vertices[currentPolygon * 3 + currentVertex].tex.y = (float)currentUV[1];
+				}
 
-				offset++;
 
-				vertices[offset].position.x = (float)controlPoints[meshes[i]->GetPolygonVertex(currentPolygon, 1)][0];
-				vertices[offset].position.y = (float)controlPoints[meshes[i]->GetPolygonVertex(currentPolygon, 1)][1];
-				vertices[offset].position.z = (float)controlPoints[meshes[i]->GetPolygonVertex(currentPolygon, 1)][2];
+				//offset++;
 
-				meshes[i]->GetPolygonVertexNormal(currentPolygon, 1, currentNormal);
-				vertices[offset].normal.x = (float)currentNormal[0];
-				vertices[offset].normal.y = (float)currentNormal[1];
-				vertices[offset].normal.z = (float)currentNormal[2];
+				//vertices[offset].position.x = (float)controlPoints[meshes[i]->GetPolygonVertex(currentPolygon, 1)][0];
+				//vertices[offset].position.y = (float)controlPoints[meshes[i]->GetPolygonVertex(currentPolygon, 1)][1];
+				//vertices[offset].position.z = (float)controlPoints[meshes[i]->GetPolygonVertex(currentPolygon, 1)][2];
 
-				meshes[i]->GetPolygonVertexUV(offset, 0, "", currentUV, isMapped);
-				vertices[offset].tex.x = (float)currentUV[0];
-				vertices[offset].tex.y = (float)currentUV[1];
+				//meshes[i]->GetPolygonVertexNormal(currentPolygon, 1, currentNormal);
+				//vertices[offset].normal.x = (float)currentNormal[0];
+				//vertices[offset].normal.y = (float)currentNormal[1];
+				//vertices[offset].normal.z = (float)currentNormal[2];
 
-				offset++;
+				//meshes[i]->GetPolygonVertexUV(offset, 0, uvName, currentUV, isMapped);
+				//vertices[offset].tex.x = (float)currentUV[0];
+				//vertices[offset].tex.y = (float)currentUV[1];
 
-				vertices[offset].position.x = (float)controlPoints[meshes[i]->GetPolygonVertex(currentPolygon, 2)][0];
-				vertices[offset].position.y = (float)controlPoints[meshes[i]->GetPolygonVertex(currentPolygon, 2)][1];
-				vertices[offset].position.z = (float)controlPoints[meshes[i]->GetPolygonVertex(currentPolygon, 2)][2];
+				//offset++;
 
-				meshes[i]->GetPolygonVertexNormal(currentPolygon, 2, currentNormal);
-				vertices[offset].normal.x = (float)currentNormal[0];
-				vertices[offset].normal.y = (float)currentNormal[1];
-				vertices[offset].normal.z = (float)currentNormal[2];
+				//vertices[offset].position.x = (float)controlPoints[meshes[i]->GetPolygonVertex(currentPolygon, 2)][0];
+				//vertices[offset].position.y = (float)controlPoints[meshes[i]->GetPolygonVertex(currentPolygon, 2)][1];
+				//vertices[offset].position.z = (float)controlPoints[meshes[i]->GetPolygonVertex(currentPolygon, 2)][2];
 
-				meshes[i]->GetPolygonVertexUV(offset, 0, "", currentUV, isMapped);
-				vertices[offset].tex.x = (float)currentUV[0];
-				vertices[offset].tex.y = (float)currentUV[1];
+				//meshes[i]->GetPolygonVertexNormal(currentPolygon, 2, currentNormal);
+				//vertices[offset].normal.x = (float)currentNormal[0];
+				//vertices[offset].normal.y = (float)currentNormal[1];
+				//vertices[offset].normal.z = (float)currentNormal[2];
+
+				//meshes[i]->GetPolygonVertexUV(offset, 0, uvName, currentUV, isMapped);
+				//vertices[offset].tex.x = (float)currentUV[0];
+				//vertices[offset].tex.y = (float)currentUV[1];
 				continue;
 			}
 
@@ -135,11 +143,11 @@ Mesh *ContentManager::LoadFBX(ID3D11Device *device, std::string pFilename, size_
 			//Initialize the new mesh
 			output[i].Init(device, vertices, (unsigned long)polygonCount * 3, (unsigned long*)indices, (unsigned long)polygonCount * 3);
 
-			output->GetWorldMatrix(xmPivot);
+			//output->GetWorldMatrix(xmPivot);
 
-			xmPivot *= XMMatrixRotationRollPitchYaw(-90.0f, 0.0f, 0.0f);//rotate it so that y is up (because changing the export settings in max dosn't do anything
+			//xmPivot *= XMMatrixRotationRollPitchYaw(-90.0f, 0.0f, 0.0f);//rotate it so that y is up (because changing the export settings in max dosn't do anything
 
-			output->SetWorldMatrix(xmPivot);
+			//output->SetWorldMatrix(xmPivot);
 
 		}
 

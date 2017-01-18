@@ -324,22 +324,22 @@ void D3D11App::Start()
 	mTimer = GameTimer();
 	mTimer.Reset();
 
-	//mMeshes = mContent->LoadFBX(md3dDevice, "res/fbx/cube.fbx", mNumMeshes);
+	mMeshes = mContent->LoadFBX(md3dDevice, "res/fbx/cratepallet_01.fbx", mNumMeshes);
 
-	mNumMeshes = 1;
-	mMeshes = new Mesh[1];
-	mMeshes[0].Init(md3dDevice, Mesh::MESH_CUBE);
+	//mNumMeshes = 1;
+	//mMeshes = new Mesh[1];
+	//mMeshes[0].Init(md3dDevice, Mesh::MESH_CUBE);
 
-	mCrateTexture = mContent->LoadTGA(md3dDevice, md3dImmediateContext, "res/tga/crate1_diffuse.tga");
+	mCrateTexture = mContent->LoadTGA(md3dDevice, md3dImmediateContext, "res/tga/cratepallet_01_alb.tga");
 
 	mMainCamera = new Camera();
 
 	// Set up the camera's projection
 	mMainCamera->CreateProjection(XM_PI / 4.0f, AspectRatio(), 1.0f, 100.0f);
 
-	XMFLOAT4 targetXMFloat = XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f);
+	XMFLOAT4 targetXMFloat = XMFLOAT4(0.0f, 0.0f, 0.8f, 1.0f);
 
-	XMVECTOR pos = XMVectorSet(0.0f, 1.0f, -2.0f, 1.0f);
+	XMVECTOR pos = XMVectorSet(0.0f, 1.5f, -2.0f, 1.0f);
 	XMVECTOR target = XMLoadFloat4(&targetXMFloat);
 	XMVECTOR up = XMVectorSet(0.0f, 1.0f, 0.0f, 1.0f);
 
@@ -349,10 +349,10 @@ void D3D11App::Start()
 	mColorMaterial = new ColorMaterial(
 		XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f),
 		XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f),
-		XMFLOAT4(1.0f, 1.0f, 1.0f, 100.0f));
+		XMFLOAT4(0.3f, 0.3f, 0.3f, 1000.0f));
 	
 	mAmbientLight = new AmbientLight();
-	mAmbientLight->Ambient = XMFLOAT4(0.9f, 0.9f, 0.9f, 1.0f);
+	mAmbientLight->Ambient = XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f);
 
 	mDirLight = new DirectionalLight();
 	mDirLight->Ambient = XMFLOAT4(0.1f, 0.1f, 0.1f, 1.0f);
@@ -365,7 +365,7 @@ void D3D11App::Start()
 	mPointLight->Diffuse = XMFLOAT4(0.5f, 0.0f, 0.0f, 1.0f);
 	mPointLight->Specular = XMFLOAT4(0.5f, 0.0f, 0.0f, 1.0f);
 	mPointLight->Position = XMFLOAT3(1.0f, 1.0f, -2.0f);
-	mPointLight->Range = 2.5f;
+	mPointLight->Range = 3.0f;
 	mPointLight->Attenuation = XMFLOAT3(0.0f, 0.0f, 1.0f);
 
 	mSpotLight = new SpotLight();
@@ -422,7 +422,7 @@ void D3D11App::Update(const GameTimer &gt)
 
 	XMMATRIX world;
 	mMeshes[0].GetWorldMatrix(world);
-	world = XMMatrixRotationAxis(upV, gt.DeltaTime()) * world;
+	world = XMMatrixRotationAxis(upV, gt.DeltaTime() / 2.0f) * world;
 	mMeshes[0].SetWorldMatrix(world);
 }
 
