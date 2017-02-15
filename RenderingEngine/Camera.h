@@ -13,6 +13,8 @@ class Camera
 private:
 	XMMATRIX mView, mProjection;
 
+	XMFLOAT4 mEyePos;
+
 	float fov, aspectRatio, nearClip, farClip;
 public:
 	Camera();
@@ -25,6 +27,7 @@ public:
 	XMFLOAT4 GetWorldPosition();
 	void XM_CALLCONV GetProjectionMatrix(XMMATRIX&);
 
+	void XM_CALLCONV CreateViewMatrix(XMVECTOR pos, XMVECTOR target, XMVECTOR up);
 	void XM_CALLCONV SetViewMatrix(XMMATRIX);
 
 	void CreateProjection(float fov, float aspectRatio, float nearClip, float farClip);

@@ -354,30 +354,30 @@ void D3D11App::Start()
 	mColorMaterial = new Mat();
 	mColorMaterial->Ambient = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
 	mColorMaterial->Diffuse = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
-	mColorMaterial->Specular = XMFLOAT4(0.5f, 0.5f, 0.5f, 1000.0f);
+	mColorMaterial->Specular = XMFLOAT4(0.5f, 0.5f, 0.5f, 10.0f);
 
 	mAmbientLight = new AmbientLight();
 	mAmbientLight->Ambient = XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f);
 
 	mDirLight = new DirectionalLight();
 	mDirLight->Ambient = XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f);
-	mDirLight->Intensity = XMFLOAT4(0.00f, 0.00f, 0.00f, 1.0f);
+	mDirLight->Intensity = XMFLOAT4(0.0f, 0.00f, 0.00f, 1.0f);
 	mDirLight->Direction =  XMFLOAT3(0.5773f, -0.5773f, 0.5773f);
 
 	mPointLight = new PointLight();
-	mPointLight->Ambient = XMFLOAT4(0.1f, 0.0f, 0.0f, 1.0f);
-	mPointLight->Intensity = XMFLOAT4(1.0f, 0.0f, 0.0f, 1.0f);
-	mPointLight->Position = XMFLOAT3(-40.0f, 20.0f, 8.0f);
-	mPointLight->Range = 60.0f;
+	mPointLight->Ambient = XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f);
+	mPointLight->Intensity = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
+	mPointLight->Position = XMFLOAT3(-40.0f, 40.0f, 16.0f);
+	mPointLight->Range = 160.0f;
 	mPointLight->Attenuation = XMFLOAT3(0.0f, 0.0f, 1.0f);
 
 	mSpotLight = new SpotLight();
-	mSpotLight->Ambient = XMFLOAT4(0.0f, 0.1f, 0.0f, 1.0f);
+	mSpotLight->Ambient = XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f);
 	mSpotLight->Intensity = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
 	mSpotLight->Position = XMFLOAT3(-4.0f, 100.0f, -90.0f);
-	mSpotLight->Range = 200.0f;
+	mSpotLight->Range = 150.0f;
 	mSpotLight->Direction = XMFLOAT3(0.36f, -0.78f, 0.51f);
-	mSpotLight->Spot = 0.5f;
+	mSpotLight->Spot = 10.0f;
 	mSpotLight->Attenuation = XMFLOAT3(0.0f, 0.0f, 1.0f);
 
 }

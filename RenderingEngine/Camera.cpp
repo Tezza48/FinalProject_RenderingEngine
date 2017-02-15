@@ -22,17 +22,23 @@ void XM_CALLCONV Camera::GetViewMatrix(XMMATRIX &other)
 
 XMFLOAT4 Camera::GetWorldPosition()
 {
-	XMVECTOR nullVector;
-	XMVECTOR eyePosVec;
-	XMFLOAT4 eyePos;
-	XMMatrixDecompose(&nullVector, &nullVector, &eyePosVec, mView);
-	XMStoreFloat4(&eyePos, eyePosVec);
-	return eyePos;
+	//XMVECTOR nullVector = XMVECTOR();
+	//XMVECTOR eyePosVec = XMVECTOR();
+	//XMFLOAT4 eyePos = XMFLOAT4(0.0f, 0.0f, 0.0f, 0.0f);
+	//XMMatrixDecompose(&nullVector, &nullVector, &eyePosVec, mView);
+	//XMStoreFloat4(&eyePos, eyePosVec);
+	return mEyePos;
 }
 
 void XM_CALLCONV Camera::GetProjectionMatrix(XMMATRIX &other)
 {
 	other = mProjection;
+}
+
+void XM_CALLCONV Camera::CreateViewMatrix(XMVECTOR pos, XMVECTOR target, XMVECTOR up)
+{
+	XMStoreFloat4(&mEyePos, pos);
+	mView = XMMatrixLookAtLH(pos, target, up);
 }
 
 void XM_CALLCONV Camera::SetViewMatrix(XMMATRIX other)

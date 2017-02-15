@@ -107,7 +107,7 @@
     </PreBuildEvent>
     <PostBuildEvent>
       <Command>xcopy /Y /E "$(ProjectDir)res" "$(OutDir)res"
-xcopy /Y /E "$(ProjectDir)dll\x86\Debug\*" "$(OutDir)"
+ xcopy /Y /E "$(ProjectDir)dll\x86\Debug\*" "$(OutDir)"
 </Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
