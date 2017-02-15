@@ -17,6 +17,8 @@ D3D11App::D3D11App()
 
 	mLitColorShader = nullptr;
 
+	mColorMaterial = nullptr;
+
 	mAmbientLight = nullptr;
 	mDirLight = nullptr;
 	mPointLight = nullptr;
@@ -324,7 +326,7 @@ void D3D11App::Start()
 	mTimer = GameTimer();
 	mTimer.Reset();
 
-	mMeshes = mContent->LoadFBX(md3dDevice, "res/fbx/sponza_sideways.fbx", mNumMeshes);
+	mMeshes = mContent->LoadFBX(md3dDevice, "res/fbx/light_demo.fbx", mNumMeshes);
 
 	//mNumMeshes = 1;
 	//mMeshes = new Mesh[1];
@@ -335,48 +337,48 @@ void D3D11App::Start()
 	mMainCamera = new Camera();
 
 	// Set up the camera's projection
-	mMainCamera->CreateProjection(XM_PI / 4.0f, AspectRatio(), 1.0f, 100.0f);
+	mMainCamera->CreateProjection(XM_PI / 2.0f, AspectRatio(), 1.0f, 1000.0f);
 
-	XMFLOAT4 targetXMFloat = XMFLOAT4(0.0f, 3.0f, 0.0f, 1.0f);
+	//XMVECTOR pos = XMVectorSet(-18.0f, 1.5f, 0.0f, 1.0f);
+	//XMVECTOR rot = XMVectorSet(67.0f, -52.0f, 0.0f, 1.0f);
 
-	XMVECTOR pos = XMVectorSet(-18.0f, 1.5f, 0.0f, 1.0f);
+	XMFLOAT4 targetXMFloat = XMFLOAT4(0.0f, 10.0f, 0.0f, 1.0f); 
+
+	XMVECTOR pos = XMVectorSet(-100.0f, 100.0f, -100.0f, 1.0f);
 	XMVECTOR target = XMLoadFloat4(&targetXMFloat);
 	XMVECTOR up = XMVectorSet(0.0f, 1.0f, 0.0f, 1.0f);
 
 	XMMATRIX  V = XMMatrixLookAtLH(pos, target, up);
 	mMainCamera->SetViewMatrix(V);
 
-	mColorMaterial = new ColorMaterial(
-		XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f),
-		XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f),
-		XMFLOAT4(0.3f, 0.3f, 0.3f, 1000.0f));
-	
+	mColorMaterial = new Mat();
+	mColorMaterial->Ambient = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
+	mColorMaterial->Diffuse = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
+	mColorMaterial->Specular = XMFLOAT4(0.5f, 0.5f, 0.5f, 1000.0f);
+
 	mAmbientLight = new AmbientLight();
 	mAmbientLight->Ambient = XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f);
 
 	mDirLight = new DirectionalLight();
 	mDirLight->Ambient = XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f);
-	mDirLight->Diffuse = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
-	mDirLight->Specular = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
-	mDirLight->Direction =  XMFLOAT3(0.5773f, -0.5773f, -0.5773f);
+	mDirLight->Intensity = XMFLOAT4(0.00f, 0.00f, 0.00f, 1.0f);
+	mDirLight->Direction =  XMFLOAT3(0.5773f, -0.5773f, 0.5773f);
 
 	mPointLight = new PointLight();
-	mPointLight->Ambient = XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f);
-	mPointLight->Diffuse = XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f);
-	mPointLight->Specular = XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f);
-	mPointLight->Position = XMFLOAT3(0.0f, 1.0f, 0.0f);
-	mPointLight->Range = 50.0f;
+	mPointLight->Ambient = XMFLOAT4(0.1f, 0.0f, 0.0f, 1.0f);
+	mPointLight->Intensity = XMFLOAT4(1.0f, 0.0f, 0.0f, 1.0f);
+	mPointLight->Position = XMFLOAT3(-40.0f, 20.0f, 8.0f);
+	mPointLight->Range = 60.0f;
 	mPointLight->Attenuation = XMFLOAT3(0.0f, 0.0f, 1.0f);
 
 	mSpotLight = new SpotLight();
-	mSpotLight->Ambient = XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f);
-	mSpotLight->Diffuse = XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f);
-	mSpotLight->Specular = XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f);
-	mSpotLight->Position = XMFLOAT3(1.0f, 2.0f, 0.0f);
-	mSpotLight->Range = 3.0f;
-	mSpotLight->Direction = XMFLOAT3(0.0f, -1.0f, 0.0f);// {-0.666667, -0.666667, -0.333333}
-	mSpotLight->Spot = 1.0f;
-	mSpotLight->Attenuation = XMFLOAT3(0.0f, 1.0f, 1.0f);
+	mSpotLight->Ambient = XMFLOAT4(0.0f, 0.1f, 0.0f, 1.0f);
+	mSpotLight->Intensity = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
+	mSpotLight->Position = XMFLOAT3(-4.0f, 100.0f, -90.0f);
+	mSpotLight->Range = 200.0f;
+	mSpotLight->Direction = XMFLOAT3(0.36f, -0.78f, 0.51f);
+	mSpotLight->Spot = 0.5f;
+	mSpotLight->Attenuation = XMFLOAT3(0.0f, 0.0f, 1.0f);
 
 }
 
@@ -438,7 +440,7 @@ void D3D11App::Draw(const GameTimer &gt)
 	md3dImmediateContext->RSSetState(mRS);
 
 	mLitColorShader->UpdateFrame(md3dImmediateContext, mAmbientLight, mDirLight, mPointLight, mSpotLight,
-		mColorMaterial->GetMaterial(), mMainCamera->GetWorldPosition());
+		mColorMaterial, mMainCamera->GetWorldPosition());
 
 	mMainCamera->GetViewMatrix(mView);
 	mMainCamera->GetProjectionMatrix(mProjection);

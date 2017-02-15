@@ -43,7 +43,7 @@ public:
 	void XM_CALLCONV UpdateFrame(ID3D11DeviceContext *deviceContext, 
 		AmbientLight *ambient, DirectionalLight *directional, 
 		PointLight *point, SpotLight *spot, 
-		Mat material, XMFLOAT4 eyePos);
+		Mat *material, XMFLOAT4 eyePos);
 
 private:
 	ID3D11VertexShader *mVertexShader;

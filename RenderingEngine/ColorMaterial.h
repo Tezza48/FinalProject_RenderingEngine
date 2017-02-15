@@ -8,7 +8,7 @@ using namespace DirectX;
 
 struct Mat
 {
-	Mat(XMFLOAT4 a, XMFLOAT4 d, XMFLOAT4 s) { Ambient = a; Diffuse = d; Specular = s; }
+	Mat() { ZeroMemory(this, sizeof(this)); }
 	XMFLOAT4 Ambient;
 	XMFLOAT4 Diffuse;
 	XMFLOAT4 Specular;
@@ -29,7 +29,14 @@ public:
 	ColorMaterial(XMFLOAT4 ambient, XMFLOAT4 diffuse, XMFLOAT4 specular);
 	~ColorMaterial();
 
-	Mat GetMaterial() { return Mat(Ambient, Diffuse, Specular); }
+	Mat GetMaterial() 
+	{
+		Mat mat;
+		mat.Ambient = Ambient;
+		mat.Diffuse = Diffuse;
+		mat.Specular = Specular;
+		return mat; 
+	}
 
 private:
 

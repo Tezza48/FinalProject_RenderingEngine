@@ -18,7 +18,7 @@ cbuffer cbPerFrame : register(b1)
 	PointLight gPointLight;
 	SpotLight gSpotLight;
 	Material gMat;
-	float3 gEyePosW;
+	float4 gEyePosW;
 };
 
 //cbuffer cbPerFrame
@@ -51,8 +51,8 @@ void ComputeLightDirectional(DirectionalLight light, Material mat, float3 pos, f
 		float3 v = reflect(-lightVec, nrm);
 		float specFactor = pow(max(dot(v, toEye), 0.0f), mat.Specular.w);
 
-		diffuse = diffuseFactor * mat.Diffuse * light.Diffuse;
-		specular = specFactor * mat.Specular * light.Specular;
+		diffuse = diffuseFactor * mat.Diffuse * light.Intensity;
+		specular = specFactor * mat.Specular * light.Intensity;
 	}
 }
 
@@ -82,8 +82,8 @@ void ComputeLightPoint(PointLight light, Material mat, float3 pos, float3 nrm, f
 		float3 v = reflect(-lightVec, nrm);
 		float specFactor = pow(max(dot(v, toEye), 0.0f), mat.Specular.w);
 
-		diffuse = diffuseFactor * mat.Diffuse * light.Diffuse;
-		specular = specFactor * mat.Specular * light.Specular;
+		diffuse = diffuseFactor * mat.Diffuse * light.Intensity;
+		specular = specFactor * mat.Specular * light.Intensity;
 	}
 
 	float att = 1.0f / dot(light.Attenuation, float3(1.0f, d, d*d));
@@ -119,8 +119,8 @@ void ComputeLightSpot(SpotLight light, Material mat, float3 pos, float3 nrm, flo
 		float3 v = reflect(-lightVec, nrm);
 		float specFactor = pow(max(dot(v, toEye), 0.0f), mat.Specular.w);
 
-		diffuse = diffuseFactor * mat.Diffuse * light.Diffuse;
-		specular = specFactor * mat.Specular * light.Specular;
+		diffuse = diffuseFactor * mat.Diffuse * light.Intensity;
+		specular = specFactor * mat.Specular * light.Intensity;
 	}
 
 	float spot = pow(max(dot(-lightVec, light.Direction), 0.0f), light.Spot);
@@ -135,7 +135,6 @@ void ComputeLightSpot(SpotLight light, Material mat, float3 pos, float3 nrm, flo
 float4 main(PixelInputType input) : SV_TARGET
 {
 	float3 toEye = normalize(gEyePosW - input.positionW);
-	toEye.z = -toEye.z;
 
 	float4 diffuseTexture = gTexture.Sample(gSampleType, input.tex);
 
@@ -168,5 +167,6 @@ float4 main(PixelInputType input) : SV_TARGET
 
 	litColor.a = 1.0f;
 
-	return diffuseTexture * litColor;
+	return litColor;
+	//return diffuseTexture * litColor;
 }

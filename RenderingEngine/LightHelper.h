@@ -17,8 +17,9 @@ struct DirectionalLight
 	DirectionalLight() { ZeroMemory(this, sizeof(this)); }
 
 	XMFLOAT4 Ambient;
-	XMFLOAT4 Diffuse;
-	XMFLOAT4 Specular;
+	XMFLOAT4 Intensity;
+	//XMFLOAT4 Diffuse;
+	//XMFLOAT4 Specular;
 	XMFLOAT3 Direction;
 private:
 	float pad;
@@ -29,8 +30,9 @@ struct PointLight
 	PointLight() { ZeroMemory(this, sizeof(this)); }
 
 	XMFLOAT4 Ambient;
-	XMFLOAT4 Diffuse;
-	XMFLOAT4 Specular;
+	XMFLOAT4 Intensity;
+	//XMFLOAT4 Diffuse;
+	//XMFLOAT4 Specular;
 	
 	XMFLOAT3 Position;
 	float Range;
@@ -45,8 +47,9 @@ struct SpotLight
 	SpotLight() { ZeroMemory(this, sizeof(this)); }
 
 	XMFLOAT4 Ambient;
-	XMFLOAT4 Diffuse;
-	XMFLOAT4 Specular;
+	XMFLOAT4 Intensity;
+	//XMFLOAT4 Diffuse;
+	//XMFLOAT4 Specular;
 
 	XMFLOAT3 Position;
 	float Range;

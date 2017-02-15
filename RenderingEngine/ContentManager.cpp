@@ -86,12 +86,13 @@ Mesh *ContentManager::LoadFBX(ID3D11Device *device, std::string pFilename, size_
 
 				for (size_t currentVertex = 0; currentVertex < 3; currentVertex++)
 				{
-					vertices[currentPolygon * 3 + currentVertex].position = FbxToDxVec3(controlPoints[meshes[i]->GetPolygonVertex(currentPolygon, currentVertex)]);
+					vertices[currentPolygon * 3 + currentVertex].position = FbxToDxVec3(controlPoints[meshes[i]->GetPolygonVertex(currentPolygon, 2 - currentVertex)], true);
+					//vertices[currentPolygon * 3 + currentVertex].position.z *= -1;
 				
-					meshes[i]->GetPolygonVertexNormal(currentPolygon, currentVertex, currentNormal);
-					vertices[currentPolygon * 3 + currentVertex].normal = FbxToDxVec3(currentNormal);
+					meshes[i]->GetPolygonVertexNormal(currentPolygon, 2 - currentVertex, currentNormal);
+					vertices[currentPolygon * 3 + currentVertex].normal = FbxToDxVec3(currentNormal, true);
 
-					meshes[i]->GetPolygonVertexUV(currentPolygon, currentVertex, uvName, currentUV, isMapped);
+					meshes[i]->GetPolygonVertexUV(currentPolygon, 2 - currentVertex, uvName, currentUV, isMapped);
 					vertices[currentPolygon * 3 + currentVertex].tex = FbxToDxVec2(currentUV);
 				}
 
@@ -182,7 +183,7 @@ Texture * ContentManager::LoadTGA(ID3D11Device *device, ID3D11DeviceContext *dev
 		char *imageData = &buffer[18 + header.idLength + header.colorMapLength];
 
 		// convert from BGR to RGB
-		for (size_t texel = 0; texel < header.width * header.height * 4; texel+=4)
+		for (size_t texel = 0; texel < (size_t)header.width * (size_t)header.height * 4; texel+=4)
 		{
 			char r = imageData[texel + 2];
 			char g = imageData[texel + 1];
@@ -235,9 +236,16 @@ XMFLOAT2 ContentManager::FbxToDxVec2(const FbxVector2 & other)
 	return XMFLOAT2((float)other[0], (float)other[1]);
 }
 
-XMFLOAT3 ContentManager::FbxToDxVec3(const FbxVector4 & other)
+XMFLOAT3 ContentManager::FbxToDxVec3(const FbxVector4 & other, bool convertAxes/* Swap y and z */)
 {
-	return XMFLOAT3((float)other[0], (float)other[1], (float)other[2]);
+	if (convertAxes)
+	{
+		return XMFLOAT3((float)other[0], (float)other[2], (float)other[1]);
+	}
+	else
+	{
+		return XMFLOAT3((float)other[0], (float)other[1], (float)other[2]);
+	}
 }
 
 XMFLOAT4 ContentManager::FbxToDxVec4(const FbxVector4 & other)

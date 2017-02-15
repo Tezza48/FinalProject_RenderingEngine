@@ -44,7 +44,7 @@ class D3D11App : IRenderFramework
 
 	// Class with vertex color VS and PS
 	LitColorShader *mLitColorShader;
-	ColorMaterial * mColorMaterial;
+	Mat *mColorMaterial;
 
 	AmbientLight *mAmbientLight;
 	DirectionalLight *mDirLight;
