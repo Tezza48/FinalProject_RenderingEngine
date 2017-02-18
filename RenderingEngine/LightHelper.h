@@ -5,21 +5,12 @@
 
 using namespace DirectX;
 
-struct AmbientLight
-{
-	AmbientLight() {ZeroMemory(this, sizeof(this)); }
-
-	XMFLOAT4 Ambient;
-};
-
 struct DirectionalLight
 {
 	DirectionalLight() { ZeroMemory(this, sizeof(this)); }
 
 	XMFLOAT4 Ambient;
 	XMFLOAT4 Intensity;
-	//XMFLOAT4 Diffuse;
-	//XMFLOAT4 Specular;
 	XMFLOAT3 Direction;
 private:
 	float pad;
@@ -31,8 +22,6 @@ struct PointLight
 
 	XMFLOAT4 Ambient;
 	XMFLOAT4 Intensity;
-	//XMFLOAT4 Diffuse;
-	//XMFLOAT4 Specular;
 	
 	XMFLOAT3 Position;
 	float Range;
@@ -48,8 +37,6 @@ struct SpotLight
 
 	XMFLOAT4 Ambient;
 	XMFLOAT4 Intensity;
-	//XMFLOAT4 Diffuse;
-	//XMFLOAT4 Specular;
 
 	XMFLOAT3 Position;
 	float Range;

@@ -1,21 +1,14 @@
 #pragma once
 
+#include <Windows.h>
 #include <DirectXMath.h>
+#include "Texture.h"
 
 using namespace DirectX;
 
-class Material
+struct Material
 {
-	XMFLOAT4 Color;
-protected:
-	Material();
-
-public:
-	Material(XMFLOAT4 color);
-	~Material();
-
-	//virtual void GetMaterial(Mat *material) { material = mMaterial; }
-
-private:
+	Material() { ZeroMemory(this, sizeof(this)); }
+	XMFLOAT4 Emmissive;
+	XMFLOAT4 Specular;
 };
-

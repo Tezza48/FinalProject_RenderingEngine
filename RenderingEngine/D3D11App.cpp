@@ -15,11 +15,10 @@ D3D11App::D3D11App()
 
 	mMainCamera = nullptr;
 
-	mLitColorShader = nullptr;
+	mLitShader = nullptr;
 
-	mColorMaterial = nullptr;
+	mMaterial = nullptr;
 
-	mAmbientLight = nullptr;
 	mDirLight = nullptr;
 	mPointLight = nullptr;
 	mSpotLight = nullptr;
@@ -53,8 +52,8 @@ D3D11App::~D3D11App()
 	
 	mRS->Release();
 	
-	delete mLitColorShader;
-	mLitColorShader = nullptr;
+	delete mLitShader;
+	mLitShader = nullptr;
 
 	delete mContent;
 	mContent = nullptr;
@@ -67,9 +66,6 @@ D3D11App::~D3D11App()
 
 	delete mMainCamera;
 	mMainCamera = nullptr;
-
-	delete mAmbientLight;
-	mAmbientLight = nullptr;
 
 	delete mDirLight;
 	mDirLight = nullptr;
@@ -306,10 +302,10 @@ bool D3D11App::InitPipeline()
 	rd.AntialiasedLineEnable = false;
 	
 	md3dDevice->CreateRasterizerState(&rd, &mRS);
-	mLitColorShader = new LitColorShader();
+	mLitShader = new LitShader();
 
 	// Initialize the basic shader we're using
-	if (!mLitColorShader->Init(md3dDevice))
+	if (!mLitShader->Init(md3dDevice))
 	{
 		MessageBox(mMainWindow, L"Could not initialize the Lit Color Shader object", L"ERROR", MB_OK);
 		return false;
@@ -351,13 +347,9 @@ void D3D11App::Start()
 	XMMATRIX  V = XMMatrixLookAtLH(pos, target, up);
 	mMainCamera->SetViewMatrix(V);
 
-	mColorMaterial = new Mat();
-	mColorMaterial->Ambient = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
-	mColorMaterial->Diffuse = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
-	mColorMaterial->Specular = XMFLOAT4(0.5f, 0.5f, 0.5f, 10.0f);
-
-	mAmbientLight = new AmbientLight();
-	mAmbientLight->Ambient = XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f);
+	mMaterial = new Material();
+	mMaterial->Emmissive = XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f);
+	mMaterial->Specular = XMFLOAT4(0.5f, 0.5f, 0.5f, 10.0f);
 
 	mDirLight = new DirectionalLight();
 	mDirLight->Ambient = XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f);
@@ -439,11 +431,15 @@ void D3D11App::Draw(const GameTimer &gt)
 	// Set the rasterizer state to our settings
 	md3dImmediateContext->RSSetState(mRS);
 
-	mLitColorShader->UpdateFrame(md3dImmediateContext, mAmbientLight, mDirLight, mPointLight, mSpotLight,
-		mColorMaterial, mMainCamera->GetWorldPosition());
+	mLitShader->UpdateFrame(md3dImmediateContext, mDirLight, mPointLight, mSpotLight,
+		mMainCamera->GetWorldPosition());
 
 	mMainCamera->GetViewMatrix(mView);
 	mMainCamera->GetProjectionMatrix(mProjection);
+
+	// onlyusing one material and texture, only need to update once
+	// when using multiple, render all meshes with material together. faster.
+	mLitShader->UpdateMaterial(md3dImmediateContext, mMaterial, mCrateTexture->GetSRV());
 
 	for (size_t i = 0; i < mNumMeshes; i++)
 	{
@@ -455,7 +451,7 @@ void D3D11App::Draw(const GameTimer &gt)
 		mWorldInvTrans = XMMatrixInverse(NULL, mWorld);
 		mWorldInvTrans = XMMatrixTranspose(mWorldInvTrans);
 
-		mLitColorShader->Render(md3dImmediateContext, mMeshes[i].GetIndexCount(), mWorld, mWorldViewProj, mWorldInvTrans, mCrateTexture->GetSRV());
+		mLitShader->Render(md3dImmediateContext, mMeshes[i].GetIndexCount(), mWorld, mWorldViewProj, mWorldInvTrans);
 	}
 
 	// present the back buffer

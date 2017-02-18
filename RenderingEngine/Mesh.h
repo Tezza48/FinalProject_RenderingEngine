@@ -6,8 +6,7 @@
 #include <DirectXMath.h>
 #include <fbxsdk.h>
 #include "FilePathMacros.h"
-//#include "Material.h"
-#include "ColorMaterial.h"
+#include "Material.h"
 #include "utils.h"
 
 using namespace DirectX;
@@ -43,7 +42,7 @@ public:
 	int GetIndexCount();
 	void XM_CALLCONV GetWorldMatrix(XMMATRIX &other);
 	void XM_CALLCONV SetWorldMatrix(XMMATRIX world);
-	void SetMaterial(ColorMaterial *material);
+	//void SetMaterial(ColorMaterial *material);
 	//ColorMaterial *GetMaterial();
 
 private:

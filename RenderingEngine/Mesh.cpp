@@ -392,10 +392,10 @@ void XM_CALLCONV Mesh::SetWorldMatrix(XMMATRIX world)
 	mWorld = world;
 }
 
-void Mesh::SetMaterial(ColorMaterial * material)
-{
-	//mMaterial = material;
-}
+//void Mesh::SetMaterial(ColorMaterial * material)
+//{
+//	//mMaterial = material;
+//}
 
 //ColorMaterial * Mesh::GetMaterial()
 //{
