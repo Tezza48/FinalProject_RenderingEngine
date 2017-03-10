@@ -365,11 +365,11 @@ void D3D11App::Start()
 
 	mSpotLight = new SpotLight();
 	mSpotLight->Ambient = XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f);
-	mSpotLight->Intensity = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
+	mSpotLight->Intensity = XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f);
 	mSpotLight->Position = XMFLOAT3(-4.0f, 100.0f, -90.0f);
 	mSpotLight->Range = 150.0f;
 	mSpotLight->Direction = XMFLOAT3(0.36f, -0.78f, 0.51f);
-	mSpotLight->Spot = 10.0f;
+	mSpotLight->Spot = 15.0f;
 	mSpotLight->Attenuation = XMFLOAT3(0.0f, 0.0f, 1.0f);
 
 }

@@ -1,8 +1,8 @@
 #include "lit.hlsli"
 #include "LightHelper.hlsli"
 
-Texture2D gTexAlbedo;
-SamplerState gSampleType;
+Texture2D gTexAlbedo : register(t0);
+SamplerState gSampleType : register(s0);
 
 cbuffer cbPerObject : register(b0)
 {
@@ -103,13 +103,13 @@ void ComputeLightSpot(SpotLight light, float specExponent, float3 pos, float3 nr
 
 	ambient = light.Ambient;
 
-	float diffuseFactor = dot(lightVec, nrm) * 255.0f;
+	float diffuseFactor = dot(lightVec, nrm);
 
 	[flatten]
 	if (diffuseFactor > 0.0f)
 	{
 		float3 v = reflect(-lightVec, nrm);
-		float specFactor = pow(max(dot(v, toEye), 0.0f), specExponent) * 255.0f;
+		float specFactor = pow(max(dot(v, toEye), 0.0f), specExponent);
 
 		diffuse = diffuseFactor * light.Intensity;
 		specular = specFactor * light.Intensity;
@@ -117,7 +117,7 @@ void ComputeLightSpot(SpotLight light, float specExponent, float3 pos, float3 nr
 
 	float spot = pow(max(dot(-lightVec, light.Direction), 0.0f), light.Spot);
 
-	float att = spot / dot(light.Attenuation, float3(1.0f, d, d*d));
+	float att = 255.0f * spot / dot(light.Attenuation, float3(1.0f, d, d*d));
 
 	ambient *= spot;
 	diffuse *= att;

@@ -208,8 +208,6 @@ void XM_CALLCONV LitShader::Render(ID3D11DeviceContext *deviceContext, int index
 	deviceContext->VSSetShader(mVertexShader, NULL, 0);
 	deviceContext->PSSetShader(mPixelShader, NULL, 0);
 
-	deviceContext->PSSetSamplers(0, 1, &mSamplerState);
-
 	// Draw the buffers on the GPU memory
 	deviceContext->DrawIndexed(indexCount, 0, 0);
 }
@@ -251,4 +249,5 @@ void LitShader::UpdateMaterial(ID3D11DeviceContext * deviceContext, Material * m
 	deviceContext->PSSetConstantBuffers(2, 1, &mPerMaterialBuffer);
 
 	deviceContext->PSSetShaderResources(0, 1, &texture);
+	deviceContext->PSSetSamplers(0, 1, &mSamplerState);
 }
