@@ -4,7 +4,7 @@ Rendering engine written in C++ with DirectX 11. Dissertation project.
 
 The development and progress of this project is documented on my blog at www.willterry.me
 
-Current Features:
+## Current Features:
  * DirectX 11
  * FBX SDK intergration
  * Targa texture loading
@@ -12,8 +12,14 @@ Current Features:
   * Directional
   * Point
   * Spot
+  
+## Media
 
-[![IMAGE ALT TEXT HERE](http://img.youtube.com/vi/HozQLePqlsE/0.jpg)](http://www.youtube.com/watch?v=HozQLePqlsE)
+### Youtube
+
+[![IMAGE ALT TEXT HERE](http://img.youtube.com/vi/HozQLePqlsE/0.jpg)](http://www.youtube.com/watch?v=HozQLePqlsE)]
+
+### Screenshots
 
 ![Utah Teapot](http://willterry.me/img/dissertation/Lighting-Teapot.png)
 
