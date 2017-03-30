@@ -16,7 +16,6 @@ struct PixelInputType
 
 struct Material
 {
-	float4 Ambient;
-	float4 Diffuse;
+	float4 Emmissive;
 	float4 Specular;
 };

@@ -1,8 +1,3 @@
-struct AmbientLight
-{
-	float4 Ambient;
-};
-
 struct DirectionalLight
 {
 	float4 Ambient;

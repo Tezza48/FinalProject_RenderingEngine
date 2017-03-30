@@ -1,17 +1,8 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <ClCompile Include="BasicShader.cpp">
-      <Filter>Source Files\ShaderClasses</Filter>
-    </ClCompile>
-    <ClCompile Include="ColorShaderClass.cpp">
-      <Filter>Source Files\ShaderClasses</Filter>
-    </ClCompile>
     <ClCompile Include="Camera.cpp">
       <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="LitColorShader.cpp">
-      <Filter>Source Files\ShaderClasses</Filter>
     </ClCompile>
     <ClCompile Include="D3D11App.cpp">
       <Filter>Source Files\Framework</Filter>
@@ -34,33 +25,21 @@
     <ClCompile Include="Material.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="ColorMaterial.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="ContentManager.cpp">
       <Filter>Source Files\Framework</Filter>
     </ClCompile>
     <ClCompile Include="Texture.cpp">
       <Filter>Source Files\Framework</Filter>
     </ClCompile>
+    <ClCompile Include="LitShader.cpp">
+      <Filter>Source Files\ShaderClasses</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="BasicShader.h">
-      <Filter>Header Files\ShaderClasses</Filter>
-    </ClInclude>
-    <ClInclude Include="ColorShaderClass.h">
-      <Filter>Header Files\ShaderClasses</Filter>
-    </ClInclude>
     <ClInclude Include="Camera.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="LitColorShader.h">
-      <Filter>Header Files\ShaderClasses</Filter>
-    </ClInclude>
     <ClInclude Include="Material.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="ColorMaterial.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="resource.h">
@@ -93,6 +72,9 @@
     <ClInclude Include="Texture.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="LitShader.h">
+      <Filter>Header Files\ShaderClasses</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Resources">
@@ -113,55 +95,35 @@
     <Filter Include="Header Files\ShaderClasses">
       <UniqueIdentifier>{6273dbd7-58b8-4944-9af7-d780557fffb3}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Resources\Basic">
-      <UniqueIdentifier>{08c4e98f-48cf-423a-831d-aa5e761e0b12}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Resources\Color">
-      <UniqueIdentifier>{06af6e55-c8ff-4ff6-99e6-ed10ba4ebbdb}</UniqueIdentifier>
-      <Extensions>
-      </Extensions>
-    </Filter>
-    <Filter Include="Resources\LitColor">
-      <UniqueIdentifier>{267a8f32-7850-4948-b608-7011301b78a1}</UniqueIdentifier>
-      <Extensions>
-      </Extensions>
-    </Filter>
     <Filter Include="Source Files\Framework">
       <UniqueIdentifier>{fd1173c9-5202-41f9-af3b-7ec9ff293b37}</UniqueIdentifier>
     </Filter>
     <Filter Include="Header Files\Framework">
       <UniqueIdentifier>{b2636297-07e8-450b-9f59-d57e0845d1e1}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Resources\Lit">
+      <UniqueIdentifier>{267a8f32-7850-4948-b608-7011301b78a1}</UniqueIdentifier>
+      <Extensions>
+      </Extensions>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <None Include="shaders.shader">
       <Filter>Resources</Filter>
     </None>
-    <None Include="colorPS.hlsl">
-      <Filter>Resources\Color</Filter>
-    </None>
-    <None Include="colorVS.hlsl">
-      <Filter>Resources\Color</Filter>
-    </None>
-    <None Include="LitColor.hlsli">
-      <Filter>Resources\LitColor</Filter>
-    </None>
     <None Include="LightHelper.hlsli">
       <Filter>Resources</Filter>
     </None>
+    <None Include="Lit.hlsli">
+      <Filter>Resources\Lit</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
-    <FxCompile Include="litColorVS.hlsl">
-      <Filter>Resources\LitColor</Filter>
+    <FxCompile Include="litPS.hlsl">
+      <Filter>Resources\Lit</Filter>
     </FxCompile>
-    <FxCompile Include="basicPS.hlsl">
-      <Filter>Resources\Basic</Filter>
-    </FxCompile>
-    <FxCompile Include="basicVS.hlsl">
-      <Filter>Resources\Basic</Filter>
-    </FxCompile>
-    <FxCompile Include="litColorPS.hlsl">
-      <Filter>Resources\LitColor</Filter>
+    <FxCompile Include="litVS.hlsl">
+      <Filter>Resources\Lit</Filter>
     </FxCompile>
   </ItemGroup>
   <ItemGroup>

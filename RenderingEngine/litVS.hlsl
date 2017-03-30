@@ -1,4 +1,4 @@
-#include "litColor.hlsli"
+#include "lit.hlsli"
 #include "LightHelper.hlsli"
 
 cbuffer cbPerObject : register(b0)

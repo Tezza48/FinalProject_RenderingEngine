@@ -7,43 +7,46 @@
 //#include <fstream>
 #include "utils.h"
 #include "LightHelper.h"
-#include "ColorMaterial.h"
+#include "Material.h"
 #include "Texture.h"
 
 using namespace DirectX;
 
 // A shader that draws lit objects
 // with ambient, direct, point and spotlights
-class LitColorShader
+class LitShader
 {
-	struct PerObjectBuffer
+	struct PerObjectBuffer// Buffer 0
 	{
 		XMMATRIX World;
 		XMMATRIX WorldInvTrans;
 		XMMATRIX WorldViewProj;
 	};
 
-	struct PerFrameBuffer
+	struct PerFrameBuffer// Buffer 1
 	{
-		AmbientLight Abmient;// Ambient Light
 		DirectionalLight Directional;// Directional Light
 		PointLight Point;
 		SpotLight Spot;
-		Mat Mat;// Object Material
 		XMFLOAT4 EyePos; // The eye's current world position
 	};
 
+	struct PerMaterialBuffer// Buffer 2
+	{
+		Material Mat;// Object Material
+	};
+
 public:
-	LitColorShader();
-	~LitColorShader();
+	LitShader();
+	~LitShader();
 
 	bool Init(ID3D11Device *device);
 	void XM_CALLCONV Render(ID3D11DeviceContext *deviceContext, int, XMMATRIX world, XMMATRIX worldViewProj, XMMATRIX worldInvTrans);
-	void XM_CALLCONV Render(ID3D11DeviceContext *deviceContext, int, XMMATRIX world, XMMATRIX worldViewProj, XMMATRIX worldInvTrans, ID3D11ShaderResourceView *texture);
 	void XM_CALLCONV UpdateFrame(ID3D11DeviceContext *deviceContext, 
-		AmbientLight *ambient, DirectionalLight *directional, 
+		DirectionalLight *directional, 
 		PointLight *point, SpotLight *spot, 
-		Mat *material, XMFLOAT4 eyePos);
+		XMFLOAT4 eyePos);
+	void UpdateMaterial(ID3D11DeviceContext *deviceContext, Material *material, ID3D11ShaderResourceView *texture);
 
 private:
 	ID3D11VertexShader *mVertexShader;
@@ -56,8 +59,8 @@ private:
 	// constant buffers
 	ID3D11Buffer *mPerObjectBuffer;
 	ID3D11Buffer *mPerFrameBuffer;
+	ID3D11Buffer *mPerMaterialBuffer;
 
 public:
-	AmbientLight defaultAmbient;
 };
 

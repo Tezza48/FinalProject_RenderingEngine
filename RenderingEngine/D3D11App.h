@@ -13,8 +13,8 @@
 #include "ContentManager.h"
 #include "Mesh.h"
 #include "Camera.h"
-#include "LitColorShader.h"
-#include "ColorMaterial.h"
+#include "LitShader.h"
+#include "Material.h"
 #include "utils.h"
 
 #pragma comment(lib, "d3d11.lib")
@@ -43,10 +43,9 @@ class D3D11App : IRenderFramework
 	Camera *mMainCamera;
 
 	// Class with vertex color VS and PS
-	LitColorShader *mLitColorShader;
-	Mat *mColorMaterial;
+	LitShader *mLitShader;
+	Material *mMaterial;
 
-	AmbientLight *mAmbientLight;
 	DirectionalLight *mDirLight;
 	PointLight *mPointLight;
 	SpotLight *mSpotLight;
