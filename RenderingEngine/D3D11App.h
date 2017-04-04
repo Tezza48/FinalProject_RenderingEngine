@@ -37,7 +37,8 @@ class D3D11App : IRenderFramework
 	size_t mNumMeshes;
 	Mesh *mMeshes; // an array of meshes;
 
-	Texture *mCrateTexture;
+	size_t mNumTextures;
+	Texture *mTextures;
 
 	// Main Camera (only camera)
 	Camera *mMainCamera;

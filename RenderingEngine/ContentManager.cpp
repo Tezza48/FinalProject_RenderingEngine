@@ -137,10 +137,9 @@ Mesh *ContentManager::LoadFBX(ID3D11Device *device, std::string pFilename, size_
 	return output;
 }
 
-Texture * ContentManager::LoadTGA(ID3D11Device *device, ID3D11DeviceContext *deviceContext, const std::string filename)
+void ContentManager::LoadTGA(ID3D11Device *device, ID3D11DeviceContext *deviceContext, const std::string filename, Texture &output)
 {
 	// http://www.cplusplus.com/reference/istream/istream/
-	Texture *output;
 	std::ifstream is;
 	is.open(filename, std::fstream::binary);
 
@@ -178,7 +177,7 @@ Texture * ContentManager::LoadTGA(ID3D11Device *device, ID3D11DeviceContext *dev
 
 		// init new texture
 
-		output = new Texture();
+		//output = Texture();
 
 		char *imageData = &buffer[18 + header.idLength + header.colorMapLength];
 
@@ -195,14 +194,16 @@ Texture * ContentManager::LoadTGA(ID3D11Device *device, ID3D11DeviceContext *dev
 			imageData[texel + 3] = a;
 		}
 
-		output->Init(device, deviceContext, imageData, header.width, header.height);
+		output.Init(device, deviceContext, imageData, header.width, header.height);
 
 		delete[] buffer;
 		buffer = nullptr;
-		imageData = nullptr;
+		imageData = nullptr; // imageData is part of buffer so it's already deleted.
 	}
-
-	return output;
+	else
+	{
+		throw std::exception();
+	}
 }
 
 FbxArray<FbxMesh*> ContentManager::GetAllMeshesReccursive(FbxNode *node)

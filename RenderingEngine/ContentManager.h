@@ -43,6 +43,16 @@ class ContentManager
 		char imagePixelSize;//24, 32, for the actual image
 		char imageDescriptorByte;//should be set to 0 says paul bourke
 	};
+
+	//struct JpegData
+	//{
+	//	JpegData() { ZeroMemory(this, sizeof(this)); }
+	//	char* marker;
+	//	short width;
+	//	short height;
+
+	//};
+
 private:
 	FbxManager *mFbxManager;
 
@@ -54,7 +64,7 @@ public:
 	~ContentManager();
 
 	Mesh *LoadFBX(ID3D11Device *device, const std::string filename, size_t &numMeshes);
-	Texture *LoadTGA(ID3D11Device *device, ID3D11DeviceContext *deviceContext, const std::string filename);
+	void LoadTGA(ID3D11Device *device, ID3D11DeviceContext *deviceContext, const std::string filename, Texture &output);
 private:
 	FbxArray<FbxMesh*> GetAllMeshesReccursive(FbxNode *node);
 

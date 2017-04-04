@@ -11,7 +11,7 @@ D3D11App::D3D11App()
 
 	mMeshes = nullptr;
 
-	mCrateTexture = nullptr;
+	mTextures = nullptr;
 
 	mMainCamera = nullptr;
 
@@ -61,8 +61,8 @@ D3D11App::~D3D11App()
 	delete[] mMeshes;
 	mMeshes = nullptr;
 
-	delete mCrateTexture;
-	mCrateTexture = nullptr;
+	delete[] mTextures;
+	mTextures = nullptr;
 
 	delete mMainCamera;
 	mMainCamera = nullptr;
@@ -322,13 +322,22 @@ void D3D11App::Start()
 	mTimer = GameTimer();
 	mTimer.Reset();
 
-	mMeshes = mContent->LoadFBX(md3dDevice, "res/fbx/light_demo.fbx", mNumMeshes);
+	//mMeshes = mContent->LoadFBX(md3dDevice, "res/fbx/light_demo.fbx", mNumMeshes);
+
+	mNumMeshes = 1;
+	mMeshes = new Mesh[mNumMeshes];
+	mMeshes[0].Init(md3dDevice, Mesh::PrimativeShape::MESH_PLANE);
 
 	//mNumMeshes = 1;
 	//mMeshes = new Mesh[1];
 	//mMeshes[0].Init(md3dDevice, Mesh::MESH_CUBE);
 
-	mCrateTexture = mContent->LoadTGA(md3dDevice, md3dImmediateContext, "res/tga/checker.tga");
+	mNumTextures = 1;
+	mTextures = new Texture[mNumTextures];
+
+	const std::string filename = "res/tga/sponza/KAMEN.tga";
+
+	mContent->LoadTGA(md3dDevice, md3dImmediateContext, filename, mTextures[0]);
 
 	mMainCamera = new Camera();
 
@@ -338,9 +347,9 @@ void D3D11App::Start()
 	//XMVECTOR pos = XMVectorSet(-18.0f, 1.5f, 0.0f, 1.0f);
 	//XMVECTOR rot = XMVectorSet(67.0f, -52.0f, 0.0f, 1.0f);
 
-	XMFLOAT4 targetXMFloat = XMFLOAT4(0.0f, 10.0f, 0.0f, 1.0f); 
+	XMFLOAT4 targetXMFloat = XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f); 
 
-	XMVECTOR pos = XMVectorSet(-100.0f, 100.0f, -100.0f, 1.0f);
+	XMVECTOR pos = XMVectorSet(0.0f, 0.0f, -1.0f, 1.0f);
 	XMVECTOR target = XMLoadFloat4(&targetXMFloat);
 	XMVECTOR up = XMVectorSet(0.0f, 1.0f, 0.0f, 1.0f);
 
@@ -352,25 +361,25 @@ void D3D11App::Start()
 	mMaterial->Specular = XMFLOAT4(0.5f, 0.5f, 0.5f, 10.0f);
 
 	mDirLight = new DirectionalLight();
-	mDirLight->Ambient = XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f);
-	mDirLight->Intensity = XMFLOAT4(0.0f, 0.00f, 0.00f, 1.0f);
-	mDirLight->Direction =  XMFLOAT3(0.5773f, -0.5773f, 0.5773f);
+	mDirLight->Ambient = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
+	//mDirLight->Intensity = XMFLOAT4(0.0f, 0.00f, 0.00f, 1.0f);
+	//mDirLight->Direction =  XMFLOAT3(0.5773f, -0.5773f, 0.5773f);
 
 	mPointLight = new PointLight();
-	mPointLight->Ambient = XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f);
-	mPointLight->Intensity = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
-	mPointLight->Position = XMFLOAT3(-40.0f, 40.0f, 16.0f);
-	mPointLight->Range = 160.0f;
-	mPointLight->Attenuation = XMFLOAT3(0.0f, 0.0f, 1.0f);
+	//mPointLight->Ambient = XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f);
+	//mPointLight->Intensity = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
+	//mPointLight->Position = XMFLOAT3(-40.0f, 40.0f, 16.0f);
+	//mPointLight->Range = 160.0f;
+	//mPointLight->Attenuation = XMFLOAT3(0.0f, 0.0f, 1.0f);
 
 	mSpotLight = new SpotLight();
-	mSpotLight->Ambient = XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f);
-	mSpotLight->Intensity = XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f);
-	mSpotLight->Position = XMFLOAT3(-4.0f, 100.0f, -90.0f);
-	mSpotLight->Range = 150.0f;
-	mSpotLight->Direction = XMFLOAT3(0.36f, -0.78f, 0.51f);
-	mSpotLight->Spot = 15.0f;
-	mSpotLight->Attenuation = XMFLOAT3(0.0f, 0.0f, 1.0f);
+	//mSpotLight->Ambient = XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f);
+	//mSpotLight->Intensity = XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f);
+	//mSpotLight->Position = XMFLOAT3(-4.0f, 100.0f, -90.0f);
+	//mSpotLight->Range = 150.0f;
+	//mSpotLight->Direction = XMFLOAT3(0.36f, -0.78f, 0.51f);
+	//mSpotLight->Spot = 15.0f;
+	//mSpotLight->Attenuation = XMFLOAT3(0.0f, 0.0f, 1.0f);
 
 }
 
@@ -439,7 +448,7 @@ void D3D11App::Draw(const GameTimer &gt)
 
 	// onlyusing one material and texture, only need to update once
 	// when using multiple, render all meshes with material together. faster.
-	mLitShader->UpdateMaterial(md3dImmediateContext, mMaterial, mCrateTexture->GetSRV());
+	mLitShader->UpdateMaterial(md3dImmediateContext, mMaterial, mTextures[0].GetSRV());
 
 	for (size_t i = 0; i < mNumMeshes; i++)
 	{
