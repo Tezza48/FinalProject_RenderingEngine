@@ -335,21 +335,21 @@ void D3D11App::Start()
 	mNumTextures = 1;
 	mTextures = new Texture[mNumTextures];
 
-	const std::string filename = "res/tga/sponza/KAMEN.tga";
+	const std::string filename = "res/tga/sponza/reljef.tga";
 
 	mContent->LoadTGA(md3dDevice, md3dImmediateContext, filename, mTextures[0]);
 
 	mMainCamera = new Camera();
 
 	// Set up the camera's projection
-	mMainCamera->CreateProjection(XM_PI / 2.0f, AspectRatio(), 1.0f, 1000.0f);
+	mMainCamera->CreateProjection(XM_PI / 2.0f, AspectRatio(), 0.1f, 1000.0f);
 
 	//XMVECTOR pos = XMVectorSet(-18.0f, 1.5f, 0.0f, 1.0f);
 	//XMVECTOR rot = XMVectorSet(67.0f, -52.0f, 0.0f, 1.0f);
 
 	XMFLOAT4 targetXMFloat = XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f); 
 
-	XMVECTOR pos = XMVectorSet(0.0f, 0.0f, -1.0f, 1.0f);
+	XMVECTOR pos = XMVectorSet(0.0f, 0.0f, -0.5f, 1.0f);
 	XMVECTOR target = XMLoadFloat4(&targetXMFloat);
 	XMVECTOR up = XMVectorSet(0.0f, 1.0f, 0.0f, 1.0f);
 

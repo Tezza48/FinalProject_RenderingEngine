@@ -102,7 +102,7 @@ private:
 	void OnResize(bool isRunning = true);
 
 	// width, height and title of the window
-	int mClientWidth = 1600, mClientHeight = 900;
+	int mClientWidth = 800, mClientHeight = 800;// 1600 90
 	std::wstring mClientTitle = L"DX11 Rendering Engine";
 	
 public:

@@ -170,18 +170,37 @@ void ContentManager::LoadTGA(ID3D11Device *device, ID3D11DeviceContext *deviceCo
 		header.imagePixelSize = buffer[16];
 		header.imageDescriptorByte = buffer[17];
 
-		if (header.imagePixelSize != 32)
-		{
-			throw std::exception("Targa was not 32bit");
-		}
-
 		// init new texture
 
-		//output = Texture();
+		char *imageData;
+		char * rawImageData = &buffer[18 + header.idLength + header.colorMapLength];
 
-		char *imageData = &buffer[18 + header.idLength + header.colorMapLength];
+		switch (header.imagePixelSize)
+		{
+		case 24:
+			// load imagedata but add in an alpha char every 3 pixels
 
-		// convert from BGR to RGB
+			imageData = new char[header.width * header.height * 4];
+
+			for (size_t texel24 = 0, texel32 = 0; texel32 < header.width * header.height * 4; texel24 +=3, texel32+=4)
+			{
+				imageData[texel32 + 0] = rawImageData[texel24 + 0];
+				imageData[texel32 + 1] = rawImageData[texel24 + 1];
+				imageData[texel32 + 2] = rawImageData[texel24 + 2];
+				imageData[texel32 + 3] = 255;
+			}
+
+
+			break;
+		case 32:
+			imageData = &buffer[18 + header.idLength + header.colorMapLength];
+			// convert from BGR to RGB
+			break;
+		default:
+			break;
+		}
+
+		// convert to rgb from bgr
 		for (size_t texel = 0; texel < (size_t)header.width * (size_t)header.height * 4; texel+=4)
 		{
 			char r = imageData[texel + 2];
