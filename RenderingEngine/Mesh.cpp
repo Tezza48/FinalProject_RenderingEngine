@@ -340,7 +340,41 @@ bool Mesh::Init(ID3D11Device *device, PrimativeShape shape)
 		indices[35] = 4;
 	}
 		break;
+	case Mesh::MESH_PLANE:
+	{
+		numVertices = 4;
+		numIndices = 6;
 
+		vertices = new Vertex[numVertices];
+		indices = new unsigned long[numIndices];
+
+		vertices[0].position = XMFLOAT3(-0.5f, -0.5f, 0.0f);
+		vertices[0].normal = XMFLOAT3(0.0f, 0.0f, -1.0f);
+
+		vertices[1].position = XMFLOAT3(-0.5f, 0.5f, 0.0f);
+		vertices[1].normal = vertices[0].normal;
+
+		vertices[2].position = XMFLOAT3(0.5f, 0.5f, 0.0f);
+		vertices[2].normal = vertices[0].normal;
+
+		vertices[3].position = XMFLOAT3(0.5f, -0.5f, 0.0f);
+		vertices[3].normal = vertices[0].normal;
+
+		vertices[0].tex = XMFLOAT2(0.0f, 0.0f);
+		vertices[1].tex = XMFLOAT2(0.0f, 1.0f);
+		vertices[2].tex = XMFLOAT2(1.0f, 1.0f);
+		vertices[3].tex = XMFLOAT2(1.0f, 0.0f);
+
+		indices[0] = 0;
+		indices[1] = 1;
+		indices[2] = 2;
+
+		indices[3] = 0;
+		indices[4] = 2;
+		indices[5] = 3;
+
+	}
+		break;
 	//case Mesh::MESH_NONE:
 	//	break;
 	//default:

@@ -27,6 +27,7 @@ public:
 		//MESH_SQUARE,
 		MESH_CUBE,
 		MESH_SOFTCUBE,
+		MESH_PLANE,
 		//MESH_NONE
 	};
 
