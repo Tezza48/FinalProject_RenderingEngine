@@ -349,7 +349,7 @@ void D3D11App::Start()
 
 	XMFLOAT4 targetXMFloat = XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f); 
 
-	XMVECTOR pos = XMVectorSet(0.0f, 0.0f, -0.5f, 1.0f);
+	XMVECTOR pos = XMVectorSet(0.0f, 0.0f, -1.0f, 1.0f);
 	XMVECTOR target = XMLoadFloat4(&targetXMFloat);
 	XMVECTOR up = XMVectorSet(0.0f, 1.0f, 0.0f, 1.0f);
 
