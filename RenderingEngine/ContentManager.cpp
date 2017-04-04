@@ -170,35 +170,47 @@ void ContentManager::LoadTGA(ID3D11Device *device, ID3D11DeviceContext *deviceCo
 		header.imagePixelSize = buffer[16];
 		header.imageDescriptorByte = buffer[17];
 
-		if (header.imagePixelSize != 32)
+		char *rawImageData = &buffer[18 + header.idLength + header.colorMapLength];
+		char *finalImageData = new char[header.width * header.height * 4];
+
+		switch (header.imagePixelSize)
 		{
-			throw std::exception("Targa was not 32bit");
+		case 24:
+			for (size_t texel24 = 0, texel32 = 0; texel24 < header.width * header.height * 3; texel24+=3, texel32+=4)
+			{
+				finalImageData[texel32 + 0] = rawImageData[texel24 + 2];
+				finalImageData[texel32 + 1] = rawImageData[texel24 + 1];
+				finalImageData[texel32 + 2] = rawImageData[texel24 + 0];
+				finalImageData[texel32 + 3] = 255;
+			}
+			break;
+		case 32:
+			// convert from BGR to RGB
+			for (size_t texel = 0; texel < (size_t)header.width * (size_t)header.height * 4; texel+=4)
+			{
+				//char r = rawImageData[texel + 2];
+				//char g = rawImageData[texel + 1];
+				//char b = rawImageData[texel + 0];
+				//char a = rawImageData[texel + 3];
+				finalImageData[texel + 0] = rawImageData[texel + 2];
+				finalImageData[texel + 1] = rawImageData[texel + 1];
+				finalImageData[texel + 2] = rawImageData[texel + 0];
+				finalImageData[texel + 3] = rawImageData[texel + 3];
+			}
+			break;
+		default:
+			throw std::exception("TARGA has invalid bit depth: " + header.imagePixelSize);
+			break;
 		}
 
-		// init new texture
 
-		//output = Texture();
-
-		char *imageData = &buffer[18 + header.idLength + header.colorMapLength];
-
-		// convert from BGR to RGB
-		for (size_t texel = 0; texel < (size_t)header.width * (size_t)header.height * 4; texel+=4)
-		{
-			char r = imageData[texel + 2];
-			char g = imageData[texel + 1];
-			char b = imageData[texel + 0];
-			char a = imageData[texel + 3];
-			imageData[texel + 0] = r;
-			imageData[texel + 1] = g;
-			imageData[texel + 2] = b;
-			imageData[texel + 3] = a;
-		}
-
-		output.Init(device, deviceContext, imageData, header.width, header.height);
+		output.Init(device, deviceContext, finalImageData, header.width, header.height);
 
 		delete[] buffer;
 		buffer = nullptr;
-		imageData = nullptr; // imageData is part of buffer so it's already deleted.
+		rawImageData = nullptr; // imageData is part of buffer so it's already deleted.
+		delete[] finalImageData;
+		finalImageData = nullptr;
 	}
 	else
 	{
