@@ -11,11 +11,17 @@ Texture::Texture()
 
 Texture::~Texture()
 {
-	mTextureView->Release();
-	mTextureView = nullptr;
+	if (mTextureView)
+	{
+		mTextureView->Release();
+		mTextureView = nullptr;
+	}
 
-	mTexture->Release();
-	mTexture = nullptr;
+	if (mTexture)
+	{
+		mTexture->Release();
+		mTexture = nullptr;
+	}	
 }
 
 void Texture::Init(ID3D11Device *device, ID3D11DeviceContext *deviceContext, char *imageData, size_t width, size_t height)
