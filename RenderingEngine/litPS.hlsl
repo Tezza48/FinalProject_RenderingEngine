@@ -41,7 +41,7 @@ void ComputeLightDirectional(DirectionalLight light, float specExponent, float3 
 	if (diffuseFactor > 0.0f)
 	{
 		float3 v = reflect(-lightVec, nrm);
-		float specFactor = pow(max(dot(v, toEye), 0.0f), specExponent) * 255.0f;
+		float specFactor = pow(max(dot(v, toEye), 0.0f), specExponent);
 
 		diffuse = diffuseFactor * light.Intensity;
 		specular = specFactor * light.Intensity;
@@ -78,7 +78,7 @@ void ComputeLightPoint(PointLight light, float specExponent, float3 pos, float3 
 		specular = specFactor * light.Intensity;
 	}
 
-	float att = 255.0f / dot(light.Attenuation, float3(1.0f, d, d*d));
+	float att = 1 / dot(light.Attenuation, float3(1.0f, d, d*d));
 
 	diffuse *= att;
 	specular *= att;

@@ -382,19 +382,19 @@ void D3D11App::Start()
 
 	mMaterial = new Material();
 	mMaterial->Emmissive = XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f);
-	mMaterial->Specular = XMFLOAT4(0.1f, 0.1f, 0.1f, 10.0f);
+	mMaterial->Specular = XMFLOAT4(0.01f, 0.01f, 0.01f, 1.0f);
 
 	mDirLight = new DirectionalLight();
 	mDirLight->Ambient = XMFLOAT4(0.1f, 0.1f, 0.1f, 1.0f);
-	mDirLight->Intensity = XMFLOAT4(0.8f, 0.8f, 0.8f, 1.0f);
+	mDirLight->Intensity = XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f);
 	mDirLight->Direction =  XMFLOAT3(0.5773f, -0.5773f, 0.5773f);
 
 	mPointLight = new PointLight();
-	//mPointLight->Ambient = XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f);
-	//mPointLight->Intensity = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
-	//mPointLight->Position = XMFLOAT3(-40.0f, 40.0f, 16.0f);
-	//mPointLight->Range = 160.0f;
-	//mPointLight->Attenuation = XMFLOAT3(0.0f, 0.0f, 1.0f);
+	mPointLight->Ambient = XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f);
+	mPointLight->Intensity = XMFLOAT4(1.0f, 0.8f, 0.8f, 1.0f);
+	mPointLight->Position = XMFLOAT3(0.0f, 2.0f, 0.0f);
+	mPointLight->Range = 10.0f;
+	mPointLight->Attenuation = XMFLOAT3(0.0f, 0.0f, 0.5f);
 
 	mSpotLight = new SpotLight();
 	//mSpotLight->Ambient = XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f);
@@ -441,7 +441,7 @@ void D3D11App::Update(const GameTimer &gt)
 void D3D11App::Draw(const GameTimer &gt)
 {
 	// Clear the RTV and DSV in preparation for drawing
-	md3dImmediateContext->ClearRenderTargetView(mRenderTargetView, DirectX::Colors::CornflowerBlue);
+	md3dImmediateContext->ClearRenderTargetView(mRenderTargetView, DirectX::Colors::Black); // nice sky colour
 
 	md3dImmediateContext->ClearDepthStencilView(mDepthStencilView,
 		D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f,(UINT8) 0.0f);
