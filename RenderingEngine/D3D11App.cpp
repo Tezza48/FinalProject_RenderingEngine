@@ -347,6 +347,8 @@ void D3D11App::Start()
 	mNumTextures = 13;
 	mTextures = new Texture[mNumTextures];
 
+	//mContent->LoadTGA(md3dDevice, md3dImmediateContext, "res/tga/debug32.tga", mTextures[0]);
+
 	mContent->LoadTGA(md3dDevice, md3dImmediateContext, "res/tga/sponza/00_skap.tga", mTextures[0]);
 	mContent->LoadTGA(md3dDevice, md3dImmediateContext, "res/tga/sponza/01_S_ba.tga", mTextures[1]);
 	mContent->LoadTGA(md3dDevice, md3dImmediateContext, "res/tga/sponza/01_St_kp.tga", mTextures[2]);

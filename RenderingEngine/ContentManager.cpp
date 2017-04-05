@@ -165,10 +165,17 @@ void ContentManager::LoadTGA(ID3D11Device *device, ID3D11DeviceContext *deviceCo
 		header.colorMapEntrySize = buffer[7];
 		header.xOrigin = buffer[9] << 8 | buffer[8];
 		header.yOrigin = buffer[11] << 8 | buffer[10];
-		header.width = buffer[13] << 8 | -buffer[12];
-		header.height = buffer[15] << 8 | -buffer[14];
+
+		unsigned char widthLo = buffer[12];
+		unsigned char widthHi = buffer[13];
+
+		unsigned char heightLo = buffer[14];
+		unsigned char heightHi = buffer[15];
+
+		header.width = widthHi << 8 | widthLo;
+		header.height = heightHi << 8 | heightLo;
 		header.imagePixelSize = buffer[16];
-		header.imageDescriptorByte = buffer[17];
+		header.imageDescriptorByte = buffer[17]; // 00000000
 
 		char *rawImageData = &buffer[18 + header.idLength + header.colorMapLength];
 		char *finalImageData = new char[header.width * header.height * 4];
