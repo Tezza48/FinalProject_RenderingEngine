@@ -40,6 +40,8 @@ Mesh *ContentManager::LoadFBX(ID3D11Device *device, std::string pFilename, size_
 
 	fbxImporter->Import(scene);
 
+	FbxAxisSystem::DirectX.ConvertScene(scene);
+
 	FbxArray<FbxMesh*> meshes = GetAllMeshesReccursive(scene->GetRootNode());
 
 	numMeshes = meshes.GetCount();
@@ -55,9 +57,6 @@ Mesh *ContentManager::LoadFBX(ID3D11Device *device, std::string pFilename, size_
 	//Control points are all the vertex positions (they are most likely used multiple times)
 	//Polygon vertices are the indices for each vertex's position (control point)
 	//Polygon Vertex Normals are the the float4 normals for each polygon vertex
-	
-	XMMATRIX xmPivot;
-	FbxAMatrix fbxPivot;// current mesh's pivot matrix
 
 	if (numMeshes > 0)
 	{
@@ -86,17 +85,15 @@ Mesh *ContentManager::LoadFBX(ID3D11Device *device, std::string pFilename, size_
 
 				for (size_t currentVertex = 0; currentVertex < 3; currentVertex++)
 				{
-					vertices[currentPolygon * 3 + currentVertex].position = FbxToDxVec3(controlPoints[meshes[i]->GetPolygonVertex(currentPolygon, 2 - currentVertex)], true);
+					vertices[currentPolygon * 3 + currentVertex].position = FbxToDxVec3(controlPoints[meshes[i]->GetPolygonVertex(currentPolygon, currentVertex)], true);
 					//vertices[currentPolygon * 3 + currentVertex].position.z *= -1;
 				
-					meshes[i]->GetPolygonVertexNormal(currentPolygon, 2 - currentVertex, currentNormal);
+					meshes[i]->GetPolygonVertexNormal(currentPolygon, currentVertex, currentNormal);
 					vertices[currentPolygon * 3 + currentVertex].normal = FbxToDxVec3(currentNormal, true);
 
-					meshes[i]->GetPolygonVertexUV(currentPolygon, 2 - currentVertex, uvName, currentUV, isMapped);
+					meshes[i]->GetPolygonVertexUV(currentPolygon, currentVertex, uvName, currentUV, isMapped);
 					vertices[currentPolygon * 3 + currentVertex].tex = FbxToDxVec2(currentUV);
 				}
-
-				continue;
 			}
 
 			unsigned long *indices = new unsigned long[polygonCount * 3];
@@ -108,29 +105,8 @@ Mesh *ContentManager::LoadFBX(ID3D11Device *device, std::string pFilename, size_
 
 			//Initialize the new mesh
 			output[i].Init(device, vertices, (unsigned long)polygonCount * 3, (unsigned long*)indices, (unsigned long)polygonCount * 3);
-
-			//output->GetWorldMatrix(xmPivot);
-
-			//xmPivot *= XMMatrixRotationRollPitchYaw(-90.0f, 0.0f, 0.0f);//rotate it so that y is up (because changing the export settings in max dosn't do anything
-
-			//output->SetWorldMatrix(xmPivot);
-
 		}
-
 	}
-
-	//delete[] polygonVertices;
-	//polygonVertices = nullptr;
-
-	//delete controlPoints;
-	//controlPoints = nullptr;
-
-	//delete[] vertices;
-	//vertices = nullptr;
-
-	//scene->Destroy(true);
-	//scene = nullptr;
-	
 	fbxImporter->Destroy(true);
 	fbxImporter = nullptr;
 
@@ -183,12 +159,12 @@ void ContentManager::LoadTGA(ID3D11Device *device, ID3D11DeviceContext *deviceCo
 		switch (header.imagePixelSize)
 		{
 		case 24:
-			for (size_t texel24 = 0, texel32 = 0; texel24 < header.width * header.height * 3; texel24+=3, texel32+=4)
+			for (size_t texel24 = 0, texel32 = 0; texel24 < header.width * header.height * (unsigned)3; texel24+=3, texel32+=4)
 			{
 				finalImageData[texel32 + 0] = rawImageData[texel24 + 2];
 				finalImageData[texel32 + 1] = rawImageData[texel24 + 1];
 				finalImageData[texel32 + 2] = rawImageData[texel24 + 0];
-				finalImageData[texel32 + 3] = 255;
+				finalImageData[texel32 + 3] = (char)255;
 			}
 			break;
 		case 32:
@@ -258,14 +234,14 @@ XMFLOAT2 ContentManager::FbxToDxVec2(const FbxVector2 & other)
 
 XMFLOAT3 ContentManager::FbxToDxVec3(const FbxVector4 & other, bool convertAxes/* Swap y and z */)
 {
-	if (convertAxes)
-	{
-		return XMFLOAT3((float)other[0], (float)other[2], (float)other[1]);
-	}
-	else
-	{
+	//if (convertAxes)
+	//{
+	//	return XMFLOAT3((float)other[0], (float)other[2], (float)other[1]);
+	//}
+	//else
+	//{
 		return XMFLOAT3((float)other[0], (float)other[1], (float)other[2]);
-	}
+	//}
 }
 
 XMFLOAT4 ContentManager::FbxToDxVec4(const FbxVector4 & other)

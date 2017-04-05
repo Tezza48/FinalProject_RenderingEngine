@@ -366,14 +366,14 @@ void D3D11App::Start()
 	mMainCamera = new Camera();
 
 	// Set up the camera's projection
-	mMainCamera->CreateProjection(XM_PI / 2.0f, AspectRatio(), 0.1f, 1000.0f);
+	mMainCamera->CreateProjection(XM_PI / 2.0f, AspectRatio(), 0.1f, 100.0f);
 
 	//XMVECTOR pos = XMVectorSet(-18.0f, 1.5f, 0.0f, 1.0f);
 	//XMVECTOR rot = XMVectorSet(67.0f, -52.0f, 0.0f, 1.0f);
 
-	XMFLOAT4 targetXMFloat = XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f); 
+	XMFLOAT4 targetXMFloat = XMFLOAT4(0.0f, 4.0f, 2.0f, 1.0f); 
 
-	XMVECTOR pos = XMVectorSet(0.0f, 0.0f, -1.0f, 1.0f);
+	XMVECTOR pos = XMVectorSet(-7.0f, 1.8f, -2.0f, 1.0f);
 	XMVECTOR target = XMLoadFloat4(&targetXMFloat);
 	XMVECTOR up = XMVectorSet(0.0f, 1.0f, 0.0f, 1.0f);
 
@@ -382,12 +382,12 @@ void D3D11App::Start()
 
 	mMaterial = new Material();
 	mMaterial->Emmissive = XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f);
-	mMaterial->Specular = XMFLOAT4(0.5f, 0.5f, 0.5f, 10.0f);
+	mMaterial->Specular = XMFLOAT4(0.1f, 0.1f, 0.1f, 10.0f);
 
 	mDirLight = new DirectionalLight();
-	mDirLight->Ambient = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
-	//mDirLight->Intensity = XMFLOAT4(0.0f, 0.00f, 0.00f, 1.0f);
-	//mDirLight->Direction =  XMFLOAT3(0.5773f, -0.5773f, 0.5773f);
+	mDirLight->Ambient = XMFLOAT4(0.1f, 0.1f, 0.1f, 1.0f);
+	mDirLight->Intensity = XMFLOAT4(0.8f, 0.8f, 0.8f, 1.0f);
+	mDirLight->Direction =  XMFLOAT3(0.5773f, -0.5773f, 0.5773f);
 
 	mPointLight = new PointLight();
 	//mPointLight->Ambient = XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f);
@@ -436,27 +436,12 @@ void D3D11App::Update(const GameTimer &gt)
 	title = mClientTitle + L". FPS: " + std::to_wstring(fps);
 
 	SetWindowText(mMainWindow, title.c_str());
-
-	// Make the thing spin
-	XMFLOAT3 diag = XMFLOAT3(0.5773f, 0.5773f, 0.5773f);
-	XMVECTOR diagV;
-	diagV = XMLoadFloat3(&diag);
-
-	// Rotate the cube in y by the deltatime
-	XMFLOAT3 up = XMFLOAT3(0.0f, 1.0f, 0.0f);
-	XMVECTOR upV;
-	upV = XMLoadFloat3(&up);
-
-	XMMATRIX world;
-	mMeshes[0].GetWorldMatrix(world);
-	world = XMMatrixRotationAxis(upV, gt.DeltaTime() / 2.0f) * world;
-	//mMeshes[0].SetWorldMatrix(world);
 }
 
 void D3D11App::Draw(const GameTimer &gt)
 {
 	// Clear the RTV and DSV in preparation for drawing
-	md3dImmediateContext->ClearRenderTargetView(mRenderTargetView, DirectX::Colors::Black);
+	md3dImmediateContext->ClearRenderTargetView(mRenderTargetView, DirectX::Colors::CornflowerBlue);
 
 	md3dImmediateContext->ClearDepthStencilView(mDepthStencilView,
 		D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f,(UINT8) 0.0f);
