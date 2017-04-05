@@ -323,21 +323,43 @@ void D3D11App::Start()
 	mTimer.Reset();
 
 	//mMeshes = mContent->LoadFBX(md3dDevice, "res/fbx/light_demo.fbx", mNumMeshes);
-
-	mNumMeshes = 1;
+	size_t temp;
+	mNumMeshes = 13;
 	mMeshes = new Mesh[mNumMeshes];
-	mMeshes[0].Init(md3dDevice, Mesh::PrimativeShape::MESH_PLANE);
+	mMeshes[0] = *mContent->LoadFBX(md3dDevice, "res/fbx/sponza/sponza_skap.FBX", temp);
+	mMeshes[1] = *mContent->LoadFBX(md3dDevice, "res/fbx/sponza/sponza_S_ba.FBX", temp);
+	mMeshes[2] = *mContent->LoadFBX(md3dDevice, "res/fbx/sponza/sponza_St_kp.FBX", temp);
+	mMeshes[3] = *mContent->LoadFBX(md3dDevice, "res/fbx/sponza/sponza_STUB.FBX", temp);
+	mMeshes[4] = *mContent->LoadFBX(md3dDevice, "res/fbx/sponza/sponza_KAMEN.FBX", temp);
+	mMeshes[5] = *mContent->LoadFBX(md3dDevice, "res/fbx/sponza/sponza_KAMEN-stup.FBX", temp);
+	mMeshes[6] = *mContent->LoadFBX(md3dDevice, "res/fbx/sponza/sponza_PROZOR.FBX", temp);
+	mMeshes[7] = *mContent->LoadFBX(md3dDevice, "res/fbx/sponza/sponza_reljef.FBX", temp);
+	mMeshes[8] = *mContent->LoadFBX(md3dDevice, "res/fbx/sponza/sponza_Sp_luk.FBX", temp);
+	mMeshes[9] = *mContent->LoadFBX(md3dDevice, "res/fbx/sponza/sponza_vrata_ko.FBX", temp);
+	mMeshes[10] = *mContent->LoadFBX(md3dDevice, "res/fbx/sponza/sponza_vrata_kr.FBX", temp);
+	mMeshes[11] = *mContent->LoadFBX(md3dDevice, "res/fbx/sponza/sponza_x01_st.FBX", temp);
+	mMeshes[12] = *mContent->LoadFBX(md3dDevice, "res/fbx/sponza/sponza_UNKNOWN.FBX", temp);
 
-	//mNumMeshes = 1;
-	//mMeshes = new Mesh[1];
-	//mMeshes[0].Init(md3dDevice, Mesh::MESH_CUBE);
+	// mNumMeshes = 1;
+	// mMeshes = new Mesh[1];
+	// mMeshes[0].Init(md3dDevice, Mesh::MESH_CUBE);
 
-	mNumTextures = 1;
+	mNumTextures = 13;
 	mTextures = new Texture[mNumTextures];
 
-	const std::string filename = "res/tga/sponza/reljef.tga";
-
-	mContent->LoadTGA(md3dDevice, md3dImmediateContext, filename, mTextures[0]);
+	mContent->LoadTGA(md3dDevice, md3dImmediateContext, "res/tga/sponza/00_skap.tga", mTextures[0]);
+	mContent->LoadTGA(md3dDevice, md3dImmediateContext, "res/tga/sponza/01_S_ba.tga", mTextures[1]);
+	mContent->LoadTGA(md3dDevice, md3dImmediateContext, "res/tga/sponza/01_St_kp.tga", mTextures[2]);
+	mContent->LoadTGA(md3dDevice, md3dImmediateContext, "res/tga/sponza/01_STUB.tga", mTextures[3]);
+	mContent->LoadTGA(md3dDevice, md3dImmediateContext, "res/tga/sponza/KAMEN.tga", mTextures[4]);
+	mContent->LoadTGA(md3dDevice, md3dImmediateContext, "res/tga/sponza/KAMEN-stup.tga", mTextures[5]);
+	mContent->LoadTGA(md3dDevice, md3dImmediateContext, "res/tga/sponza/prozor1.tga", mTextures[6]);
+	mContent->LoadTGA(md3dDevice, md3dImmediateContext, "res/tga/sponza/reljef.tga", mTextures[7]);
+	mContent->LoadTGA(md3dDevice, md3dImmediateContext, "res/tga/sponza/sp_luk.tga", mTextures[8]);
+	mContent->LoadTGA(md3dDevice, md3dImmediateContext, "res/tga/sponza/vrata_ko.tga", mTextures[9]);
+	mContent->LoadTGA(md3dDevice, md3dImmediateContext, "res/tga/sponza/vrata_kr.tga", mTextures[10]);
+	mContent->LoadTGA(md3dDevice, md3dImmediateContext, "res/tga/sponza/x01_st.tga", mTextures[11]);
+	mContent->LoadTGA(md3dDevice, md3dImmediateContext, "res/tga/sponza/KAMEN-stup.tga", mTextures[12]);
 
 	mMainCamera = new Camera();
 
@@ -448,10 +470,12 @@ void D3D11App::Draw(const GameTimer &gt)
 
 	// onlyusing one material and texture, only need to update once
 	// when using multiple, render all meshes with material together. faster.
-	mLitShader->UpdateMaterial(md3dImmediateContext, mMaterial, mTextures[0].GetSRV());
+	//mLitShader->UpdateMaterial(md3dImmediateContext, mMaterial, mTextures[0].GetSRV());
 
 	for (size_t i = 0; i < mNumMeshes; i++)
 	{
+		mLitShader->UpdateMaterial(md3dImmediateContext, mMaterial, mTextures[i].GetSRV());
+
 		mMeshes[i].Render(md3dImmediateContext);
 		mMeshes[i].GetWorldMatrix(mWorld);
 

@@ -18,6 +18,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR pCmdLine, 
 	}
 	catch (std::exception e)
 	{
+		MessageBox(NULL, L"Something went wrong.", L"ERROR", NULL);
 		return 0;
 	}
 }
