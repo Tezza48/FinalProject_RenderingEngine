@@ -43,8 +43,8 @@ public:
 	int GetIndexCount();
 	void XM_CALLCONV GetWorldMatrix(XMMATRIX &other);
 	void XM_CALLCONV SetWorldMatrix(XMMATRIX world);
-	//void SetMaterial(ColorMaterial *material);
-	//ColorMaterial *GetMaterial();
+	void SetMaterial(Material *material);
+	Material *GetMaterial();
 
 private:
 	//bool InitBuffers(ID3D11Device*);
@@ -55,5 +55,5 @@ private:
 	XMMATRIX mWorld;
 	ID3D11Buffer *mVertexBuffer, *mIndexBuffer;
 	int mVertexCount, mIndexCount;
-	//ColorMaterial *mMaterial;
+	Material *mMaterial;
 };

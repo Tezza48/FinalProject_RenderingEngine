@@ -17,8 +17,6 @@ D3D11App::D3D11App()
 
 	mLitShader = nullptr;
 
-	mMaterial = nullptr;
-
 	mDirLight = nullptr;
 	mPointLight = nullptr;
 	mSpotLight = nullptr;
@@ -340,10 +338,6 @@ void D3D11App::Start()
 	mMeshes[11] = *mContent->LoadFBX(md3dDevice, "res/fbx/sponza/sponza_x01_st.FBX", temp);
 	mMeshes[12] = *mContent->LoadFBX(md3dDevice, "res/fbx/sponza/sponza_UNKNOWN.FBX", temp);
 
-	// mNumMeshes = 1;
-	// mMeshes = new Mesh[1];
-	// mMeshes[0].Init(md3dDevice, Mesh::MESH_CUBE);
-
 	mNumTextures = 13;
 	mTextures = new Texture[mNumTextures];
 
@@ -363,6 +357,11 @@ void D3D11App::Start()
 	mContent->LoadTGA(md3dDevice, md3dImmediateContext, "res/tga/sponza/x01_st.tga", mTextures[11]);
 	mContent->LoadTGA(md3dDevice, md3dImmediateContext, "res/tga/sponza/KAMEN-stup.tga", mTextures[12]);
 
+	for (size_t i = 0; i < 13; i++)
+	{
+		mMeshes[i].SetMaterial(new Material{ XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f), XMFLOAT4(0.01f, 0.01f, 0.01f, 1.0f) });
+	}
+
 	mMainCamera = new Camera();
 
 	// Set up the camera's projection
@@ -379,10 +378,6 @@ void D3D11App::Start()
 
 	XMMATRIX  V = XMMatrixLookAtLH(pos, target, up);
 	mMainCamera->SetViewMatrix(V);
-
-	mMaterial = new Material();
-	mMaterial->Emmissive = XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f);
-	mMaterial->Specular = XMFLOAT4(0.01f, 0.01f, 0.01f, 1.0f);
 
 	mDirLight = new DirectionalLight();
 	mDirLight->Ambient = XMFLOAT4(0.1f, 0.1f, 0.1f, 1.0f);
@@ -461,7 +456,7 @@ void D3D11App::Draw(const GameTimer &gt)
 
 	for (size_t i = 0; i < mNumMeshes; i++)
 	{
-		mLitShader->UpdateMaterial(md3dImmediateContext, mMaterial, mTextures[i].GetSRV());
+		mLitShader->UpdateMaterial(md3dImmediateContext, mMeshes[i].GetMaterial(), mTextures[i].GetSRV());
 
 		mMeshes[i].Render(md3dImmediateContext);
 		mMeshes[i].GetWorldMatrix(mWorld);

@@ -16,6 +16,11 @@ using namespace DirectX;
 // with ambient, direct, point and spotlights
 class LitShader
 {
+	struct ShaderMat
+	{
+		XMFLOAT4 Emissive;
+		XMFLOAT4 Specular;
+	};
 	struct PerObjectBuffer// Buffer 0
 	{
 		XMMATRIX World;

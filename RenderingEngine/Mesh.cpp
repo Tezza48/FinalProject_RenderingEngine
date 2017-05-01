@@ -4,7 +4,7 @@ Mesh::Mesh()
 {
 	mVertexBuffer = nullptr;
 	mIndexBuffer = nullptr;
-	//mMaterial = nullptr;
+	mMaterial = nullptr;
 
 	mWorld = XMMatrixIdentity();
 }
@@ -426,15 +426,15 @@ void XM_CALLCONV Mesh::SetWorldMatrix(XMMATRIX world)
 	mWorld = world;
 }
 
-//void Mesh::SetMaterial(ColorMaterial * material)
-//{
-//	//mMaterial = material;
-//}
+void Mesh::SetMaterial(Material * material)
+{
+	mMaterial = material;
+}
 
-//ColorMaterial * Mesh::GetMaterial()
-//{
-//	//return mMaterial;
-//}
+Material * Mesh::GetMaterial()
+{
+	return mMaterial;
+}
 
 bool Mesh::InitBuffers(ID3D11Device *device, 
 	Vertex *vertices, unsigned long numVertices, 
