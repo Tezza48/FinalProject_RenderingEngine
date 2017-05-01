@@ -38,7 +38,7 @@ class LitShader
 
 	struct PerMaterialBuffer// Buffer 2
 	{
-		Material Mat;// Object Material
+		ShaderMat Mat;// Object Material
 	};
 
 public:
@@ -51,7 +51,7 @@ public:
 		DirectionalLight *directional, 
 		PointLight *point, SpotLight *spot, 
 		XMFLOAT4 eyePos);
-	void UpdateMaterial(ID3D11DeviceContext *deviceContext, Material *material, ID3D11ShaderResourceView *texture);
+	void UpdateMaterial(ID3D11DeviceContext *deviceContext, Material *material);
 
 private:
 	ID3D11VertexShader *mVertexShader;

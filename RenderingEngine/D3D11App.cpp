@@ -357,9 +357,19 @@ void D3D11App::Start()
 	mContent->LoadTGA(md3dDevice, md3dImmediateContext, "res/tga/sponza/x01_st.tga", mTextures[11]);
 	mContent->LoadTGA(md3dDevice, md3dImmediateContext, "res/tga/sponza/KAMEN-stup.tga", mTextures[12]);
 
-	for (size_t i = 0; i < 13; i++)
+	for (size_t i = 0; i < mNumMeshes; i++)
 	{
-		mMeshes[i].SetMaterial(new Material{ XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f), XMFLOAT4(0.01f, 0.01f, 0.01f, 1.0f) });
+		// Material we will use for that mesh
+		Material *tempMat = new Material();
+
+		// Texture to referance in the material
+		tempMat->texDiffuse = &mTextures[i];
+
+		// Not bothering to set individual values for each mesh
+		tempMat->colEmmissive = XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f);
+		tempMat->colSpecular = XMFLOAT4(0.01f, 0.01f, 0.01f, 1.0f);
+			
+		mMeshes[i].SetMaterial(tempMat);
 	}
 
 	mMainCamera = new Camera();
@@ -450,13 +460,11 @@ void D3D11App::Draw(const GameTimer &gt)
 	mMainCamera->GetViewMatrix(mView);
 	mMainCamera->GetProjectionMatrix(mProjection);
 
-	// onlyusing one material and texture, only need to update once
 	// when using multiple, render all meshes with material together. faster.
-	//mLitShader->UpdateMaterial(md3dImmediateContext, mMaterial, mTextures[0].GetSRV());
 
 	for (size_t i = 0; i < mNumMeshes; i++)
 	{
-		mLitShader->UpdateMaterial(md3dImmediateContext, mMeshes[i].GetMaterial(), mTextures[i].GetSRV());
+		mLitShader->UpdateMaterial(md3dImmediateContext, mMeshes[i].GetMaterial());
 
 		mMeshes[i].Render(md3dImmediateContext);
 		mMeshes[i].GetWorldMatrix(mWorld);

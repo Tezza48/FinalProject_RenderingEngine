@@ -232,7 +232,7 @@ void XM_CALLCONV LitShader::UpdateFrame(ID3D11DeviceContext *deviceContext,
 	deviceContext->PSSetConstantBuffers(1, 1, &mPerFrameBuffer);
 }
 
-void LitShader::UpdateMaterial(ID3D11DeviceContext * deviceContext, Material * material, ID3D11ShaderResourceView * texture)
+void LitShader::UpdateMaterial(ID3D11DeviceContext * deviceContext, Material * material)
 {
 	// update the material
 	HRESULT hr;
@@ -243,11 +243,14 @@ void LitShader::UpdateMaterial(ID3D11DeviceContext * deviceContext, Material * m
 	DX::ThrowIfFailed(hr);
 
 	pMaterialBuffer = (PerMaterialBuffer*)mappedResource.pData;
-	pMaterialBuffer->Mat = *material;
+	pMaterialBuffer->Mat.Emissive = material->colEmmissive;
+	pMaterialBuffer->Mat.Specular = material->colSpecular;
 	deviceContext->Unmap(mPerMaterialBuffer, 0);
 
 	deviceContext->PSSetConstantBuffers(2, 1, &mPerMaterialBuffer);
 
-	deviceContext->PSSetShaderResources(0, 1, &texture);
+	ID3D11ShaderResourceView *textureView = material->texDiffuse->GetSRV();
+
+	deviceContext->PSSetShaderResources(0, 1, &textureView);
 	deviceContext->PSSetSamplers(0, 1, &mSamplerState);
 }
