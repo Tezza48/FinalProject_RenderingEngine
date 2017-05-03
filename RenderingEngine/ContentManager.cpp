@@ -5,13 +5,6 @@ ContentManager::ContentManager()
 	mFbxManager = FbxManager::Create();
 
 	mFbxIOS = FbxIOSettings::Create(mFbxManager, IOSROOT);
-	//mFBXIOSMeshOnly->SetBoolProp(IMP_FBX_MATERIAL, false);
-	//mFBXIOSMeshOnly->SetBoolProp(IMP_FBX_TEXTURE, false);
-	//mFBXIOSMeshOnly->SetBoolProp(IMP_FBX_LINK, false);
-	//mFBXIOSMeshOnly->SetBoolProp(IMP_FBX_SHAPE, true);
-	//mFBXIOSMeshOnly->SetBoolProp(IMP_FBX_GOBO, false);
-	//mFBXIOSMeshOnly->SetBoolProp(IMP_FBX_ANIMATION, false);
-	//mFBXIOSMeshOnly->SetBoolProp(IMP_FBX_GLOBAL_SETTINGS, false);
 
 	mFbxManager->SetIOSettings(mFbxIOS);
 }
@@ -49,10 +42,9 @@ Mesh *ContentManager::LoadFBX(ID3D11Device *device, std::string pFilename, size_
 
 	Mesh::Vertex *vertices;
 
-	FbxVector4 *controlPoints;// vertex positions. dont need to know how many because polygon vertices does (kinda)
-	size_t numControlPoints;//number of polygon vertices (the indices that point to control points)
-	size_t polygonCount;// control point indices for each vertex
-	//FbxArray<FbxVector4> polyVertNrms;//polygon vertex normals
+	FbxVector4 *controlPoints;
+	size_t numControlPoints;
+	size_t polygonCount;
 
 	//Control points are all the vertex positions (they are most likely used multiple times)
 	//Polygon vertices are the indices for each vertex's position (control point)
@@ -85,11 +77,10 @@ Mesh *ContentManager::LoadFBX(ID3D11Device *device, std::string pFilename, size_
 
 				for (size_t currentVertex = 0; currentVertex < 3; currentVertex++)
 				{
-					vertices[currentPolygon * 3 + currentVertex].position = FbxToDxVec3(controlPoints[meshes[i]->GetPolygonVertex(currentPolygon, currentVertex)], true);
-					//vertices[currentPolygon * 3 + currentVertex].position.z *= -1;
+					vertices[currentPolygon * 3 + currentVertex].position = FbxToDxVec3(controlPoints[meshes[i]->GetPolygonVertex(currentPolygon, currentVertex)]);
 				
 					meshes[i]->GetPolygonVertexNormal(currentPolygon, currentVertex, currentNormal);
-					vertices[currentPolygon * 3 + currentVertex].normal = FbxToDxVec3(currentNormal, true);
+					vertices[currentPolygon * 3 + currentVertex].normal = FbxToDxVec3(currentNormal);
 
 					meshes[i]->GetPolygonVertexUV(currentPolygon, currentVertex, uvName, currentUV, isMapped);
 					vertices[currentPolygon * 3 + currentVertex].tex = FbxToDxVec2(currentUV);
@@ -171,10 +162,6 @@ void ContentManager::LoadTGA(ID3D11Device *device, ID3D11DeviceContext *deviceCo
 			// convert from BGR to RGB
 			for (size_t texel = 0; texel < (size_t)header.width * (size_t)header.height * 4; texel+=4)
 			{
-				//char r = rawImageData[texel + 2];
-				//char g = rawImageData[texel + 1];
-				//char b = rawImageData[texel + 0];
-				//char a = rawImageData[texel + 3];
 				finalImageData[texel + 0] = rawImageData[texel + 2];
 				finalImageData[texel + 1] = rawImageData[texel + 1];
 				finalImageData[texel + 2] = rawImageData[texel + 0];
@@ -232,16 +219,9 @@ XMFLOAT2 ContentManager::FbxToDxVec2(const FbxVector2 & other)
 	return XMFLOAT2((float)other[0], (float)other[1]);
 }
 
-XMFLOAT3 ContentManager::FbxToDxVec3(const FbxVector4 & other, bool convertAxes/* Swap y and z */)
+XMFLOAT3 ContentManager::FbxToDxVec3(const FbxVector4 & other)
 {
-	//if (convertAxes)
-	//{
-	//	return XMFLOAT3((float)other[0], (float)other[2], (float)other[1]);
-	//}
-	//else
-	//{
-		return XMFLOAT3((float)other[0], (float)other[1], (float)other[2]);
-	//}
+	return XMFLOAT3((float)other[0], (float)other[1], (float)other[2]);
 }
 
 XMFLOAT4 ContentManager::FbxToDxVec4(const FbxVector4 & other)

@@ -377,9 +377,6 @@ void D3D11App::Start()
 	// Set up the camera's projection
 	mMainCamera->CreateProjection(XM_PI / 2.0f, AspectRatio(), 0.1f, 100.0f);
 
-	//XMVECTOR pos = XMVectorSet(-18.0f, 1.5f, 0.0f, 1.0f);
-	//XMVECTOR rot = XMVectorSet(67.0f, -52.0f, 0.0f, 1.0f);
-
 	XMFLOAT4 targetXMFloat = XMFLOAT4(0.0f, 4.0f, 2.0f, 1.0f); 
 
 	XMVECTOR pos = XMVectorSet(-7.0f, 1.8f, -2.0f, 1.0f);
@@ -446,7 +443,7 @@ void D3D11App::Update(const GameTimer &gt)
 void D3D11App::Draw(const GameTimer &gt)
 {
 	// Clear the RTV and DSV in preparation for drawing
-	md3dImmediateContext->ClearRenderTargetView(mRenderTargetView, DirectX::Colors::Black); // nice sky colour
+	md3dImmediateContext->ClearRenderTargetView(mRenderTargetView, DirectX::Colors::Black);
 
 	md3dImmediateContext->ClearDepthStencilView(mDepthStencilView,
 		D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f,(UINT8) 0.0f);
