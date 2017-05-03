@@ -10,12 +10,12 @@
 #include <DirectXMath.h>
 #include <DirectXColors.h>
 #include "IRenderFramework.h"
-#include "ContentManager.h"
 #include "Mesh.h"
 #include "Camera.h"
 #include "LitShader.h"
 #include "Material.h"
 #include "utils.h"
+#include "Scene.h"
 
 #pragma comment(lib, "d3d11.lib")
 #pragma comment(lib, "d3dx11.lib")
@@ -30,32 +30,11 @@ class D3D11App : IRenderFramework
 {
 	bool mIsRunning;
 
-	ContentManager *mContent;
-
-	size_t mNumMeshes;
-	Mesh *mMeshes; // an array of meshes;
-
-	size_t mNumTextures;
-	Texture *mTextures;
-
-	// Main Camera (only camera)
-	Camera *mMainCamera;
-
-	// Class with vertex color VS and PS
-	LitShader *mLitShader;
-
-	DirectionalLight *mDirLight;
-	PointLight *mPointLight;
-	SpotLight *mSpotLight;
-
-	// we're rotating mCube for the demonstration
-	float triRotY = 0.0f;
-
-	// Matrices we use when rendering
-	XMMATRIX mWorld, mView, mProjection, mWorldViewProj, mWorldInvTrans;
-
 	// Rasterizer state i'm using to debug stuff
 	ID3D11RasterizerState *mRS;
+
+public:
+	LitShader *mLitShader;
 
 private:
 	// Singleton of this app
@@ -80,6 +59,8 @@ private:
 	bool m4xMsaaState = true;
 	UINT m4xMsaaQuality = 1;
 
+	class Scene *mScene;
+
 	// Set up the Window
 	bool InitWindowsApp(HINSTANCE hInstance, int nShowCmd);
 	// Initialize Direct 3D components
@@ -93,14 +74,8 @@ private:
 	// Draw/Render the scene
 	void Draw(const GameTimer &gt) override;
 
-	// Helper Method to get the Aspect Ratio
-	float AspectRatio();
 	// What to do when the Window is resized
 	void OnResize(bool isRunning = true);
-
-	// width, height and title of the window
-	int mClientWidth = 1600, mClientHeight = 900;// 1600 900
-	std::wstring mClientTitle = L"DX11 Rendering Engine";
 	
 public:
 	D3D11App();
