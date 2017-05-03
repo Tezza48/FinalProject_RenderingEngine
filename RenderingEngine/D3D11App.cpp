@@ -341,21 +341,19 @@ void D3D11App::Start()
 	mNumTextures = 13;
 	mTextures = new Texture[mNumTextures];
 
-	//mContent->LoadTGA(md3dDevice, md3dImmediateContext, "res/tga/debug32.tga", mTextures[0]);
-
-	mContent->LoadTGA(md3dDevice, md3dImmediateContext, "res/tga/sponza/00_skap.tga", mTextures[0]);
-	mContent->LoadTGA(md3dDevice, md3dImmediateContext, "res/tga/sponza/01_S_ba.tga", mTextures[1]);
-	mContent->LoadTGA(md3dDevice, md3dImmediateContext, "res/tga/sponza/01_St_kp.tga", mTextures[2]);
-	mContent->LoadTGA(md3dDevice, md3dImmediateContext, "res/tga/sponza/01_STUB.tga", mTextures[3]);
-	mContent->LoadTGA(md3dDevice, md3dImmediateContext, "res/tga/sponza/KAMEN.tga", mTextures[4]);
-	mContent->LoadTGA(md3dDevice, md3dImmediateContext, "res/tga/sponza/KAMEN-stup.tga", mTextures[5]);
-	mContent->LoadTGA(md3dDevice, md3dImmediateContext, "res/tga/sponza/prozor1.tga", mTextures[6]);
-	mContent->LoadTGA(md3dDevice, md3dImmediateContext, "res/tga/sponza/reljef.tga", mTextures[7]);
-	mContent->LoadTGA(md3dDevice, md3dImmediateContext, "res/tga/sponza/sp_luk.tga", mTextures[8]);
-	mContent->LoadTGA(md3dDevice, md3dImmediateContext, "res/tga/sponza/vrata_ko.tga", mTextures[9]);
-	mContent->LoadTGA(md3dDevice, md3dImmediateContext, "res/tga/sponza/vrata_kr.tga", mTextures[10]);
-	mContent->LoadTGA(md3dDevice, md3dImmediateContext, "res/tga/sponza/x01_st.tga", mTextures[11]);
-	mContent->LoadTGA(md3dDevice, md3dImmediateContext, "res/tga/sponza/KAMEN-stup.tga", mTextures[12]);
+	mTextures[0] = *mContent->LoadTGA(md3dDevice, md3dImmediateContext, "res/tga/sponza/00_skap.tga");
+	mTextures[1] = *mContent->LoadTGA(md3dDevice, md3dImmediateContext, "res/tga/sponza/01_S_ba.tga");
+	mTextures[2] = *mContent->LoadTGA(md3dDevice, md3dImmediateContext, "res/tga/sponza/01_St_kp.tga");
+	mTextures[3] = *mContent->LoadTGA(md3dDevice, md3dImmediateContext, "res/tga/sponza/01_STUB.tga");
+	mTextures[4] = *mContent->LoadTGA(md3dDevice, md3dImmediateContext, "res/tga/sponza/KAMEN.tga");
+	mTextures[5] = *mContent->LoadTGA(md3dDevice, md3dImmediateContext, "res/tga/sponza/KAMEN-stup.tga");
+	mTextures[6] = *mContent->LoadTGA(md3dDevice, md3dImmediateContext, "res/tga/sponza/prozor1.tga");
+	mTextures[7] = *mContent->LoadTGA(md3dDevice, md3dImmediateContext, "res/tga/sponza/reljef.tga");
+	mTextures[8] = *mContent->LoadTGA(md3dDevice, md3dImmediateContext, "res/tga/sponza/sp_luk.tga");
+	mTextures[9] = *mContent->LoadTGA(md3dDevice, md3dImmediateContext, "res/tga/sponza/vrata_ko.tga");
+	mTextures[10] = *mContent->LoadTGA(md3dDevice, md3dImmediateContext, "res/tga/sponza/vrata_kr.tga");
+	mTextures[11] = *mContent->LoadTGA(md3dDevice, md3dImmediateContext, "res/tga/sponza/x01_st.tga");
+	mTextures[12] = *mContent->LoadTGA(md3dDevice, md3dImmediateContext, "res/tga/sponza/KAMEN-stup.tga");
 
 	for (size_t i = 0; i < mNumMeshes; i++)
 	{

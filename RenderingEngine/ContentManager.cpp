@@ -104,7 +104,7 @@ Mesh *ContentManager::LoadFBX(ID3D11Device *device, std::string pFilename, size_
 	return output;
 }
 
-void ContentManager::LoadTGA(ID3D11Device *device, ID3D11DeviceContext *deviceContext, const std::string filename, Texture &output)
+Texture *ContentManager::LoadTGA(ID3D11Device *device, ID3D11DeviceContext *deviceContext, const std::string filename)
 {
 	// http://www.cplusplus.com/reference/istream/istream/
 	std::ifstream is;
@@ -174,13 +174,16 @@ void ContentManager::LoadTGA(ID3D11Device *device, ID3D11DeviceContext *deviceCo
 		}
 
 
-		output.Init(device, deviceContext, finalImageData, header.width, header.height);
+		Texture *output = new Texture();
+		output->Init(device, deviceContext, finalImageData, header.width, header.height);
 
 		delete[] buffer;
 		buffer = nullptr;
 		rawImageData = nullptr; // imageData is part of buffer so it's already deleted.
 		delete[] finalImageData;
 		finalImageData = nullptr;
+
+		return output;
 	}
 	else
 	{
