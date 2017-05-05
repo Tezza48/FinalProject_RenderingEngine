@@ -1,7 +1,6 @@
 #pragma once
 
 #include <D3D11.h>
-#include "D3D11App.h"
 #include "Camera.h"
 #include "ContentManager.h"
 #include "GameTimer.h"
@@ -37,8 +36,7 @@ public:
 	Scene();
 	~Scene();
 
-	void Start(ID3D11Device *device, ID3D11DeviceContext *deviceContext);
+	void Start();
 	void Update(const GameTimer &gt);
 	void Draw(ID3D11DeviceContext *deviceContext);
 };
-

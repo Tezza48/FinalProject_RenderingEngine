@@ -1,17 +1,10 @@
-#include "D3D11App.h"
+#include "D3D11Graphics.h"
 
-D3D11App::D3D11App()
+D3D11Graphics::D3D11Graphics()
 {
-	assert(mApp == nullptr);
-	mApp = this;
-
-	mIsRunning = false;
-
 	mLitShader = nullptr;
 
 	mRS = nullptr;
-
-	mMainWindow = 0;
 
 	md3dDevice = nullptr;
 	md3dImmediateContext = nullptr;
@@ -20,15 +13,10 @@ D3D11App::D3D11App()
 	mDepthStencilBuffer = nullptr;
 	mRenderTargetView = nullptr;
 	mDepthStencilView = nullptr;
-
-	mScene = nullptr;
 }
 
-D3D11App::~D3D11App()
+D3D11Graphics::~D3D11Graphics()
 {
-	delete mScene;
-	mScene = nullptr;
-
 	mDepthStencilView->Release();
 	mRenderTargetView->Release();
 	mDepthStencilBuffer->Release();
@@ -41,70 +29,29 @@ D3D11App::~D3D11App()
 	
 	delete mLitShader;
 	mLitShader = nullptr;
-
-	mApp = nullptr;
 }
 
-bool D3D11App::Init(HINSTANCE hInstance, int nShowCmd)
+ID3D11Device * D3D11Graphics::GetDevice() const
 {
-	if (!InitWindowsApp(hInstance, nShowCmd))
-		return false;
-	if (!InitD3D())
+	return md3dDevice;
+}
+
+ID3D11DeviceContext * D3D11Graphics::GetImmediateContext() const
+{
+	return md3dImmediateContext;
+}
+
+bool D3D11Graphics::Init(HWND hwnd)
+{
+	if (!InitD3D(hwnd))
 		return false;
 
 	if (!InitPipeline())
 		return false;
-
-	Start();
-	mIsRunning = true;
 	return true;
 }
 
-// Standard Win32 initialization
-bool D3D11App::InitWindowsApp(HINSTANCE hInstance, int nShowCmd)
-{
-	WNDCLASS wc;
-	wc.style = CS_HREDRAW | CS_VREDRAW;
-	wc.lpfnWndProc = MainWndProc;
-	wc.cbClsExtra = 0;
-	wc.cbWndExtra = 0;
-	wc.hInstance = hInstance;
-	wc.hIcon = LoadIcon(0, IDI_APPLICATION);
-	wc.hCursor = LoadCursor(0, IDC_ARROW);
-	wc.hbrBackground = (HBRUSH)GetStockObject(WHITE_BRUSH);
-	wc.lpszMenuName = 0;
-	wc.lpszClassName = L"DX11RE";
-
-	if (!RegisterClass(&wc))
-	{
-		return false;//add message box
-	}
-
-	mMainWindow = CreateWindow(
-		L"DX11RE",
-		mClientTitle.c_str(),
-		WS_OVERLAPPEDWINDOW,
-		CW_USEDEFAULT,
-		CW_USEDEFAULT,
-		mClientWidth,
-		mClientHeight,
-		0,
-		0,
-		hInstance,
-		0);
-
-	if (mMainWindow == 0)
-	{
-		return false;//add message box
-	}
-
-	ShowWindow(mMainWindow, nShowCmd);
-	UpdateWindow(mMainWindow);
-
-	return true;
-}
-
-bool D3D11App::InitD3D()
+bool D3D11Graphics::InitD3D(HWND hwnd)
 {
 
 	UINT createDeviceFlags = 0;
@@ -148,17 +95,15 @@ bool D3D11App::InitD3D()
 	assert(m4xMsaaQuality > 0);
 
 	// For ease (and laziness) We initialize the rest by calling OnResize
-	OnResize(mIsRunning);
+	OnResize(hwnd);
 
 	return true;
 }
 
 // Resize the buffers we're using
 // If it's running, also remake the camera's projection.
-void D3D11App::OnResize(bool isRunning)
+void D3D11Graphics::OnResize(HWND hwnd)
 {
-	
-
 	// Describe the Swap Chain
 	DXGI_SWAP_CHAIN_DESC sd;
 	sd.BufferDesc.Width = mClientWidth;
@@ -172,7 +117,7 @@ void D3D11App::OnResize(bool isRunning)
 	sd.SampleDesc.Quality = m4xMsaaState ? (m4xMsaaQuality - 1) : 0;//?: is a little neather here
 	sd.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
 	sd.BufferCount = 1;
-	sd.OutputWindow = mMainWindow;
+	sd.OutputWindow = hwnd;
 	sd.Windowed = true;
 	sd.SwapEffect = DXGI_SWAP_EFFECT_DISCARD;
 	sd.Flags = 0;
@@ -190,7 +135,7 @@ void D3D11App::OnResize(bool isRunning)
 	
 
 	ThrowIfFailed(dxgiFactory->CreateSwapChain(md3dDevice, &sd, &mSwapChain));
-	dxgiFactory->MakeWindowAssociation(mMainWindow, /*DXGI_MWA_NO_ALT_ENTER*/0);
+	dxgiFactory->MakeWindowAssociation(hwnd, /*DXGI_MWA_NO_ALT_ENTER*/0);
 
 	// release the helper objects
 	dxgiDevice->Release();
@@ -242,14 +187,9 @@ void D3D11App::OnResize(bool isRunning)
 	vp.MaxDepth = 1.0f;
 
 	md3dImmediateContext->RSSetViewports(1, &vp);
-
-	if (isRunning)
-	{
-		mScene->mMainCamera->ResizeAspectRatio((float)(mClientWidth) / (float)(mClientHeight));
-	}
 }
 
-bool D3D11App::InitPipeline()
+bool D3D11Graphics::InitPipeline()
 {
 	// Rasterizer Description.
 	// Only using it for quick debugging.
@@ -273,108 +213,27 @@ bool D3D11App::InitPipeline()
 	// Initialize the basic shader we're using
 	if (!mLitShader->Init(md3dDevice))
 	{
-		MessageBox(mMainWindow, L"Could not initialize the Lit Color Shader object", L"ERROR", MB_OK);
+		MessageBox(NULL, L"Could not initialize the Lit Color Shader object", L"ERROR", MB_OK);
 		return false;
 	}
 
 	return true;
 }
 
-void D3D11App::Start()
-{
-	// Set up the Game timer
-	mTimer = GameTimer();
-	mTimer.Reset();
-
-
-
-}
-
-int D3D11App::Run()
-{
-	MSG msg = { 0 };
-	while (msg.message != WM_QUIT)
-	{
-		if (PeekMessage(&msg, 0, 0, 0, PM_REMOVE))
-		{
-			TranslateMessage(&msg);
-			DispatchMessage(&msg);
-		}
-		else
-		{
-			mTimer.Tick();
-			Update(mTimer);
-			Draw(mTimer);
-		}
-	}
-	return (int)msg.wParam;
-}
-
-void D3D11App::Update(const GameTimer &gt)
-{
-	// Adding the FPS to the window title
-	std::wstring title;
-
-	int fps = (int)(1.0f / gt.DeltaTime());	
-	title = mClientTitle + L". FPS: " + std::to_wstring(fps);
-
-	SetWindowText(mMainWindow, title.c_str());
-}
-
-void D3D11App::Draw(const GameTimer &gt)
-{
+void D3D11Graphics::DrawBegin()
+{	
 	// Clear the RTV and DSV in preparation for drawing
 	md3dImmediateContext->ClearRenderTargetView(mRenderTargetView, DirectX::Colors::Black);
 
 	md3dImmediateContext->ClearDepthStencilView(mDepthStencilView,
-		D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f,(UINT8) 0.0f);
+		D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, (UINT8) 0.0f);
 
 	// Set the rasterizer state to our settings
 	md3dImmediateContext->RSSetState(mRS);
+}
 
-
-
+void D3D11Graphics::DrawEnd()
+{
 	// present the back buffer
 	mSwapChain->Present(0, 0);
-}
-
-
-LRESULT CALLBACK MainWndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
-{
-	return D3D11App::GetApp()->WndProc(hWnd, msg, wParam, lParam);
-}
-
-LRESULT CALLBACK D3D11App::WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
-{
-	switch (msg)
-	{
-	case WM_KEYDOWN:
-		if (wParam == VK_ESCAPE)
-			DestroyWindow(mMainWindow);
-		return 0;
-	case WM_DESTROY:
-		PostQuitMessage(0);
-		return 0;
-	case WM_ENTERSIZEMOVE:
-		mTimer.Stop();
-		return 0;
-	case WM_EXITSIZEMOVE:
-		mTimer.Start();
-		return 0;
-	case WM_SIZE:
-		if (mIsRunning)
-		{
-			mClientWidth = LOWORD(lParam);
-			mClientHeight = HIWORD(lParam);
-			OnResize(true);
-		}
-		return 0;
-	}
-	return DefWindowProc(hWnd, msg, wParam, lParam);
-}
-
-D3D11App *D3D11App::mApp = nullptr;
-D3D11App *D3D11App::GetApp()
-{
-	return mApp;
 }

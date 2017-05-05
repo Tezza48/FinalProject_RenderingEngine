@@ -6,7 +6,6 @@
 #include <STRING>
 #include <D3D11.h>
 #include <D3DX11.h>
-//#include <D3DX10.h>
 #include <DirectXMath.h>
 #include <DirectXColors.h>
 #include "IRenderFramework.h"
@@ -15,7 +14,6 @@
 #include "LitShader.h"
 #include "Material.h"
 #include "utils.h"
-#include "Scene.h"
 
 #pragma comment(lib, "d3d11.lib")
 #pragma comment(lib, "d3dx11.lib")
@@ -23,13 +21,8 @@
 using namespace DirectX;
 using namespace DX;
 
-// Global Message procedure, redirects to the class's message proc
-LRESULT CALLBACK MainWndProc(HWND, UINT, WPARAM, LPARAM);
-
-class D3D11App : IRenderFramework
+class D3D11Graphics : IRenderFramework
 {
-	bool mIsRunning;
-
 	// Rasterizer state i'm using to debug stuff
 	ID3D11RasterizerState *mRS;
 
@@ -37,12 +30,6 @@ public:
 	LitShader *mLitShader;
 
 private:
-	// Singleton of this app
-	static D3D11App *mApp;
-
-	// Main Window handle
-	HWND mMainWindow;
-
 	// DirextX 11 Device
 	ID3D11Device *md3dDevice;
 	// DirectX 11 Context
@@ -59,37 +46,25 @@ private:
 	bool m4xMsaaState = true;
 	UINT m4xMsaaQuality = 1;
 
-	class Scene *mScene;
-
-	// Set up the Window
-	bool InitWindowsApp(HINSTANCE hInstance, int nShowCmd);
 	// Initialize Direct 3D components
-	bool InitD3D();
+	bool InitD3D(HWND hwnd);
 	// Initialize Specific pipeline objects
 	bool InitPipeline();
-	// Set up misc things
-	void Start() override;
-	// Update the scene (objects, variables, other stuff)
-	void Update(const GameTimer &gt) override;
-	// Draw/Render the scene
-	void Draw(const GameTimer &gt) override;
-
-	// What to do when the Window is resized
-	void OnResize(bool isRunning = true);
 	
 public:
-	D3D11App();
-	virtual ~D3D11App();
+	D3D11Graphics();
+	virtual ~D3D11Graphics();
 
-	// get the singleton of this app
-	static D3D11App *GetApp();
+	ID3D11Device *GetDevice() const;
+	ID3D11DeviceContext *GetImmediateContext() const;
 
-	// Window Message Procedure
-	LRESULT CALLBACK WndProc(HWND, UINT, WPARAM, LPARAM);
+	// Draw/Render the scene
+	void DrawBegin();
+	void DrawEnd();
+
+	// What to do when the Window is resized
+	void OnResize(HWND hwnd);
 	
 	// Initialize the app
-	bool Init(HINSTANCE hInstance, int nShowCmd);
-
-	// Start the main loop
-	int Run();
+	bool Init(HWND hwnd);
 };
