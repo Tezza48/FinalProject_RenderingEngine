@@ -44,15 +44,6 @@ class ContentManager
 		unsigned char imageDescriptorByte;//should be set to 0 says paul bourke
 	};
 
-	//struct JpegData
-	//{
-	//	JpegData() { ZeroMemory(this, sizeof(this)); }
-	//	char* marker;
-	//	short width;
-	//	short height;
-
-	//};
-
 private:
 	FbxManager *mFbxManager;
 

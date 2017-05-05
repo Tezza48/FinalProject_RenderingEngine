@@ -4,9 +4,6 @@
     <ClCompile Include="Camera.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="D3D11App.cpp">
-      <Filter>Source Files\Framework</Filter>
-    </ClCompile>
     <ClCompile Include="GameTimer.cpp">
       <Filter>Source Files\Framework</Filter>
     </ClCompile>
@@ -34,6 +31,18 @@
     <ClCompile Include="LitShader.cpp">
       <Filter>Source Files\ShaderClasses</Filter>
     </ClCompile>
+    <ClCompile Include="Scene.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="SceneObject.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="NoobieEngine.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D3D11Graphics.cpp">
+      <Filter>Source Files\Framework</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Camera.h">
@@ -50,9 +59,6 @@
     </ClInclude>
     <ClInclude Include="FilePathMacros.h">
       <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="D3D11App.h">
-      <Filter>Header Files\Framework</Filter>
     </ClInclude>
     <ClInclude Include="ContentManager.h">
       <Filter>Header Files\Framework</Filter>
@@ -74,6 +80,18 @@
     </ClInclude>
     <ClInclude Include="LitShader.h">
       <Filter>Header Files\ShaderClasses</Filter>
+    </ClInclude>
+    <ClInclude Include="Scene.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="SceneObject.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="NoobieEngine.h">
+      <Filter>Header Files\Framework</Filter>
+    </ClInclude>
+    <ClInclude Include="D3D11Graphics.h">
+      <Filter>Header Files\Framework</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
