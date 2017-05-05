@@ -20,10 +20,10 @@ protected:
 public:
 	// Stuff that's going to change
 private:
-	int mNumMeshes;
+	size_t mNumMeshes;
 	Mesh *mMeshes;
 
-	int mNumTextures;
+	size_t mNumTextures;
 	Texture *mTextures;
 
 	DirectionalLight *mDirLight;
@@ -42,8 +42,8 @@ public:
 	D3D11Graphics *GetGraphics() const;
 	GameTimer GetTimer() const;
 
-	bool Init(HWND hwnd);
-	bool Run();
+	bool Init(HWND hwnd, int width, int height);
+	void OnResize(HWND hwnd, int width, int height);
 
 	void Start();
 	void Update();

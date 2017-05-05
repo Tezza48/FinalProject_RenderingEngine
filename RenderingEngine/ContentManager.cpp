@@ -35,6 +35,8 @@ Mesh *ContentManager::LoadFBX(ID3D11Device *device, std::string pFilename, size_
 
 	FbxAxisSystem::DirectX.ConvertScene(scene);
 
+	//FbxSystemUnit::m.ConvertScene(scene);
+
 	FbxArray<FbxMesh*> meshes = GetAllMeshesReccursive(scene->GetRootNode());
 
 	numMeshes = meshes.GetCount();

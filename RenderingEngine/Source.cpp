@@ -12,7 +12,7 @@ HWND gMainWindow;
 bool gIsRunning = false;
 
 std::wstring gClientTitle = L"Noobie Engine";
-int gClientWidth = 1600, gClientHeight = 900;
+//int gClientWidth = 1600, gClientHeight = 900;
 
 LRESULT CALLBACK MainWndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
@@ -34,16 +34,16 @@ LRESULT CALLBACK MainWndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 	case WM_SIZE:
 		if (gIsRunning)
 		{
-			::gClientWidth = LOWORD(lParam);
-			::gClientHeight = HIWORD(lParam);
-			gEngine.GetGraphics()->OnResize(gMainWindow);
+			int width = LOWORD(lParam);
+			int height = HIWORD(lParam);
+			gEngine.OnResize(gMainWindow, width, height);
 		}
 		return 0;
 	}
 	return DefWindowProc(hWnd, msg, wParam, lParam);
 }
 
-bool InitWindowsApp(HINSTANCE hInstance, int nShowCmd)
+bool InitWindowsApp(HINSTANCE hInstance, int nShowCmd, int width, int height)
 {
 	WNDCLASS wc;
 	wc.style = CS_HREDRAW | CS_VREDRAW;
@@ -68,8 +68,8 @@ bool InitWindowsApp(HINSTANCE hInstance, int nShowCmd)
 		WS_OVERLAPPEDWINDOW,
 		CW_USEDEFAULT,
 		CW_USEDEFAULT,
-		::gClientWidth,
-		::gClientHeight,
+		width,
+		height,
 		0,
 		0,
 		hInstance,
@@ -107,14 +107,18 @@ bool Run()
 
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR pCmdLine, int nShowCmd)
 {
+	int width = 1600, height = 900;
 	try
 	{
-		if (!InitWindowsApp(hInstance, nShowCmd))
+		if (!InitWindowsApp(hInstance, nShowCmd, width, height))
 			throw std::exception();
 
-		if (!gEngine.Init(gMainWindow))
+		if (!gEngine.Init(gMainWindow, width, height))
 			throw std::exception();
 		gEngine.Start();
+
+		gIsRunning = true;
+		
 		return Run();
 	}
 	catch (std::exception e)

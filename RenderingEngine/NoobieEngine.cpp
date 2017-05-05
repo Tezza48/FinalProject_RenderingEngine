@@ -28,19 +28,24 @@ GameTimer NoobieEngine::GetTimer() const
 	return mTimer;
 }
 
-bool NoobieEngine::Init(HWND hwnd)
+bool NoobieEngine::Init(HWND hwnd, int width, int height)
 {
 	mGraphics = new D3D11Graphics();
-	if (!mGraphics->Init(hwnd))
+	if (!mGraphics->Init(hwnd, width, height))
 		return false;
+
 	mContent = new ContentManager();
+
 	mTimer = GameTimer();
+	mTimer.Reset();
+
 	return true;
 }
 
-bool NoobieEngine::Run()
+void NoobieEngine::OnResize(HWND hwnd, int width, int height)
 {
-	return false;
+	mGraphics->OnResize(hwnd, width, height);
+	mMainCamera->ResizeAspectRatio((float)width / (float)height);
 }
 
 void NoobieEngine::Start()
@@ -49,41 +54,12 @@ void NoobieEngine::Start()
 	mContent = new ContentManager();
 	// Initialize Scene Objects Here
 
+	mMeshes = mContent->LoadFBX(mGraphics->GetDevice(), "res/fbx/cratepallet_01.FBX", mNumMeshes);
 
-	//mMeshes = mContent->LoadFBX(md3dDevice, "res/fbx/light_demo.fbx", mNumMeshes);
-	size_t temp;
-	mNumMeshes = 13;
-	mMeshes = new Mesh[mNumMeshes];
-	mMeshes[0] = *mContent->LoadFBX(mGraphics->GetDevice(), "res/fbx/sponza/sponza_skap.FBX", temp);
-	mMeshes[1] = *mContent->LoadFBX(mGraphics->GetDevice(), "res/fbx/sponza/sponza_S_ba.FBX", temp);
-	mMeshes[2] = *mContent->LoadFBX(mGraphics->GetDevice(), "res/fbx/sponza/sponza_St_kp.FBX", temp);
-	mMeshes[3] = *mContent->LoadFBX(mGraphics->GetDevice(), "res/fbx/sponza/sponza_STUB.FBX", temp);
-	mMeshes[4] = *mContent->LoadFBX(mGraphics->GetDevice(), "res/fbx/sponza/sponza_KAMEN.FBX", temp);
-	mMeshes[5] = *mContent->LoadFBX(mGraphics->GetDevice(), "res/fbx/sponza/sponza_KAMEN-stup.FBX", temp);
-	mMeshes[6] = *mContent->LoadFBX(mGraphics->GetDevice(), "res/fbx/sponza/sponza_PROZOR.FBX", temp);
-	mMeshes[7] = *mContent->LoadFBX(mGraphics->GetDevice(), "res/fbx/sponza/sponza_reljef.FBX", temp);
-	mMeshes[8] = *mContent->LoadFBX(mGraphics->GetDevice(), "res/fbx/sponza/sponza_Sp_luk.FBX", temp);
-	mMeshes[9] = *mContent->LoadFBX(mGraphics->GetDevice(), "res/fbx/sponza/sponza_vrata_ko.FBX", temp);
-	mMeshes[10] = *mContent->LoadFBX(mGraphics->GetDevice(), "res/fbx/sponza/sponza_vrata_kr.FBX", temp);
-	mMeshes[11] = *mContent->LoadFBX(mGraphics->GetDevice(), "res/fbx/sponza/sponza_x01_st.FBX", temp);
-	mMeshes[12] = *mContent->LoadFBX(mGraphics->GetDevice(), "res/fbx/sponza/sponza_UNKNOWN.FBX", temp);
-
-	mNumTextures = 13;
+	mNumTextures = 1;
 	mTextures = new Texture[mNumTextures];
 
-	mTextures[0] = *mContent->LoadTGA(mGraphics->GetDevice(), mGraphics->GetImmediateContext(), "res/tga/sponza/00_skap.tga");
-	mTextures[1] = *mContent->LoadTGA(mGraphics->GetDevice(), mGraphics->GetImmediateContext(), "res/tga/sponza/01_S_ba.tga");
-	mTextures[2] = *mContent->LoadTGA(mGraphics->GetDevice(), mGraphics->GetImmediateContext(), "res/tga/sponza/01_St_kp.tga");
-	mTextures[3] = *mContent->LoadTGA(mGraphics->GetDevice(), mGraphics->GetImmediateContext(), "res/tga/sponza/01_STUB.tga");
-	mTextures[4] = *mContent->LoadTGA(mGraphics->GetDevice(), mGraphics->GetImmediateContext(), "res/tga/sponza/KAMEN.tga");
-	mTextures[5] = *mContent->LoadTGA(mGraphics->GetDevice(), mGraphics->GetImmediateContext(), "res/tga/sponza/KAMEN-stup.tga");
-	mTextures[6] = *mContent->LoadTGA(mGraphics->GetDevice(), mGraphics->GetImmediateContext(), "res/tga/sponza/prozor1.tga");
-	mTextures[7] = *mContent->LoadTGA(mGraphics->GetDevice(), mGraphics->GetImmediateContext(), "res/tga/sponza/reljef.tga");
-	mTextures[8] = *mContent->LoadTGA(mGraphics->GetDevice(), mGraphics->GetImmediateContext(), "res/tga/sponza/sp_luk.tga");
-	mTextures[9] = *mContent->LoadTGA(mGraphics->GetDevice(), mGraphics->GetImmediateContext(), "res/tga/sponza/vrata_ko.tga");
-	mTextures[10] = *mContent->LoadTGA(mGraphics->GetDevice(), mGraphics->GetImmediateContext(), "res/tga/sponza/vrata_kr.tga");
-	mTextures[11] = *mContent->LoadTGA(mGraphics->GetDevice(), mGraphics->GetImmediateContext(), "res/tga/sponza/x01_st.tga");
-	mTextures[12] = *mContent->LoadTGA(mGraphics->GetDevice(), mGraphics->GetImmediateContext(), "res/tga/sponza/KAMEN-stup.tga");
+	mTextures[0] = *mContent->LoadTGA(mGraphics->GetDevice(), mGraphics->GetImmediateContext(), "res/tga/cratepallet_01_alb.tga");
 
 	for (size_t i = 0; i < mNumMeshes; i++)
 	{
@@ -103,11 +79,11 @@ void NoobieEngine::Start()
 	mMainCamera = new Camera();
 
 	// Set up the camera's projection
-	//mMainCamera->CreateProjection(XM_PI / 2.0f, (float)(mEngine->mClientWidth) / (float)(mEngine->GetScreenHeight), 0.1f, 1000.0f);
+	mMainCamera->CreateProjection(XM_PI / 2.0f, (float)(mGraphics->GetScreenWidth()) / (float)(mGraphics->GetScreenHeight()), 0.1f, 1000.0f);
 
-	XMFLOAT4 targetXMFloat = XMFLOAT4(0.0f, 4.0f, 2.0f, 1.0f);
+	XMFLOAT4 targetXMFloat = XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f);
 
-	XMVECTOR pos = XMVectorSet(-7.0f, 1.8f, -2.0f, 1.0f);
+	XMVECTOR pos = XMVectorSet(-2.0f, 2.0f, -2.0f, 1.0f);
 	XMVECTOR target = XMLoadFloat4(&targetXMFloat);
 	XMVECTOR up = XMVectorSet(0.0f, 1.0f, 0.0f, 1.0f);
 
@@ -115,7 +91,7 @@ void NoobieEngine::Start()
 	mMainCamera->SetViewMatrix(V);
 
 	mDirLight = new DirectionalLight();
-	mDirLight->Ambient = XMFLOAT4(0.1f, 0.1f, 0.1f, 1.0f);
+	mDirLight->Ambient = XMFLOAT4(0.5f, 0.5f, 0.5f, 1.0f);
 	mDirLight->Intensity = XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f);
 	mDirLight->Direction = XMFLOAT3(0.5773f, -0.5773f, 0.5773f);
 
@@ -139,6 +115,7 @@ void NoobieEngine::Start()
 void NoobieEngine::Update()
 {
 	// Run Updates Here
+	mTimer.Tick();
 }
 
 void NoobieEngine::Draw()

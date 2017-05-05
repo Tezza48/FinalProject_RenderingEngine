@@ -21,7 +21,7 @@
 using namespace DirectX;
 using namespace DX;
 
-class D3D11Graphics : IRenderFramework
+class D3D11Graphics/* : public IRenderFramework*/
 {
 	// Rasterizer state i'm using to debug stuff
 	ID3D11RasterizerState *mRS;
@@ -46,6 +46,8 @@ private:
 	bool m4xMsaaState = true;
 	UINT m4xMsaaQuality = 1;
 
+	int mClientWidth, mClientHeight;
+
 	// Initialize Direct 3D components
 	bool InitD3D(HWND hwnd);
 	// Initialize Specific pipeline objects
@@ -58,13 +60,16 @@ public:
 	ID3D11Device *GetDevice() const;
 	ID3D11DeviceContext *GetImmediateContext() const;
 
+	int GetScreenWidth();
+	int GetScreenHeight();
+
 	// Draw/Render the scene
 	void DrawBegin();
 	void DrawEnd();
 
 	// What to do when the Window is resized
-	void OnResize(HWND hwnd);
+	void OnResize(HWND hwnd, int width, int height);
 	
 	// Initialize the app
-	bool Init(HWND hwnd);
+	bool Init(HWND hwnd, int width, int height);
 };

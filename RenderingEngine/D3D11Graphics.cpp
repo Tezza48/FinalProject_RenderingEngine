@@ -41,8 +41,21 @@ ID3D11DeviceContext * D3D11Graphics::GetImmediateContext() const
 	return md3dImmediateContext;
 }
 
-bool D3D11Graphics::Init(HWND hwnd)
+int D3D11Graphics::GetScreenWidth()
 {
+	return mClientWidth;
+}
+
+int D3D11Graphics::GetScreenHeight()
+{
+	return mClientHeight;
+}
+
+bool D3D11Graphics::Init(HWND hwnd, int width, int height)
+{
+	mClientWidth = width;
+	mClientHeight = height;
+
 	if (!InitD3D(hwnd))
 		return false;
 
@@ -95,15 +108,18 @@ bool D3D11Graphics::InitD3D(HWND hwnd)
 	assert(m4xMsaaQuality > 0);
 
 	// For ease (and laziness) We initialize the rest by calling OnResize
-	OnResize(hwnd);
+	OnResize(hwnd, mClientWidth, mClientHeight);
 
 	return true;
 }
 
 // Resize the buffers we're using
 // If it's running, also remake the camera's projection.
-void D3D11Graphics::OnResize(HWND hwnd)
+void D3D11Graphics::OnResize(HWND hwnd, int width, int height)
 {
+	mClientWidth = width;
+	mClientHeight = height;
+
 	// Describe the Swap Chain
 	DXGI_SWAP_CHAIN_DESC sd;
 	sd.BufferDesc.Width = mClientWidth;
@@ -131,8 +147,6 @@ void D3D11Graphics::OnResize(HWND hwnd)
 
 	IDXGIFactory *dxgiFactory = 0;
 	ThrowIfFailed(dxgiAdapter->GetParent(__uuidof(IDXGIFactory), (void**)&dxgiFactory));
-
-	
 
 	ThrowIfFailed(dxgiFactory->CreateSwapChain(md3dDevice, &sd, &mSwapChain));
 	dxgiFactory->MakeWindowAssociation(hwnd, /*DXGI_MWA_NO_ALT_ENTER*/0);
@@ -223,7 +237,7 @@ bool D3D11Graphics::InitPipeline()
 void D3D11Graphics::DrawBegin()
 {	
 	// Clear the RTV and DSV in preparation for drawing
-	md3dImmediateContext->ClearRenderTargetView(mRenderTargetView, DirectX::Colors::Black);
+	md3dImmediateContext->ClearRenderTargetView(mRenderTargetView, DirectX::Colors::CornflowerBlue);
 
 	md3dImmediateContext->ClearDepthStencilView(mDepthStencilView,
 		D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, (UINT8) 0.0f);

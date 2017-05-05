@@ -1,5 +1,5 @@
 #pragma once
-
+/*
 
 #include <string>
 #include "GameTimer.h"
@@ -24,3 +24,4 @@ protected:
 	//virtual void Draw(const GameTimer &gt) = 0;
 };
 
+*/
